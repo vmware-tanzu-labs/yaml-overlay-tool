@@ -36,6 +36,8 @@ A yaml overlay tool with templating tendencies.
 - [License](#license)
 - [Contributing](#contributing)
 - [Code of Conduct](#code-of-conduct)
+- [Communication](#communication)
+	- [E-Mail](#e-mail)
 
 <!-- /TOC -->
 
@@ -348,7 +350,7 @@ metadata:
 This will render three versions of the file test.yaml for DEV, QA, and PROD, where the metadata.name field will have been extended as such `my-cool-app-DEV`, `my-cool-app-QA`, and `my-cool-app-PROD`.
 
 ## Author
-[Andrew J. Huffman](mailto:ahuffman@vmware.com)
+[Andrew J. Huffman](https://github.com/ahuffman)
 
 
 ## License
@@ -362,3 +364,8 @@ Please see our [Contribution Guide](CONTRIBUTING.md)
 
 ## Code of Conduct
 Please see our project's [Code of Conduct](CODE-OF-CONDUCT.md)
+
+## Communication
+
+### E-Mail
+Please join our mailing list on Google Groups: [yaml-overlay-tool-users](https://groups.google.com/g/yaml-overlay-tool-users)
