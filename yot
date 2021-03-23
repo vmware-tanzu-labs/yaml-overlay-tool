@@ -361,6 +361,89 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
         exit(1)
     return manifest
 
+def process_document_query(document_query_key, manifest):
+    """
+    Takes in the document_query_key and a yaml manifest for processing
+    Requires that all "and" operators get a match + at least 1 "or" operator
+    """
+    and_matched = ""
+    or_matched = []
+    # Loop through the list of operators ('and' or 'or')
+    for i in document_query_key:
+        try:
+            op = i["operator"]
+        except:
+            # not specifically set, defaults to 'and'
+            print('"operator" key not set, defaulting to "and"')
+            op = 'and'
+        if op == 'and':
+            print('"and" document_query operator')
+            for q in i["queries"]:
+                # check for a match
+                matches = test_for_key(q["key"], manifest)
+                if not matches[0]:
+                    ########################
+                    print(matches[1])
+                    for m in matches[1]:
+                        for v in m.to_dict().values():
+                            print(v)
+                    ############################leftoffhere
+                            if q["value"] == v:
+                                # we have a match in manifest
+                                and_matched = True
+                                print(f'matched {q["value"]} with query {q["key"]}')
+                            else:
+                                # no match, stop processing because they all need to have valid matches if op is 'and'
+                                and_matched = False
+                                print(f'no match on {q["value"]} with query {q["key"]}')
+                                break
+                elif matches[0]:
+                    # no match, stop processing because they all need to have matches if op is 'and'
+                    and_matched = False
+                    print(f'no matches returned from query {q["key"]}')
+                    break
+        elif op == 'or':
+            print('"or" document_query operator')
+            for q in i["queries"]:
+                matches = test_for_key(q["key"], manifest)
+                if not matches[0]:
+                    for m in matches[1]:
+                        for v in m.to_dict().values():
+                            print(v)
+                            if q["value"] == v:
+                                # we have a match in manifest, update or_matched list
+                                or_matched.append("yes")
+                                print(f'matched {q["value"]} with query {q["key"]}')
+                            else:
+                                # no match, update or_matched list
+                                or_matched.append("no")
+                                print(f'no match on {q["value"]} with query {q["key"]}')
+                else:
+                    # no matches
+                    or_matched.append("no")
+                    print(f'produced no matches returned from query {q["key"]} with value of {q["value"]}')
+        else:
+            print(f'error: {op} is not a recognized operator in a document_query key')
+            exit(1)
+    print(f'and_matched: {and_matched}')
+    print(f'or_matched: {or_matched}')
+    # Processing complete, setup return
+    if and_matched == "" and "yes" in or_matched:
+        # we didn't have any 'and' operator
+        print('returned "True" from "or" operator')
+        return True
+    elif len(or_matched) == 0 and and_matched:
+        # we didn't have any 'or' operator and a good 'and' operator
+        print('returned "True" from "and" operator')
+        return True
+    elif "yes" in or_matched or and_matched:
+        # one or the other
+        print('returned "True" from either "or" operator or "and" operator')
+        return True
+    else:
+        print('returned "False" from all document_query items')
+        return False
+
 def process_manifests(overlays, manifests, manifest_path, type, document=''):
     """
     Type can be either 'common' for common_overlays and overlays or 'document' for documents.overlays, which are processed slightly differently
@@ -393,8 +476,9 @@ def process_manifests(overlays, manifests, manifest_path, type, document=''):
                     # see if we have 'document_query' set
                     try:
                         # key and value are required if document_query set
-                        document_query = overlay["document_query"]["key"]
-                        document_query_value = overlay["document_query"]["value"]
+                        # document_query = overlay["document_query"]["key"]
+                        # document_query_value = overlay["document_query"]["value"]
+                        document_query = overlay["document_query"]
                         document_query_key = True
                     except:
                         document_query_key = False
@@ -428,23 +512,21 @@ def process_manifests(overlays, manifests, manifest_path, type, document=''):
                 on_missing = None
                 inject_path = []
             if type == "common":
+                manifest_count = 0 # to provide a doc path index on errors/warnings
                 for manifest in manifests[manifest_path]:
-                    manifest_count = 0 # to provide a doc path index on errors/warnigns
+                    print(f'manifest count is {manifest_count}')
                     # if we have a qualifier like document_index or document_query,
                     ## act on the manifest only if we have a proper match
+                    # if document_query_key and document_index_key:
                     if document_query_key and document_index_key:
                         # print('we have a document_query key and document_index key')
                         # we have both qualifiers
                         if manifest_count in document_index:
-                            # go deeper because the doc is in our document_index
-                            doc_match = test_for_key(document_query, manifest)
-                            if not doc_match[0]:
-                                # we had a result from query
-                                for m in doc_match[1]:
-                                    # scan the results to see if the result matches the qualifying value
-                                    if m[document_query] == document_query_value:
-                                        # if we have a match, then act
-                                        manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count))
+                            doc_query = process_document_query(document_query, manifest)
+                            print(doc_query)
+                            if doc_query:
+                                # queries successfully matched
+                                manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count))
                     elif document_index_key and not document_query_key:
                         # print('we have a document_index')
                         if manifest_count in document_index:
@@ -452,14 +534,11 @@ def process_manifests(overlays, manifests, manifest_path, type, document=''):
                             manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count))
                     elif document_query_key and not document_index_key:
                         # print('we have a document_query key')
-                        doc_match = test_for_key(document_query, manifest)
-                        if not doc_match[0]:
-                            # we had a result from query
-                            for m in doc_match[1]:
-                                # scan the results to see if the result matches the qualifying value
-                                if m[document_query] == document_query_value:
-                                    # if we have a match, then act
-                                    manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count))
+                        doc_query = process_document_query(document_query, manifest)
+                        print(doc_query)
+                        if doc_query:
+                            # queries successfully matched
+                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count))
                     else:
                         # process all yaml-docs in manifest with top-level common_overlays and overlays first
                         # print(manifest)
@@ -527,6 +606,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             common_overlays = []
             common_overlays_key = False
         for yaml_file in instructions[instruction_path]["yaml_files"]:
+            print(f'processing {yaml_file["path"]}')
             manifests = Box(box_dots=True)
             ## following try statement may be useful for debugging or verbose outputs
             # try:
