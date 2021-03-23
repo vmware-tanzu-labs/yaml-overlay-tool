@@ -3,12 +3,19 @@
 common_overlays:
   - name: "add a common label to all k8s Services"
     query: metadata.labels
-    value: {'kind': 'service'}
+    value: {'namespace': 'tanzu-dns'}
     action: merge
-    # qualifier to further refine when this is applied
+    # qualifier to further refine when this overlay is applied
     document_query:
-      key: kind
-      value: Service
+      # default operator behavior is 'and' and has been omitted as an example of
+      ## this behavior
+      - queries:
+        - key: kind
+          value: Service
+      - operator: or
+        queries:
+        - key: metadata.name
+          value: pvc-var-cache-bind
   - name: "add a common label to everything"
     query: metadata.labels
     value: {'cool_label': 'bro'}

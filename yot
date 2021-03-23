@@ -364,7 +364,7 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
 def process_document_query(document_query_key, manifest):
     """
     Takes in the document_query_key and a yaml manifest for processing
-    Requires that all "and" operators get a match + at least 1 "or" operator
+    Requires that all "and" operators get a match or at least 1 "or" operator
     """
     and_matched = ""
     or_matched = []
