@@ -1,7 +1,7 @@
 ---
 # the common_overlays apply to all yaml_files listed out in 'yaml_files' and are processed first on each file
 common_overlays:
-  - name: "add a common label to all k8s Services"
+  - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels
     value: {'namespace': 'tanzu-dns'}
     action: merge
@@ -9,13 +9,17 @@ common_overlays:
     document_query:
       # default operator behavior is 'and' and has been omitted as an example of
       ## this behavior
-      - queries:
-        - key: kind
-          value: Service
-      - operator: or
-        queries:
-        - key: metadata.name
-          value: pvc-var-cache-bind
+      # all of the 'and' operator queries must match or any one of the 'or'
+      ## operator queries
+    - queries:
+      - key: kind
+        value: Service
+      - key: metadata.labels.'app.kubernetes.io/name'
+        value: external-dns
+    - operator: or
+      queries:
+      - key: metadata.name
+        value: pvc-var-cache-bind
   - name: "add a common label to everything"
     query: metadata.labels
     value: {'cool_label': 'bro'}
@@ -24,85 +28,85 @@ yaml_files: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
-      - name: "delete all annotations"
-        query: metadata.annotations
-        value: {}
-        action: "delete"
-      - name: "add in a new label"
-        query: metadata.labels
-        value: {'some': 'thing'}
-        action: "merge"
-        on_missing:
-          action: "inject" # inject | ignore
-      - name: "Change the apiVersion to v2alpha1"
-        query: apiVersion
-        value: v2alpha1
-        action: replace
-      # on the following 2 items, notice that the on_missing is not set
-      ## these will only affect the yaml docs that have matches, otherwise ignore
-      - name: "Merge in a list item"
-        query: spec.ports
-        value:
-          - name: dns-tcp
-            port: 53
-            protocol: TCP
-            targetPort: dns-tcp
-        action: merge
-      # not really a real-world example, but showing off functionality
-      - name: "now replace the merged list with just the new port"
-        query: spec.ports
-        value:
-          - name: dns-tcp
-            port: 53
-            protocol: TCP
-            targetPort: dns-tcp
-        action: replace
-      # next one shouldn't do anything because no on_missing = implicit ignore
-      - query: status
-        value: {}
-        action: "merge"
-      - name: "Demo the need for an inject path"
-        query: fake.key1.*
-        value: {'fake': 'content1'}
-        action: "merge"
-        on_missing:
-          action: "inject"
-      # same as previous, but with an inject_path (actually does this one)
-      - name: "Show same example but with an inject_path"
-        query: fake.key2.*
-        value: {'fake': 'content2'}
-        action: "merge"
-        on_missing:
-          action: "inject"
-          inject_path: fake2.key2
-        # qualifier to only apply to the first doc in the yaml file
-        document_index:
-          - 0
+    - name: "delete all annotations"
+      query: metadata.annotations
+      value: {}
+      action: "delete"
+    - name: "add in a new label"
+      query: metadata.labels
+      value: {'some': 'thing'}
+      action: "merge"
+      on_missing:
+        action: "inject" # inject | ignore
+    - name: "Change the apiVersion to v2alpha1"
+      query: apiVersion
+      value: v2alpha1
+      action: replace
+    # on the following 2 items, notice that the on_missing is not set
+    ## these will only affect the yaml docs that have matches, otherwise ignore
+    - name: "Merge in a list item"
+      query: spec.ports
+      value:
+        - name: dns-tcp
+          port: 53
+          protocol: TCP
+          targetPort: dns-tcp
+      action: merge
+    # not really a real-world example, but showing off functionality
+    - name: "now replace the merged list with just the new port"
+      query: spec.ports
+      value:
+        - name: dns-tcp
+          port: 53
+          protocol: TCP
+          targetPort: dns-tcp
+      action: replace
+    # next one shouldn't do anything because no on_missing = implicit ignore
+    - query: status
+      value: {}
+      action: "merge"
+    - name: "Demo the need for an inject path"
+      query: fake.key1.*
+      value: {'fake': 'content1'}
+      action: "merge"
+      on_missing:
+        action: "inject"
+    # same as previous, but with an inject_path (actually does this one)
+    - name: "Show same example but with an inject_path"
+      query: fake.key2.*
+      value: {'fake': 'content2'}
+      action: "merge"
+      on_missing:
+        action: "inject"
+        inject_path: fake2.key2
+      # qualifier to only apply to the first doc in the yaml file
+      document_index:
+        - 0
     documents: # optional and only used for multi-doc yaml files
     # need to refer to them by their index
-      - name: the manifest that does something
-        path: 0
-        overlays:
-          - query: a.b.c.d
-            value: {'foo': 'bar'}
-            action: merge
-            on_missing:
-              action: "inject"
-          - query: metadata.labels
-            value: {'some': 'one'}
-            action: merge
-            on_missing:
-              action: "inject"
-          # demos multiple inject paths on missing
-          - query: x.*
-            value: {'x': 'x'}
-            action: merge
-            on_missing:
-              action: "inject"
-              inject_path:
-                - x
-                - y
-                - z
+    - name: the manifest that does something
+      path: 0
+      overlays:
+        - query: a.b.c.d
+          value: {'foo': 'bar'}
+          action: merge
+          on_missing:
+            action: "inject"
+        - query: metadata.labels
+          value: {'some': 'one'}
+          action: merge
+          on_missing:
+            action: "inject"
+        # demos multiple inject paths on missing
+        - query: x.*
+          value: {'x': 'x'}
+          action: merge
+          on_missing:
+            action: "inject"
+            inject_path:
+              - x
+              - y
+              - z
   # demoing application of 'common_overlays' without a 'overlays' or 'documents' key
   - name: "another file"
     path: "examples/manifests/another.yaml"

@@ -162,24 +162,83 @@ Qualifiers are a means to further refine when an overlay is applied to a yaml do
 
 ##### document_query Qualifier
 
-The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay with another value contained in a yaml document within a file.
+The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
 
+Think of the document_query as a set of conditions that must be met before applying this overlay to the yaml document.
+
+The `document_query` key is a list/array which contains the following top-level keys:
+
+###### document_query Top-level keys
+
+| Key | Description | Type |
+| --- | --- | --- |
+| operator | Optional key to allow for complex qualification scenarios. This will default to a value of `and` if `operator` key is omitted. Accepts either `and` or `or`.  If operator is `and`, each one of the key/value queries must be valid matches. If the operator is `or` then any single one of the key/value queries must be valid matches.  You can use a combination of the `and` and `or` operators in the `document_query` array. | string |
+| queries | A list/array of key/value JSONPath queries to perform with the `operator` to qualify application of an overlay | list |
+
+####### document_query.queries keys
 | Key | Description | Type |
 | --- | --- | --- |
 | key | The key to search for within a yaml document written as a fully-qualified JSONpath expression (dot-notation) | string |
 | value | The value that the query must return from the `key` query, before an overlay action will be applied to a document. | string |
 
-##### document_query Example
+##### document_query Examples
+
+The following example demonstrates use of the `and` `operator` with the optional `operator` key being omitted. However, the default behavior of the `operator` key is `and`, and if more than one key/value `queries` were listed, all would have to match within the yaml document prior to the overlay's application.  Think of each query as "match this" and "match this".
 
 ```yaml
+# with document_query operator omitted
 common_overlays:
 - name: Change the namespace for all k8s Deployments
   query: metadata.namespace
   value: my-namespace
   action: replace
   document_query:
-    key: kind
-    value: Deployment
+  - queries:
+    - key: kind
+      value: Deployment
+
+# exactly same behavior, but with the operator specified
+common_overlays:
+- name: Change the namespace for all k8s Deployments
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  document_query:
+  - operator: and
+    queries:
+    - key: kind
+      value: Deployment
+
+# With multiple queries, must be a Deployment with a specific label to get applied
+common_overlays:
+- name: Change the namespace for all k8s Deployments with name label of cool-app
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  document_query:
+  - operator: and
+    queries:
+    - key: kind
+      value: Deployment
+    - key: metadata.labels.`app.kubernetes.io/name`
+      value: cool-app
+```
+
+The following example demonstrates use of the `or` `operator`.  Any single one of these key/value queries would need to match within the yaml document prior to the overlay's application. Think of each query as "match this" or "match this".
+
+```yaml
+common_overlays:
+- name: Change the namespace for all k8s Deployments or Services
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  document_query:
+  - operator: or
+    queries:
+    - key: kind
+      value: Deployment
+    - key: kind:
+      value: Service
 ```
 
 ##### document_index Qualifier
@@ -213,8 +272,10 @@ common_overlays: # optional way to apply overlays to all 'yaml_files'
   on_missing: # optional - what to do if 'query' not found in yaml
     action: inject # inject | ignore, default of ignore if on_missing not set
   document_query: # qualifier
-    key: kind # search for the 'kind' key in the yaml doc
-    value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
+  - operator: and # <-- 'operator' key default is 'and' and could be omitted
+    queries:
+    - key: kind # search for the 'kind' key in the yaml doc
+      value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
 yaml_files: # what to overlay onto
 - name: "some arbitrary descriptor" # Name is Optional
   path: "path/relative/to/directory/of/execution.yaml" # or
