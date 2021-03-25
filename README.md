@@ -3,6 +3,7 @@
 A yaml overlay tool with templating tendencies.
 
 ## Table of Contents
+
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Table of Contents](#table-of-contents)
@@ -19,7 +20,7 @@ A yaml overlay tool with templating tendencies.
 		- [Qualifiers](#qualifiers)
 			- [document_query Qualifier](#documentquery-qualifier)
 				- [document_query Top-level keys](#documentquery-top-level-keys)
-				- [# document_query.queries keys](#-documentqueryqueries-keys)
+				- [document_query conditions keys](#documentquery-conditions-keys)
 			- [document_query Examples](#documentquery-examples)
 			- [document_index Qualifier](#documentindex-qualifier)
 		- [Instructions File Full-Specification Example](#instructions-file-full-specification-example)
@@ -42,7 +43,6 @@ A yaml overlay tool with templating tendencies.
 	- [E-Mail](#e-mail)
 
 <!-- /TOC -->
-
 
 ## Why?
 
@@ -175,72 +175,60 @@ Qualifiers are a means to further refine when an overlay is applied to a yaml do
 
 ##### document_query Qualifier
 
-The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
+The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a `yaml_files.path`, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
 
-Think of the document_query as a set of conditions that must be met before applying this overlay to the yaml document.
+Think of the `document_query` as groups of conditions that must be met before applying this overlay to the yaml document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
 
-The `document_query` key is a list/array which contains the following top-level keys:
+The `document_query` key is a list/array which contains a list of the following top-level keys:
 
 
 ###### document_query Top-level keys
 
 | Key | Description | Type |
 | --- | --- | --- |
-| operator | Optional key to allow for complex qualification scenarios. This will default to a value of `and` if `operator` key is omitted. Accepts either `and` or `or`.  If operator is `and`, each one of the key/value queries must be valid matches. If the operator is `or` then any single one of the key/value queries must be valid matches.  You can use a combination of the `and` and `or` operators in the `document_query` array. | string |
-| queries | A list/array of key/value JSONPath queries to perform with the `operator` to qualify application of an overlay | list |
+| conditions | A grouping of conditions that must exist in a yaml document to qualify application of an overlay. Each `document_query` list can contain one or many condition groups.  Each list of `conditions` contains a list of key/value pairs that must all return valid matches with expected values prior to qualifying application of an overlay. | list |
 
 
-####### document_query.queries keys
+###### document_query conditions keys
 
 | Key | Description | Type |
 | --- | --- | --- |
-| key | The key to search for within a yaml document written as a fully-qualified JSONpath expression (dot-notation) | string |
-| value | The value that the query must return from the `key` query, before an overlay action will be applied to a document. | string |
+| key | The key to search for within a yaml document expressed as a JSONPath query or dot-notation. | string |
+| value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action will be applied to a document. | string |
+
 
 ##### document_query Examples
 
-The following example demonstrates use of the `and` `operator` with the optional `operator` key being omitted. However, the default behavior of the `operator` key is `and`, and if more than one key/value `queries` were listed, all would have to match within the yaml document prior to the overlay's application.  Think of each query as "match this" and "match this".
+The following example demonstrates use of `common_overlays` with a `document_query` to qualify when the overlay will be applied.  All key/value pairs within each `conditions` item would have to contain a valid matched result within the yaml document prior to the overlay's application.  
+
+Think of each grouping of `conditions` as "match this" or "match this".  Think of each condition within a group of `conditions` as "match this" and "match this".
 
 ```yaml
-# with document_query operator omitted
 common_overlays:
 - name: Change the namespace for all k8s Deployments
   query: metadata.namespace
   value: my-namespace
   action: replace
   document_query:
-  - queries:
+  - conditions:
     - key: kind
       value: Deployment
 
-# exactly same behavior, but with the operator specified
-common_overlays:
-- name: Change the namespace for all k8s Deployments
-  query: metadata.namespace
-  value: my-namespace
-  action: replace
-  document_query:
-  - operator: and
-    queries:
-    - key: kind
-      value: Deployment
-
-# With multiple queries, must be a Deployment with a specific label to get applied
+# With multiple conditions, must be a Deployment with a specific label to get applied
 common_overlays:
 - name: Change the namespace for all k8s Deployments with name label of cool-app
   query: metadata.namespace
   value: my-namespace
   action: replace
   document_query:
-  - operator: and
-    queries:
+  - conditions:
     - key: kind
       value: Deployment
     - key: metadata.labels.`app.kubernetes.io/name`
       value: cool-app
 ```
 
-The following example demonstrates use of the `or` `operator`.  Any single one of these key/value queries would need to match within the yaml document prior to the overlay's application. Think of each query as "match this" or "match this".
+The following example demonstrates use of multiple `document_query` groupings.  Any single one of these key/value conditions groups would need to match within the yaml document prior to the overlay's application. Think of each group of conditions as "match this" or "match this".
 
 ```yaml
 common_overlays:
@@ -249,10 +237,10 @@ common_overlays:
   value: my-namespace
   action: replace
   document_query:
-  - operator: or
-    queries:
+  - conditions:
     - key: kind
       value: Deployment
+  - conditions:
     - key: kind:
       value: Service
 ```
@@ -288,8 +276,10 @@ common_overlays: # optional way to apply overlays to all 'yaml_files'
   on_missing: # optional - what to do if 'query' not found in yaml
     action: inject # inject | ignore, default of ignore if on_missing not set
   document_query: # qualifier
-  - operator: and # <-- 'operator' key default is 'and' and could be omitted
-    queries:
+  # array/list of condition groupings. Each array of conditions is treated separately
+  # each grouping of conditions must all match. If 1 group of conditions returns
+  ## True, then the overlay will get applied
+  - conditions:
     - key: kind # search for the 'kind' key in the yaml doc
       value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
 yaml_files: # what to overlay onto
