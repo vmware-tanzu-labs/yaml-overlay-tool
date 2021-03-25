@@ -381,7 +381,7 @@ def test_document_query(document_query_key, manifest):
             exit(1)
         condition_group_matched = []
         for c in i["conditions"]:
-            # succeed early
+            # succeed early, since only one of these 'i' groupings needs be True
             if True in matched:
                 return True
             # check for a match
@@ -594,7 +594,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             common_overlays = []
             common_overlays_key = False
         for yaml_file in instructions[instruction_path]["yaml_files"]:
-            print(f'processing {yaml_file["path"]}')
+            # print(f'processing {yaml_file["path"]}')
             manifests = Box(box_dots=True)
             ## following try statement may be useful for debugging or verbose outputs
             # try:
