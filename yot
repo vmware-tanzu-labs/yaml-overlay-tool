@@ -367,83 +367,68 @@ def test_document_query(document_query_key, manifest):
     """
     Takes in the document_query_key and a yaml manifest for checking if we
     should apply the overlay to a document.
-    Requires that all "and" operator queries get a match or at least 1
-    "or" operator query must match to return True and allow application of the
-    overlay
+    Requires that all conditions in each item all match. If the group of
+    conditions all match, then we add a True to the matched list var. If True is in
+    the matched list, then we will return True, otherwise we'll return False
     """
-    and_matched = ""
-    or_matched = []
-    # Loop through the list of operators ('and' or 'or')
+    matched = []
+    # Loop through the groupings of document_query conditions
     for i in document_query_key:
         try:
-            op = i["operator"]
+            conditions = i["conditions"]
         except:
-            # not specifically set, defaults to 'and'
-            # print('"operator" key not set, defaulting to "and"')
-            op = 'and'
-        if op == 'and':
-            # print('"and" document_query operator')
-            for q in i["queries"]:
-                # check for a match
-                matches = test_for_key(q["key"], manifest)
-                if not matches[0]:
-                    # print(matches[1])
-                    for m in matches[1]:
-                        for v in m.to_dict().values():
-                            # print(v)
-                            if q["value"] == v:
-                                # we have a match in manifest
-                                and_matched = True
-                                # print(f'matched {q["value"]} with query {q["key"]}')
-                            else:
-                                # no match, stop processing because they all need to have valid matches if op is 'and'
-                                and_matched = False
-                                # print(f'no match on {q["value"]} with query {q["key"]}')
-                                break
-                elif matches[0]:
-                    # no match, stop processing because they all need to have matches if op is 'and'
-                    and_matched = False
-                    # print(f'no matches returned from query {q["key"]}')
-                    break
-        elif op == 'or':
-            # print('"or" document_query operator')
-            for q in i["queries"]:
-                matches = test_for_key(q["key"], manifest)
-                if not matches[0]:
-                    for m in matches[1]:
-                        for v in m.to_dict().values():
-                            # print(v)
-                            if q["value"] == v:
-                                # we have a match in manifest, update or_matched list
-                                or_matched.append("yes")
-                                # print(f'matched {q["value"]} with query {q["key"]}')
-                            else:
-                                # no match, update or_matched list
-                                or_matched.append("no")
-                                # print(f'no match on {q["value"]} with query {q["key"]}')
-                else:
-                    # no matches
-                    or_matched.append("no")
-                    # print(f'produced no matches from query {q["key"]} with value of {q["value"]}')
-        else:
-            print(f'error: {op} is not a recognized operator in a document_query key')
+            print(f'the document_query item did not have a "conditions" key:\n{i}\n...exiting')
             exit(1)
-    # print(f'and_matched: {and_matched}')
-    # print(f'or_matched: {or_matched}')
+        condition_group_matched = []
+        for c in i["conditions"]:
+            # succeed early
+            if True in matched:
+                return True
+            # check for a match
+            matches = test_for_key(c["key"], manifest)
+            if not matches[0]:
+                # print(matches[1])
+                for m in matches[1]:
+                    for v in m.to_dict().values():
+                        # print(v)
+                        if c["value"] == v:
+                            # we have a match in manifest
+                            condition_group_matched.append(True)
+                            # print(f'matched {c["value"]} with query {c["key"]}')
+                        else:
+                            # no match, stop processing because they all need to have valid matches if op is 'and'
+                            condition_group_matched.append(False)
+                            # print(f'no match on {c["value"]} with query {c["key"]}')
+                            break
+                    if False in condition_group_matched:
+                        # print('exited document_query grouping check because of a non-match')
+                        break
+            elif matches[0]:
+                # no match, stop processing because they all need to have matches if op is 'and'
+                condition_group_matched.append(False)
+                # print(f'no matches returned from query {q["key"]}')
+                break
+        if False in condition_group_matched:
+            matched.append(False)
+        if False not in condition_group_matched and len(condition_group_matched) > 0 and True in condition_group_matched:
+            matched.append(True)
+        # print(f'processed document_query results for item:\n{i["conditions"]}')
+        # print(f'condition_group_matched: {condition_group_matched}\n')
     # Processing complete, setup return
-    if and_matched == "" and "yes" in or_matched:
-        # we didn't have any 'and' operator
-        # print('returned "True" from "or" operator')
+    # print(f'matched: {matched}')
+    if len(matched) == 0:
+        # we didn't have any proper conditions
+        # print('returned "False" from "document_query"')
+        return False
+    elif True in matched:
+        # one of the condition groupings has matched
+        # print('returned "True" from "document_query"')
         return True
-    elif len(or_matched) == 0 and and_matched:
-        # we didn't have any 'or' operator and a good 'and' operator
-        # print('returned "True" from "and" operator')
-        return True
-    elif "yes" in or_matched or and_matched:
-        # one or the other
-        # print('returned "True" from either "or" operator or "and" operator')
-        return True
+    elif True not in matched:
+        # print('returned "False" from "document_query"')
+        return False
     else:
+        # catch all
         # print('returned "False" from all document_query items')
         return False
 
@@ -609,7 +594,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             common_overlays = []
             common_overlays_key = False
         for yaml_file in instructions[instruction_path]["yaml_files"]:
-            # print(f'processing {yaml_file["path"]}')
+            print(f'processing {yaml_file["path"]}')
             manifests = Box(box_dots=True)
             ## following try statement may be useful for debugging or verbose outputs
             # try:
