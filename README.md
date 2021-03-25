@@ -3,6 +3,7 @@
 A yaml overlay tool with templating tendencies.
 
 ## Table of Contents
+
 <!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [Table of Contents](#table-of-contents)
@@ -18,7 +19,9 @@ A yaml overlay tool with templating tendencies.
 		- [documents keys](#documents-keys)
 		- [Qualifiers](#qualifiers)
 			- [document_query Qualifier](#documentquery-qualifier)
-			- [document_query Example](#documentquery-example)
+				- [document_query Top-level keys](#documentquery-top-level-keys)
+				- [document_query conditions keys](#documentquery-conditions-keys)
+			- [document_query Examples](#documentquery-examples)
 			- [document_index Qualifier](#documentindex-qualifier)
 		- [Instructions File Full-Specification Example](#instructions-file-full-specification-example)
 - [Order of Operations](#order-of-operations)
@@ -41,7 +44,6 @@ A yaml overlay tool with templating tendencies.
 
 <!-- /TOC -->
 
-
 ## Why?
 
 `yot` was designed to be flexible, simple, and familiar.  Whether you want the ability to use a templating language to transform yaml data, or just change a couple values in a yaml document, `yot` makes it possible.  
@@ -55,9 +57,11 @@ This practice gets you out of the cycle of updating and managing complex yaml te
 The use of JSONpath queries and Jinja2 templating give the tool familiar interfaces, making adoption easier, and a more pleasant end-user experience.  The specification, or instructions file, is put together in a declarative way, where we only operate on what has been defined.  We take actions based on JSONpath query results.  We provide flexibility by allowing your instructions to be templated if needed.  The following sections will help get you moving along with `yot`!
 
 ## Usage
+
 `./yot -h`
 
 ### Example Usage
+
 ```bash
 # with no templating
 ./yot \
@@ -74,6 +78,7 @@ The use of JSONpath queries and Jinja2 templating give the tool familiar interfa
 ```
 
 ## Setup
+
 Install the required Python3 libraries:
 ```bash
 pip3 install -r ./requirements.txt
@@ -82,6 +87,7 @@ pip3 install -r ./requirements.txt
 If you would like to try an interactive tutorial on installing `yot`, go [here](https://katacoda.com/ahuffman/scenarios/tool-setup)
 
 ## Quick Start
+
 `yot` is not a templating tool in the sense of a traditional text-based templating tool.  `yot` is primarily an overlayment tool, meaning we take fragments of yaml configuration and apply or inject them over the top of an existing yaml configuration.  
 
 `yot` also includes a templating feature by making use of the popular [Jinja2](https://jinja.palletsprojects.com/en/master/templates/) templating language to allow for templated overlay values which are rendered into memory and processed at run-time.  Use of the templating engine is completely optional, and instruction files can be static yaml documents.  When using the templating engine, anything within the instructions file can be templated, but keep in mind the document must template into a valid yaml document.  The template feature is useful if you are managing multi-environment yaml configurations.  Values files are also treated as templates, and can contain jinja2 content.  This is most useful in a scenario with a lot of values, where you would like to organize them into separate files and use the `{% include 'addl_values.yaml' %}` [Jinja2](https://jinja.palletsprojects.com/en/master/templates/#include) tag.  This is also extremely useful for large instruction files.
@@ -89,9 +95,11 @@ If you would like to try an interactive tutorial on installing `yot`, go [here](
 Each overlay operation can be performed with a JSONpath query.  If a JSONpath query produces no results in the yaml document, a desired value can be either ignored (default behavior) or injected (`on_missing: {'action': 'inject'}`) and provided a specific path (`on_missing: {'inject_path': []}`) to inject the value if the query was not a fully-qualified JSONpath (example: `metadata.labels.*` <= query VS. `metadata.labels` <= fully-qualified path).
 
 ### The Instructions File
+
 What is an instructions file?  A yaml document that contains a list of yaml documents to perform operations on.  Each instructions file starts with the key `yaml_files`, which is a list, along with an optional key `common_overlays` which is also a list.
 
 #### Top-level common_overlays Keys
+
 The `common_overlays` key is completely optional, and is a means to providing overlays that should be applied to every `yaml_files` list item or `yaml_files[*].documents[*].path` defined in the instructions. Each list item in the `common_overlays` key is treated as a dictionary with the following top-level keys:
 
 | key | required | description | default | type |
@@ -105,6 +113,7 @@ The `common_overlays` key is completely optional, and is a means to providing ov
 | document_query | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yaml_files`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary |
 
 #### Top-Level yaml_files Keys
+
 Each list item in the `yaml_files` key is treated as a dictionary with the following top-level keys:
 
 | key | required | description | default | type |
@@ -115,6 +124,7 @@ Each list item in the `yaml_files` key is treated as a dictionary with the follo
 | documents | no | List of overlay operations to apply to a multi-document yaml file.  When each document from a multi-document yaml file is loaded, an overlay can be applied by addressing the document by its index.  See [documents keys](#documents-keys) for available dictionary keys. | None | list of dictionaries |
 
 #### overlays keys
+
 The `overlays` key is the main place to set your overlay operation instructions, but is an optional setting.  If working with multi-document yaml files, the items set under the `overlays` key will apply to all yaml documents in the file, unless a qualifier or combination of qualifiers `document_query` and `document_index` are provided. The `overlays` are processed prior to overlays in the [documents key](#documents-keys) instructions.  Each `overlays` list item can have the following keys set:
 
 
@@ -131,6 +141,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 
 
 #### documents keys
+
 The `documents` list applies only to multi-document yaml files and is completely optional the same as the top-level `overlays` key is.  If you require changes to a specific yaml document in the multi-document yaml file, then this is where you define them.  Actions in the `documents` key are processed after actions in the top-level `overlays` key.  Think of the `common_overlays` key as a place to perform changes on all files listed in `yaml_files`, while the `overlays` key is a place to perform your "common" changes within a single file, and actions defined here in the `documents` key are for making specific changes to a specific document within the yaml file.
 
 The keys in the `documents` list are the same as found in the [Top-Level Instructions Keys](#top-level-instructions-keys), except you will refer to the `path` key as a numeric value.  This numeric value represents the positional index of the yaml document within the multi-document yaml file.  You can determine this numeric value by referring to your file, and counting each document starting at `0`.  Qualifiers such as the `document_query` and `document_index` are not available here, because we are performing actions on a specific document within a file.
@@ -158,18 +169,39 @@ In the example above, the index which would be used for the `path` key have been
 
 
 #### Qualifiers
+
 Qualifiers are a means to further refine when an overlay is applied to a yaml document within a file path.  Currently `yot` has two kinds of qualifiers, `document_query` and `document_index`.  These can be used together or separately, or not at all.
+
 
 ##### document_query Qualifier
 
-The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay with another value contained in a yaml document within a file.
+The `document_query` qualifier can be used on either `common_overlays` or the `overlays` key on a `yaml_files.path`, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
+
+Think of the `document_query` as groups of conditions that must be met before applying this overlay to the yaml document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
+
+The `document_query` key is a list/array which contains a list of the following top-level keys:
+
+
+###### document_query Top-level keys
 
 | Key | Description | Type |
 | --- | --- | --- |
-| key | The key to search for within a yaml document written as a fully-qualified JSONpath expression (dot-notation) | string |
-| value | The value that the query must return from the `key` query, before an overlay action will be applied to a document. | string |
+| conditions | A grouping of conditions that must exist in a yaml document to qualify application of an overlay. Each `document_query` list can contain one or many condition groups.  Each list of `conditions` contains a list of key/value pairs that must all return valid matches with expected values prior to qualifying application of an overlay. | list |
 
-##### document_query Example
+
+###### document_query conditions keys
+
+| Key | Description | Type |
+| --- | --- | --- |
+| key | The key to search for within a yaml document expressed as a JSONPath query or dot-notation. | string |
+| value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action will be applied to a document. | string |
+
+
+##### document_query Examples
+
+The following example demonstrates use of `common_overlays` with a `document_query` to qualify when the overlay will be applied.  All key/value pairs within each `conditions` item would have to contain a valid matched result within the yaml document prior to the overlay's application.  
+
+Think of each grouping of `conditions` as "match this" or "match this".  Think of each condition within a group of `conditions` as "match this" and "match this".
 
 ```yaml
 common_overlays:
@@ -178,8 +210,39 @@ common_overlays:
   value: my-namespace
   action: replace
   document_query:
-    key: kind
-    value: Deployment
+  - conditions:
+    - key: kind
+      value: Deployment
+
+# With multiple conditions, must be a Deployment with a specific label to get applied
+common_overlays:
+- name: Change the namespace for all k8s Deployments with name label of cool-app
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  document_query:
+  - conditions:
+    - key: kind
+      value: Deployment
+    - key: metadata.labels.`app.kubernetes.io/name`
+      value: cool-app
+```
+
+The following example demonstrates use of multiple `document_query` groupings.  Any single one of these key/value conditions groups would need to match within the yaml document prior to the overlay's application. Think of each group of conditions as "match this" or "match this".
+
+```yaml
+common_overlays:
+- name: Change the namespace for all k8s Deployments or Services
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  document_query:
+  - conditions:
+    - key: kind
+      value: Deployment
+  - conditions:
+    - key: kind:
+      value: Service
 ```
 
 ##### document_index Qualifier
@@ -213,8 +276,12 @@ common_overlays: # optional way to apply overlays to all 'yaml_files'
   on_missing: # optional - what to do if 'query' not found in yaml
     action: inject # inject | ignore, default of ignore if on_missing not set
   document_query: # qualifier
-    key: kind # search for the 'kind' key in the yaml doc
-    value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
+  # array/list of condition groupings. Each array of conditions is treated separately
+  # each grouping of conditions must all match. If 1 group of conditions returns
+  ## True, then the overlay will get applied
+  - conditions:
+    - key: kind # search for the 'kind' key in the yaml doc
+      value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
 yaml_files: # what to overlay onto
 - name: "some arbitrary descriptor" # Name is Optional
   path: "path/relative/to/directory/of/execution.yaml" # or
@@ -247,6 +314,7 @@ yaml_files: # what to overlay onto
 ## Order of Operations
 
 ### 1a. Dynamic Instructions (Templating)
+
 When one or more values files have been passed to `yot` a `defaults.yaml` or `defaults.yml` file must exist within that path, when passing a directory with the `-v` option.  
 
 Alternatively, a single or multiple default value files can be passed with the `-d` option.
@@ -257,6 +325,7 @@ If you pass multiple default values files with the `-d` option, the first file p
 Any additional values files (files passed with `-v`) are treated as additional sites (or site values), and the values contained in those files are merged over the top of the `defaults.yaml` file's values.  The base filename of the additional values files are used to output the modified yaml files into.  
 
 #### Templating Example
+
 Consider the following example:
 
 ```bash
@@ -275,6 +344,7 @@ $ tree
 > **NOTE:**  Please be careful about naming your values files, as a values file called test.yaml and test.yml would dump both of their rendered contents into ./output/test
 
 ### 1b. Static Instructions (No Templating)
+
 If no values files were passed, then the instructions file skips the templating mechanism and is loaded directly, as long as the document is valid yaml.
 
 Consider the following example:
@@ -285,6 +355,7 @@ yot -i instructions.yaml -o ./output
 `yot` will read the instructions.yaml file and any outputs will be placed directly in ./output/ .
 
 ### 2. Processing Instructions
+
 After the instructions have either been rendered or read, they are processed.
 
 Processing begins at the instruction's `common_overlays` if they exist in the instruction set.  `yot` combines the `common_overlays` with the `yaml_files.path.overlays` first if they exist.  If `yaml_files.path.overlays` do not exist, `yot` combines `common_overlays` with `yaml_files.path.documents.path.overlays`.  In both of these scenarios, the `common_overlays` will always be applied prior to the more granular overlays.
@@ -292,6 +363,7 @@ Processing begins at the instruction's `common_overlays` if they exist in the in
 If no `common_overlays` have been defined, processing starts at the first item of the `yaml_files` list and processes one yaml file `path` at a time sequentially.  Within each yaml file `path`, `overlays` are processed first if set, followed by the items within the `documents` key, which applies overlays to specific documents within a multi-yaml document yaml file. A single yaml document in a yaml file could still be referred to by `path: 0` from the `documents` key if desired.
 
 ### 3. Output
+
 If no templating was performed, then output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output`.
 
 If values files in addition to a defaults.yaml were passed at runtime, then the output for each values file will be `<output directory>/<value file basename>`.
@@ -299,19 +371,24 @@ If values files in addition to a defaults.yaml were passed at runtime, then the 
 If only a defaults.yaml value file was passed, then the output will be placed in the output directory specified at runtime, or if it was not provided, the default path of `./output`.
 
 ## Details on How Types are Handled with Merge Actions
+
 The action of `merge` can affect how the `value` data gets applied to a yaml document, depending on the type of data it is.  This is fairly intuitive by design, but there are a few things to know so you can harness the full feature set of `yot`.
 
 
 ### Dictionary Merge Action
+
 When merging dictionary data, `yot` performs a deep merge on the original dictionary data with the new dictionary data.  This means any new keys are added into the existing values, and any identical keys with new values are simply updated. If this approach does not work for your situation, consider using the `replace` action.
 
 ### List Merge Action
+
 When merging list data, `yot` takes the original list data, and extends it with the new list data.  This is fairly intuitive, but worth calling out for clarity.
 
 ### String Merge Action
+
 When merging string data, `yot` takes the original string data and concatenates it with the new string data.  This is not initially intuitive, but can provide some interesting use-cases.  
 
 #### String Merge Examples
+
 A few use-cases that come to mind is adding on to a kubernetes `apiVersion` (i.e. v1 + alpha2 => outputs a change of v1alpha2).  In a templated instructions file with multiple values files for differing kubernetes clusters, a user could have the value of `site` set differently in each values file, such as:
 
 ```yaml
@@ -350,22 +427,27 @@ metadata:
 This will render three versions of the file test.yaml for DEV, QA, and PROD, where the metadata.name field will have been extended as such `my-cool-app-DEV`, `my-cool-app-QA`, and `my-cool-app-PROD`.
 
 ## Author
+
 [Andrew J. Huffman](https://github.com/ahuffman)
 
 
 ## License
+
 [MIT](LICENSE)  
 [NOTICE](NOTICE)
 
 
 ## Contributing
+
 Please see our [Contribution Guide](CONTRIBUTING.md)
 
 
 ## Code of Conduct
+
 Please see our project's [Code of Conduct](CODE-OF-CONDUCT.md)
 
 ## Communication
 
 ### E-Mail
+
 Please join our mailing list on Google Groups: [yaml-overlay-tool-users](https://groups.google.com/g/yaml-overlay-tool-users)
