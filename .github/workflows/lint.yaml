@@ -1,9 +1,9 @@
-name: Pylint
+name: Python
 
 on: [push]
 
 jobs:
-  build:
+  Lint:
 
     runs-on: ubuntu-latest
 
