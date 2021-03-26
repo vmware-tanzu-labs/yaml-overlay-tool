@@ -20,3 +20,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         find . -name '*.py' -exec pylint {} \;
+        pylint ./yot
