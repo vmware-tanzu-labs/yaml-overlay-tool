@@ -58,11 +58,11 @@ The use of JSONpath queries and Jinja2 templating give the tool familiar interfa
 
 ## Usage
 
-```bash
+```
 yot --help
 
 usage: yot [-h] [-d DEFAULT_VALUES_FILE] [-v VALUES_PATH] -i INSTRUCTION_FILE
-           [-o OUTPUT_DIRECTORY] [-s] [-r]
+           [-o OUTPUT_DIRECTORY] [-s] [-r] [-l LOG_FILE] [-V]
 
 yot (YAML overlay tool) is a yaml overlay tool which allows for the templating
 of overlay instruction data with jinja2, and the application of rendered
@@ -109,6 +109,12 @@ optional arguments:
                         reviewing how they were rendered prior to a full run
                         of yot. Equivalent to a dry-run. Exits with return
                         code 0 prior to processing instructions
+  -l LOG_FILE, --log-file LOG_FILE
+                        debug log file output path. Where to output the log
+                        to. Defaults to ./yot.log
+  -V, --log-verbosity   Log level verbosity (-V for critical, -VV for error,
+                        -VVV for warning, -VVVV for info, -VVVVV for debug).
+                        Defaults to -VVV (warning and above)
 ```
 
 ### Example Usage
