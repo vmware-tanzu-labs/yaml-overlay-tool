@@ -35,13 +35,13 @@ yaml_files: # what to overlay onto
       query: metadata.labels
       value: {'some': 'thing'}
       action: "merge"
-      on_missing:
+      onMissing:
         action: "inject" # inject | ignore
     - name: "Change the apiVersion to v2alpha1"
       query: apiVersion
       value: v2alpha1
       action: replace
-    # on the following 2 items, notice that the on_missing is not set
+    # on the following 2 items, notice that the onMissing is not set
     ## these will only affect the yaml docs that have matches, otherwise ignore
     - name: "Merge in a list item"
       query: spec.ports
@@ -60,7 +60,7 @@ yaml_files: # what to overlay onto
           protocol: TCP
           targetPort: dns-tcp
       action: replace
-    # next one shouldn't do anything because no on_missing = implicit ignore
+    # next one shouldn't do anything because no onMissing = implicit ignore
     - query: status
       value: {}
       action: "merge"
@@ -68,14 +68,14 @@ yaml_files: # what to overlay onto
       query: fake.key1.*
       value: {'fake': 'content1'}
       action: "merge"
-      on_missing:
+      onMissing:
         action: "inject"
     # same as previous, but with an inject_path (actually does this one)
     - name: "Show same example but with an inject_path"
       query: fake.key2.*
       value: {'fake': 'content2'}
       action: "merge"
-      on_missing:
+      onMissing:
         action: "inject"
         inject_path: fake2.key2
       # qualifier to only apply to the first doc in the yaml file
@@ -89,18 +89,18 @@ yaml_files: # what to overlay onto
         - query: a.b.c.d
           value: {'foo': 'bar'}
           action: merge
-          on_missing:
+          onMissing:
             action: "inject"
         - query: metadata.labels
           value: {'some': 'one'}
           action: merge
-          on_missing:
+          onMissing:
             action: "inject"
         # demos multiple inject paths on missing
         - query: x.*
           value: {'x': 'x'}
           action: merge
-          on_missing:
+          onMissing:
             action: "inject"
             inject_path:
               - x

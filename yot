@@ -346,9 +346,9 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                 for k in match.to_dict().keys():
                     manifest[k] = transform_data(k, overlay_value, match[k], action)
         else:
-            # handle on_missing, pass overlay_value twice,
+            # handle onMissing, pass overlay_value twice,
             ## because it'll update over itself
-            logging.debug('perform_overlayment:\n  on_missing case')
+            logging.debug('perform_overlayment:\n  onMissing case')
             if on_missing == "inject":
                 logging.debug('perform_overlayment: inject')
                 if len(inject_path) > 0:
@@ -395,11 +395,11 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                         else:
                             manifest[overlay_expression] = transform_data(overlay_expression, overlay_value, overlay_value, action)
                     else:
-                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a on_missing.inject_path to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
+                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a onMissing.inject_path to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
                         if not stdout:
-                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a on_missing.inject_path to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
+                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a onMissing.inject_path to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
             elif (on_missing != "ignore"):
-                logging.error(f'perform_overlayment:\n  "{on_missing}" is not a valid option for key "on_missing.action"')
+                logging.error(f'perform_overlayment:\n  "{onMissing}" is not a valid option for key "onMissing.action"')
                 exit_run(1)
     else:
         print(f'invalid action {action}. Must be one of \'delete\', \'merge\', or \'replace\'.\n ...exiting')
@@ -509,7 +509,7 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
         action = overlay["action"]
         # loop over all the queries for this overlay
         for expression in overlay_expression:
-            # on_missing does not apply to an action of delete
+            # onMissing does not apply to an action of delete
             if (action == "replace") or (action == "merge"):
                 if type == "common":
                     # see if we have 'document_query' set
@@ -528,12 +528,12 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                     except:
                         document_index_key = False
                         logging.debug('process_manifests:\n  document_index_key is False')
-                # see if we have on_missing set
+                # see if we have onMissing set
                 try:
-                    on_missing = overlay["on_missing"]["action"]
+                    on_missing = overlay["onMissing"]["action"]
                     try:
                         # see if we have an inject_path
-                        inject_path = overlay["on_missing"]["inject_path"]
+                        inject_path = overlay["onMissing"]["inject_path"]
                         # make it a list if it's a string
                         if isinstance(inject_path, str):
                             inject_path = [inject_path]
@@ -573,22 +573,22 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                         logging.debug(f'process_manifests:\n  we have a document_index')
                         if manifest_count in document_index:
                             # do the overlayment, because it's an index match
-                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
+                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_query_key and not document_index_key:
                         logging.debug('process_manifests:\n  we have a document_query key')
                         doc_query_valid = test_document_query(document_query, manifest)
                         logging.debug(f'process_manifests:\n  doc_query_valid: {doc_query_valid}')
                         if doc_query_valid:
                             # queries successfully matched
-                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
+                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
                     else:
                         # process all yaml-docs in manifest with top-level commonOverlays and overlays first
-                        manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
+                        manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
                     manifest_count += 1
             elif type == "document":
                 # we don't take document_query or document_index for the documents key
                 try:
-                    # it's possible to not have the specified doc index when on_missing.action == inject
+                    # it's possible to not have the specified doc index when onMissing.action == inject
                     manifests[manifest_path][document].merge_update(perform_overlayment(action, manifests[manifest_path][document], expression, overlay_value, on_missing, inject_path, manifest_path, document, stdout))
                 except:
                     # the doc path didn't exist, so lets create one
