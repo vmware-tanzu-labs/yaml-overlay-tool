@@ -1,6 +1,6 @@
 ---
-# the common_overlays apply to all yaml_files listed out in 'yaml_files' and are processed first on each file
-common_overlays:
+# the commonOverlays apply to all yaml_files listed out in 'yaml_files' and are processed first on each file
+commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels
     value: {'namespace': 'tanzu-dns'}
@@ -106,10 +106,10 @@ yaml_files: # what to overlay onto
               - x
               - y
               - z
-  # demoing application of 'common_overlays' without a 'overlays' or 'documents' key
+  # demoing application of 'commonOverlays' without a 'overlays' or 'documents' key
   - name: "another file"
     path: "examples/manifests/another.yaml"
-    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with common_overlays {'cool_label': 'bro'}
+    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with commonOverlays {'cool_label': 'bro'}
     # documents:
     #   - path: 0
     #   - path: 2
