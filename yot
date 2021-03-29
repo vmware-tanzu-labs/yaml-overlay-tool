@@ -395,11 +395,11 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                         else:
                             manifest[overlay_expression] = transform_data(overlay_expression, overlay_value, overlay_value, action)
                     else:
-                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a onMissing.inject_path to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
+                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a onMissing.injectPath to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
                         if not stdout:
-                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a onMissing.inject_path to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
+                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a onMissing.injectPath to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
             elif (on_missing != "ignore"):
-                logging.error(f'perform_overlayment:\n  "{onMissing}" is not a valid option for key "onMissing.action"')
+                logging.error(f'perform_overlayment:\n  "{on_missing}" is not a valid option for key "onMissing.action"')
                 exit_run(1)
     else:
         print(f'invalid action {action}. Must be one of \'delete\', \'merge\', or \'replace\'.\n ...exiting')
@@ -532,14 +532,14 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                 try:
                     on_missing = overlay["onMissing"]["action"]
                     try:
-                        # see if we have an inject_path
-                        inject_path = overlay["onMissing"]["inject_path"]
+                        # see if we have an injectPath
+                        inject_path = overlay["onMissing"]["injectPath"]
                         # make it a list if it's a string
                         if isinstance(inject_path, str):
                             inject_path = [inject_path]
                         elif not isinstance(inject_path, list):
-                            print(f'warning: inject_path must be a string or list: {inject_path}.\n...ignoring inject')
-                            logging.warning(f'process_manifests:\n  inject_path must be a string or list: {inject_path}. ignoring inject')
+                            print(f'warning: injectPath must be a string or list: {inject_path}.\n...ignoring inject')
+                            logging.warning(f'process_manifests:\n  injectPath must be a string or list: {inject_path}. ignoring inject')
                             on_missing = "ignore"
                     except:
                         # validate overlay_expression otherwise set to empty

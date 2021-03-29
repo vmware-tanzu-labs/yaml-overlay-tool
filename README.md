@@ -149,7 +149,7 @@ If you would like to try an interactive tutorial on installing `yot`, go [here](
 
 `yot` also includes a templating feature by making use of the popular [Jinja2](https://jinja.palletsprojects.com/en/master/templates/) templating language to allow for templated overlay values which are rendered into memory and processed at run-time.  Use of the templating engine is completely optional, and instruction files can be static yaml documents.  When using the templating engine, anything within the instructions file can be templated, but keep in mind the document must template into a valid yaml document.  The template feature is useful if you are managing multi-environment yaml configurations.  Values files are also treated as templates, and can contain jinja2 content.  This is most useful in a scenario with a lot of values, where you would like to organize them into separate files and use the `{% include 'addl_values.yaml' %}` [Jinja2](https://jinja.palletsprojects.com/en/master/templates/#include) tag.  This is also extremely useful for large instruction files.
 
-Each overlay operation can be performed with a JSONpath query.  If a JSONpath query produces no results in the yaml document, a desired value can be either ignored (default behavior) or injected (`onMissing: {'action': 'inject'}`) and provided a specific path (`onMissing: {'inject_path': []}`) to inject the value if the query was not a fully-qualified JSONpath (example: `metadata.labels.*` <= query VS. `metadata.labels` <= fully-qualified path).
+Each overlay operation can be performed with a JSONpath query.  If a JSONpath query produces no results in the yaml document, a desired value can be either ignored (default behavior) or injected (`onMissing: {'action': 'inject'}`) and provided a specific path (`onMissing: {'injectPath': []}`) to inject the value if the query was not a fully-qualified JSONpath (example: `metadata.labels.*` <= query VS. `metadata.labels` <= fully-qualified path).
 
 ### The Instructions File
 
@@ -166,7 +166,7 @@ The `commonOverlays` key is completely optional, and is a means to providing ove
 | value | yes | The desired value to take action with if `query` is found. | None | str, dict, list |
 | action | yes | The action to take when the JSONPath expression is found in the yaml document. Can be one of `delete`, `merge`, or `replace`. | None | string |
 | onMissing.action | no | What to do if the JSONpath expression is not found. Can be one of `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
-| onMissing.inject_path | no | If your JSONpath expression was not a fully-qualified path (dot-notation) then an `inject_path` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list of paths to inject the value if your JSONpath expression was not found in the yaml document | None | string or list |
+| onMissing.injectPath | no | If your JSONpath expression was not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list of paths to inject the value if your JSONpath expression was not found in the yaml document | None | string or list |
 | document_query | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yaml_files`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary |
 
 #### Top-Level yaml_files Keys
@@ -192,7 +192,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 | value | yes | The desired value to take action with if `query` is found. | None | str, dict, list |
 | action | yes | The action to take when the JSONPath expression is found in the yaml document. Can be one of `delete`, `merge`, or `replace`. | None | string |
 | onMissing.action | no | What to do if the JSONpath expression is not found. Can be one of `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
-| onMissing.inject_path | no | If your JSONpath expression was not a fully-qualified path (dot-notation) then an `inject_path` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list of paths to inject the value if your JSONpath expression was not found in the yaml document | None | string or list |
+| onMissing.injectPath | no | If your JSONpath expression was not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list of paths to inject the value if your JSONpath expression was not found in the yaml document | None | string or list |
 | document_query | no | A qualifier to refine which documents the overlay is applied to.  If not set, the overlay applies to all documents in the yaml file.  Can be used in conjunction with `document_index`. See [Qualifiers](#qualifiers) for more details.| None | dictionary |
 | document_index | no | A qualifier to refine which documents the overlay is applied to, which is a list of yaml document indexes in a multi-document yaml file.  When this is set, the overlay will only be applied to this list of documents within the file.  Can be used in conjunction with the `document_query`.  See [Qualifiers](#qualifiers) for more details. | None | list |
 
@@ -350,7 +350,7 @@ yaml_files: # what to overlay onto
     action: "replace" # merge, replace, delete
     onMissing:
       action: "inject" # inject | ignore
-      inject_path: "metadata.labels" # if your key (metadata.labels) in this instance was a jsonpath expression, we can't exactly inject to an expression.  We need a real path to plug it into. If you had a jsonpath expression and no onMissing.inject_path we would assume ignore and print a warning
+      injectPath: "metadata.labels" # if your key (metadata.labels) in this instance was a jsonpath expression, we can't exactly inject to an expression.  We need a real path to plug it into. If you had a jsonpath expression and no onMissing.injectPath we would assume ignore and print a warning
     document_query: # qualifier, only modify if a k8s Deployment
       key: kind
       value: Deployment

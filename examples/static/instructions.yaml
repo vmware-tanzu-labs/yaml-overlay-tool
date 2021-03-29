@@ -70,14 +70,14 @@ yaml_files: # what to overlay onto
       action: "merge"
       onMissing:
         action: "inject"
-    # same as previous, but with an inject_path (actually does this one)
-    - name: "Show same example but with an inject_path"
+    # same as previous, but with an injectPath (actually does this one)
+    - name: "Show same example but with an injectPath"
       query: fake.key2.*
       value: {'fake': 'content2'}
       action: "merge"
       onMissing:
         action: "inject"
-        inject_path: fake2.key2
+        injectPath: fake2.key2
       # qualifier to only apply to the first doc in the yaml file
       document_index:
         - 0
@@ -102,7 +102,7 @@ yaml_files: # what to overlay onto
           action: merge
           onMissing:
             action: "inject"
-            inject_path:
+            injectPath:
               - x
               - y
               - z

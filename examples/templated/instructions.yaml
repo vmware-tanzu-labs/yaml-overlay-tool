@@ -8,7 +8,7 @@ yaml_files:
         action: "merge"
         onMissing:
           action: "inject"
-          inject_path: metadata.labels
+          injectPath: metadata.labels
       - query: metadata.annotations
         value: {}
         action: "delete"
