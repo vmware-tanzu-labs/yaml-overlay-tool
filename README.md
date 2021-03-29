@@ -14,7 +14,7 @@ A yaml overlay tool with templating tendencies.
 - [Quick Start](#quick-start)
 	- [The Instructions File](#the-instructions-file)
 		- [Top-level commonOverlays Keys](#top-level-commonoverlays-keys)
-		- [Top-Level yaml_files Keys](#top-level-yamlfiles-keys)
+		- [Top-Level yamlFiles Keys](#top-level-yamlfiles-keys)
 		- [overlays keys](#overlays-keys)
 		- [documents keys](#documents-keys)
 		- [Qualifiers](#qualifiers)
@@ -153,11 +153,11 @@ Each overlay operation can be performed with a JSONpath query.  If a JSONpath qu
 
 ### The Instructions File
 
-What is an instructions file?  A yaml document that contains a list of yaml documents to perform operations on.  Each instructions file starts with the key `yaml_files`, which is a list, along with an optional key `commonOverlays` which is also a list.
+What is an instructions file?  A yaml document that contains a list of yaml documents to perform operations on.  Each instructions file starts with the key `yamlFiles`, which is a list, along with an optional key `commonOverlays` which is also a list.
 
 #### Top-level commonOverlays Keys
 
-The `commonOverlays` key is completely optional, and is a means to providing overlays that should be applied to every `yaml_files` list item or `yaml_files[*].documents[*].path` defined in the instructions. Each list item in the `commonOverlays` key is treated as a dictionary with the following top-level keys:
+The `commonOverlays` key is completely optional, and is a means to providing overlays that should be applied to every `yamlFiles` list item or `yamlFiles[*].documents[*].path` defined in the instructions. Each list item in the `commonOverlays` key is treated as a dictionary with the following top-level keys:
 
 | key | required | description | default | type |
 | --- | --- | --- | --- | --- |
@@ -167,11 +167,11 @@ The `commonOverlays` key is completely optional, and is a means to providing ove
 | action | yes | The action to take when the JSONPath expression is found in the yaml document. Can be one of `delete`, `merge`, or `replace`. | None | string |
 | onMissing.action | no | What to do if the JSONpath expression is not found. Can be one of `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
 | onMissing.injectPath | no | If your JSONpath expression was not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list of paths to inject the value if your JSONpath expression was not found in the yaml document | None | string or list |
-| document_query | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yaml_files`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary |
+| document_query | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary |
 
-#### Top-Level yaml_files Keys
+#### Top-Level yamlFiles Keys
 
-Each list item in the `yaml_files` key is treated as a dictionary with the following top-level keys:
+Each list item in the `yamlFiles` key is treated as a dictionary with the following top-level keys:
 
 | key | required | description | default | type |
 | --- | --- | --- | --- | --- |
@@ -199,7 +199,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 
 #### documents keys
 
-The `documents` list applies only to multi-document yaml files and is completely optional the same as the top-level `overlays` key is.  If you require changes to a specific yaml document in the multi-document yaml file, then this is where you define them.  Actions in the `documents` key are processed after actions in the top-level `overlays` key.  Think of the `commonOverlays` key as a place to perform changes on all files listed in `yaml_files`, while the `overlays` key is a place to perform your "common" changes within a single file, and actions defined here in the `documents` key are for making specific changes to a specific document within the yaml file.
+The `documents` list applies only to multi-document yaml files and is completely optional the same as the top-level `overlays` key is.  If you require changes to a specific yaml document in the multi-document yaml file, then this is where you define them.  Actions in the `documents` key are processed after actions in the top-level `overlays` key.  Think of the `commonOverlays` key as a place to perform changes on all files listed in `yamlFiles`, while the `overlays` key is a place to perform your "common" changes within a single file, and actions defined here in the `documents` key are for making specific changes to a specific document within the yaml file.
 
 The keys in the `documents` list are the same as found in the [Top-Level Instructions Keys](#top-level-instructions-keys), except you will refer to the `path` key as a numeric value.  This numeric value represents the positional index of the yaml document within the multi-document yaml file.  You can determine this numeric value by referring to your file, and counting each document starting at `0`.  Qualifiers such as the `document_query` and `document_index` are not available here, because we are performing actions on a specific document within a file.
 
@@ -232,7 +232,7 @@ Qualifiers are a means to further refine when an overlay is applied to a yaml do
 
 ##### document_query Qualifier
 
-The `document_query` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yaml_files.path`, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
+The `document_query` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yamlFiles.path`, but cannot be used under the `documents` key.  The purpose of a `document_query` is to qualify an overlay operation by checking for a value or multiple values contained in a yaml document within a file.
 
 Think of the `document_query` as groups of conditions that must be met before applying this overlay to the yaml document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
 
@@ -324,7 +324,7 @@ document_index:
 
 ```yaml
 ---
-commonOverlays: # optional way to apply overlays to all 'yaml_files'
+commonOverlays: # optional way to apply overlays to all 'yamlFiles'
 - name: Apply common label only to k8s services # optional key
   query: metadata.labels # required JSONpath (dot-notation)
   value: # desired value to perform an action on matches of the query with
@@ -339,7 +339,7 @@ commonOverlays: # optional way to apply overlays to all 'yaml_files'
   - conditions:
     - key: kind # search for the 'kind' key in the yaml doc
       value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
-yaml_files: # what to overlay onto
+yamlFiles: # what to overlay onto
 - name: "some arbitrary descriptor" # Name is Optional
   path: "path/relative/to/directory/of/execution.yaml" # or
   # path: "/fully/qualified/path.yaml"
@@ -415,9 +415,9 @@ yot -i instructions.yaml -o ./output
 
 After the instructions have either been rendered or read, they are processed.
 
-Processing begins at the instruction's `commonOverlays` if they exist in the instruction set.  `yot` combines the `commonOverlays` with the `yaml_files.path.overlays` first if they exist.  If `yaml_files.path.overlays` do not exist, `yot` combines `commonOverlays` with `yaml_files.path.documents.path.overlays`.  In both of these scenarios, the `commonOverlays` will always be applied prior to the more granular overlays.
+Processing begins at the instruction's `commonOverlays` if they exist in the instruction set.  `yot` combines the `commonOverlays` with the `yamlFiles.path.overlays` first if they exist.  If `yamlFiles.path.overlays` do not exist, `yot` combines `commonOverlays` with `yamlFiles.path.documents.path.overlays`.  In both of these scenarios, the `commonOverlays` will always be applied prior to the more granular overlays.
 
-If no `commonOverlays` have been defined, processing starts at the first item of the `yaml_files` list and processes one yaml file `path` at a time sequentially.  Within each yaml file `path`, `overlays` are processed first if set, followed by the items within the `documents` key, which applies overlays to specific documents within a multi-yaml document yaml file. A single yaml document in a yaml file could still be referred to by `path: 0` from the `documents` key if desired.
+If no `commonOverlays` have been defined, processing starts at the first item of the `yamlFiles` list and processes one yaml file `path` at a time sequentially.  Within each yaml file `path`, `overlays` are processed first if set, followed by the items within the `documents` key, which applies overlays to specific documents within a multi-yaml document yaml file. A single yaml document in a yaml file could still be referred to by `path: 0` from the `documents` key if desired.
 
 ### 3. Output
 
@@ -465,7 +465,7 @@ site: "PROD"
 With an overlay of:
 
 ```yaml
-yaml_files:
+yamlFiles:
   - path: "examples/manifests/test.yaml"
     overlays:
       - query: metadata.name

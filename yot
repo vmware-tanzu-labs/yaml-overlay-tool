@@ -199,10 +199,10 @@ def make_output_dirs(output_path, paths):
     Creates output paths in output dir if add'l value files provided. Otherwise,
         drops outputs to the output dir
     """
-    if not isdir(join(output_path, 'yaml_files')):
-        mkdir(join(output_path, 'yaml_files'))
+    if not isdir(join(output_path, 'yamlFiles')):
+        mkdir(join(output_path, 'yamlFiles'))
     for i in paths:
-        dir = join(join(output_path, 'yaml_files'),splitext(basename(i))[0])
+        dir = join(join(output_path, 'yamlFiles'),splitext(basename(i))[0])
         if not isdir(dir):
             mkdir(dir)
     return
@@ -482,7 +482,7 @@ def test_document_query(document_query_key, manifest):
 def process_manifests(overlays, manifests, manifest_path, type, stdout=False, document=''):
     """
     Type can be either 'common' for commonOverlays and overlays or 'document' for documents.overlays, which are processed slightly differently
-    Contains the logic for processing each yaml_file entry in the instructions
+    Contains the logic for processing each yamlFile entry in the instructions
     """
     logging.debug('process_manifests function')
     ## document is the doc index path in a multi-doc yaml file
@@ -613,7 +613,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
     all_instruction_paths = [k for k in instructions.keys()]
     all_yaml_paths = list()
     for i in all_instruction_paths:
-        all_yaml_paths.extend([abspath(p["path"]) for p in instructions[i]["yaml_files"]])
+        all_yaml_paths.extend([abspath(p["path"]) for p in instructions[i]["yamlFiles"]])
     common_path = commonpath(all_yaml_paths)
     unique_paths = list(set([dirname(p.split(common_path)[1]) for p in all_yaml_paths]))
 
@@ -626,7 +626,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
         exit_run(0)
     if not stdout:
         for dir in unique_paths:
-            makedirs(join(output_dir, 'yaml_files') + dir, exist_ok=True)
+            makedirs(join(output_dir, 'yamlFiles') + dir, exist_ok=True)
 
     for instruction_path in all_instruction_paths:
         # dump the instructions, only when templated, and before other work in
@@ -647,7 +647,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
         except:
             common_overlays = []
             common_overlays_key = False
-        for yaml_file in instructions[instruction_path]["yaml_files"]:
+        for yaml_file in instructions[instruction_path]["yamlFiles"]:
             logging.info(f'process_instructions:\n  processing {yaml_file["path"]}')
             manifests = Box(box_dots=True)
             try:
@@ -749,11 +749,11 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             if not path_is_dir:
                 if not stdout:
                     if instruction_path == "untemplated" or instruction_path == "defaults":
-                        opath = join(output_dir, 'yaml_files')
+                        opath = join(output_dir, 'yamlFiles')
                         # drop files preserving source pathing to avoid filename collissions
                         opath += dirname(list(manifests.to_dict().keys())[0].split(common_path)[1])
                     else:
-                        opath = join(join(output_dir, 'yaml_files'), instruction_path)
+                        opath = join(join(output_dir, 'yamlFiles'), instruction_path)
                         opath += dirname(list(manifests.to_dict().keys())[0].split(common_path)[1])
 
                 # print(yaml.dump(manifests.to_dict()))

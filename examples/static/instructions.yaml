@@ -1,5 +1,5 @@
 ---
-# the commonOverlays apply to all yaml_files listed out in 'yaml_files' and are processed first on each file
+# the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels
@@ -23,7 +23,7 @@ commonOverlays:
     query: metadata.labels
     value: {'cool_label': 'bro'}
     action: merge
-yaml_files: # what to overlay onto
+yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
