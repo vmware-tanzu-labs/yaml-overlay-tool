@@ -417,13 +417,13 @@ def test_document_query(document_query_key, manifest):
     """
     logging.debug('test_document_query function')
     matched = []
-    # Loop through the groupings of document_query conditions
+    # Loop through the groupings of documentQuery conditions
     for i in document_query_key:
         try:
             conditions = i["conditions"]
         except:
-            print(f'the document_query item did not have a "conditions" key:\n{i}\n...exiting')
-            logging.error(f'test_document_query:\n  the document_query item did not have a "conditions" key:\n    {i}')
+            print(f'the documentQuery item did not have a "conditions" key:\n{i}\n...exiting')
+            logging.error(f'test_document_query:\n  the documentQuery item did not have a "conditions" key:\n    {i}')
             exit_run(1)
         condition_group_matched = []
         for c in i["conditions"]:
@@ -448,7 +448,7 @@ def test_document_query(document_query_key, manifest):
                             logging.info(f'test_document_query:\n  no match on {c["value"]} with query {c["key"]}')
                             break
                     if False in condition_group_matched:
-                        logging.info('test_document_query:\n  exited document_query grouping check because of a non-match in 1 of the conditions')
+                        logging.info('test_document_query:\n  exited documentQuery grouping check because of a non-match in 1 of the conditions')
                         break
             elif matches[0]:
                 # no match, stop processing because they all need to have matches if op is 'and'
@@ -459,24 +459,24 @@ def test_document_query(document_query_key, manifest):
             matched.append(False)
         if False not in condition_group_matched and len(condition_group_matched) > 0 and True in condition_group_matched:
             matched.append(True)
-        logging.debug(f'test_document_query:\n  processed document_query results for item:\n{i["conditions"]}')
+        logging.debug(f'test_document_query:\n  processed documentQuery results for item:\n{i["conditions"]}')
         logging.debug(f'test_document_query:\n  condition_group_matched: {condition_group_matched}\n')
     # Processing complete, setup return
     logging.debug(f'test_document_query:\n  matched: {matched}')
     if len(matched) == 0:
         # we didn't have any proper conditions
-        logging.debug('test_document_query:\n  returned "False" from "document_query"')
+        logging.debug('test_document_query:\n  returned "False" from "documentQuery"')
         return False
     elif True in matched:
         # one of the condition groupings has matched
-        logging.debug('test_document_query:\nreturned "True" from "document_query"')
+        logging.debug('test_document_query:\nreturned "True" from "documentQuery"')
         return True
     elif True not in matched:
-        logging.debug('test_document_query:\n  returned "False" from "document_query"')
+        logging.debug('test_document_query:\n  returned "False" from "documentQuery"')
         return False
     else:
         # catch all
-        logging.debug('test_document_query:\nreturned "False" from all document_query items')
+        logging.debug('test_document_query:\nreturned "False" from all documentQuery items')
         return False
 
 def process_manifests(overlays, manifests, manifest_path, type, stdout=False, document=''):
@@ -512,17 +512,17 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
             # onMissing does not apply to an action of delete
             if (action == "replace") or (action == "merge"):
                 if type == "common":
-                    # see if we have 'document_query' set
+                    # see if we have 'documentQuery' set
                     try:
-                        document_query = overlay["document_query"]
+                        document_query = overlay["documentQuery"]
                         document_query_key = True
                         logging.debug("process_manifests:\n  document_query_key True")
                     except:
                         document_query_key = False
                         logging.debug("process_manifests:\n  document_query_key False")
-                    # see if we have a 'document_index' set
+                    # see if we have a 'documentIndex' set
                     try:
-                        document_index = overlay["document_index"]
+                        document_index = overlay["documentIndex"]
                         document_index_key = True
                         logging.debug('process_manifests:\n  document_index_key is True')
                     except:
@@ -557,25 +557,25 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                 manifest_count = 0 # to provide a doc path index on errors/warnings
                 for manifest in manifests[manifest_path]:
                     logging.debug(f'process_manifests:\n  manifest count is {manifest_count}')
-                    # if we have a qualifier like document_index or document_query,
+                    # if we have a qualifier like documentIndex or documentQuery,
                     ## act on the manifest only if we have a proper match
                     # if document_query_key and document_index_key:
                     if document_query_key and document_index_key:
-                        logging.debug('process_manifests:\n  we have a document_query key and document_index key')
+                        logging.debug('process_manifests:\n  we have a documentQuery key and documentIndex key')
                         # we have both qualifiers
                         if manifest_count in document_index:
                             doc_query_valid = test_document_query(document_query, manifest)
-                            logging.debug(f'process_manifests:\n  document_query: {doc_query}')
+                            logging.debug(f'process_manifests:\n  documentQuery: {doc_query}')
                             if doc_query_valid:
                                 # queries successfully matched
                                 manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_index_key and not document_query_key:
-                        logging.debug(f'process_manifests:\n  we have a document_index')
+                        logging.debug(f'process_manifests:\n  we have a documentIndex')
                         if manifest_count in document_index:
                             # do the overlayment, because it's an index match
                             manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_query_key and not document_index_key:
-                        logging.debug('process_manifests:\n  we have a document_query key')
+                        logging.debug('process_manifests:\n  we have a documentQuery key')
                         doc_query_valid = test_document_query(document_query, manifest)
                         logging.debug(f'process_manifests:\n  doc_query_valid: {doc_query_valid}')
                         if doc_query_valid:
@@ -586,7 +586,7 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                         manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
                     manifest_count += 1
             elif type == "document":
-                # we don't take document_query or document_index for the documents key
+                # we don't take documentQuery or documentIndex for the documents key
                 try:
                     # it's possible to not have the specified doc index when onMissing.action == inject
                     manifests[manifest_path][document].merge_update(perform_overlayment(action, manifests[manifest_path][document], expression, overlay_value, on_missing, inject_path, manifest_path, document, stdout))

@@ -6,7 +6,7 @@ commonOverlays:
     value: {'namespace': 'tanzu-dns'}
     action: merge
     # qualifier to further refine when this overlay is applied
-    document_query:
+    documentQuery:
       # default operator behavior is 'and' and has been omitted as an example of
       ## this behavior
       # all of the 'and' operator queries must match or any one of the 'or'
@@ -79,7 +79,7 @@ yamlFiles: # what to overlay onto
         action: "inject"
         injectPath: fake2.key2
       # qualifier to only apply to the first doc in the yaml file
-      document_index:
+      documentIndex:
         - 0
     documents: # optional and only used for multi-doc yaml files
     # need to refer to them by their index
