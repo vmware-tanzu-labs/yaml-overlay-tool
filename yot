@@ -573,17 +573,17 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                         logging.debug(f'process_manifests:\n  we have a documentIndex')
                         if manifest_count in document_index:
                             # do the overlayment, because it's an index match
-                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
+                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_query_key and not document_index_key:
                         logging.debug('process_manifests:\n  we have a documentQuery key')
                         doc_query_valid = test_document_query(document_query, manifest)
                         logging.debug(f'process_manifests:\n  doc_query_valid: {doc_query_valid}')
                         if doc_query_valid:
                             # queries successfully matched
-                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
+                            manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     else:
                         # process all yaml-docs in manifest with top-level commonOverlays and overlays first
-                        manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, onMissing, inject_path, manifest_path, manifest_count, stdout))
+                        manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     manifest_count += 1
             elif type == "document":
                 # we don't take documentQuery or documentIndex for the documents key
