@@ -346,9 +346,9 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                 for k in match.to_dict().keys():
                     manifest[k] = transform_data(k, overlay_value, match[k], action)
         else:
-            # handle on_missing, pass overlay_value twice,
+            # handle onMissing, pass overlay_value twice,
             ## because it'll update over itself
-            logging.debug('perform_overlayment:\n  on_missing case')
+            logging.debug('perform_overlayment:\n  onMissing case')
             if on_missing == "inject":
                 logging.debug('perform_overlayment: inject')
                 if len(inject_path) > 0:
@@ -395,11 +395,11 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                         else:
                             manifest[overlay_expression] = transform_data(overlay_expression, overlay_value, overlay_value, action)
                     else:
-                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a on_missing.inject_path to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
+                        logging.warning(f'perform_overlayment:\n  While searching with the query "{overlay_expression}", no matches were found in the yaml file "{abspath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path. Please specify a onMissing.injectPath to properly inject this value {overlay_value}. ignoring inject action due to invalid inject path')
                         if not stdout:
-                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a on_missing.inject_path to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
+                            print(f'warning: while searching with the query "{overlay_expression}", no matches were found in the yaml file "{relpath(manifest_path)}" at document {loop_count}, and the query is not a valid fully-qualified path.\n  Please specify a onMissing.injectPath to properly inject this value {overlay_value}.\n    ...ignoring inject action\n')
             elif (on_missing != "ignore"):
-                logging.error(f'perform_overlayment:\n  "{on_missing}" is not a valid option for key "on_missing.action"')
+                logging.error(f'perform_overlayment:\n  "{on_missing}" is not a valid option for key "onMissing.action"')
                 exit_run(1)
     else:
         print(f'invalid action {action}. Must be one of \'delete\', \'merge\', or \'replace\'.\n ...exiting')
@@ -417,13 +417,13 @@ def test_document_query(document_query_key, manifest):
     """
     logging.debug('test_document_query function')
     matched = []
-    # Loop through the groupings of document_query conditions
+    # Loop through the groupings of documentQuery conditions
     for i in document_query_key:
         try:
             conditions = i["conditions"]
         except:
-            print(f'the document_query item did not have a "conditions" key:\n{i}\n...exiting')
-            logging.error(f'test_document_query:\n  the document_query item did not have a "conditions" key:\n    {i}')
+            print(f'the documentQuery item did not have a "conditions" key:\n{i}\n...exiting')
+            logging.error(f'test_document_query:\n  the documentQuery item did not have a "conditions" key:\n    {i}')
             exit_run(1)
         condition_group_matched = []
         for c in i["conditions"]:
@@ -448,7 +448,7 @@ def test_document_query(document_query_key, manifest):
                             logging.info(f'test_document_query:\n  no match on {c["value"]} with query {c["key"]}')
                             break
                     if False in condition_group_matched:
-                        logging.info('test_document_query:\n  exited document_query grouping check because of a non-match in 1 of the conditions')
+                        logging.info('test_document_query:\n  exited documentQuery grouping check because of a non-match in 1 of the conditions')
                         break
             elif matches[0]:
                 # no match, stop processing because they all need to have matches if op is 'and'
@@ -459,30 +459,30 @@ def test_document_query(document_query_key, manifest):
             matched.append(False)
         if False not in condition_group_matched and len(condition_group_matched) > 0 and True in condition_group_matched:
             matched.append(True)
-        logging.debug(f'test_document_query:\n  processed document_query results for item:\n{i["conditions"]}')
+        logging.debug(f'test_document_query:\n  processed documentQuery results for item:\n{i["conditions"]}')
         logging.debug(f'test_document_query:\n  condition_group_matched: {condition_group_matched}\n')
     # Processing complete, setup return
     logging.debug(f'test_document_query:\n  matched: {matched}')
     if len(matched) == 0:
         # we didn't have any proper conditions
-        logging.debug('test_document_query:\n  returned "False" from "document_query"')
+        logging.debug('test_document_query:\n  returned "False" from "documentQuery"')
         return False
     elif True in matched:
         # one of the condition groupings has matched
-        logging.debug('test_document_query:\nreturned "True" from "document_query"')
+        logging.debug('test_document_query:\nreturned "True" from "documentQuery"')
         return True
     elif True not in matched:
-        logging.debug('test_document_query:\n  returned "False" from "document_query"')
+        logging.debug('test_document_query:\n  returned "False" from "documentQuery"')
         return False
     else:
         # catch all
-        logging.debug('test_document_query:\nreturned "False" from all document_query items')
+        logging.debug('test_document_query:\nreturned "False" from all documentQuery items')
         return False
 
 def process_manifests(overlays, manifests, manifest_path, type, stdout=False, document=''):
     """
-    Type can be either 'common' for common_overlays and overlays or 'document' for documents.overlays, which are processed slightly differently
-    Contains the logic for processing each yaml_file entry in the instructions
+    Type can be either 'common' for commonOverlays and overlays or 'document' for documents.overlays, which are processed slightly differently
+    Contains the logic for processing each yamlFile entry in the instructions
     """
     logging.debug('process_manifests function')
     ## document is the doc index path in a multi-doc yaml file
@@ -509,37 +509,37 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
         action = overlay["action"]
         # loop over all the queries for this overlay
         for expression in overlay_expression:
-            # on_missing does not apply to an action of delete
+            # onMissing does not apply to an action of delete
             if (action == "replace") or (action == "merge"):
                 if type == "common":
-                    # see if we have 'document_query' set
+                    # see if we have 'documentQuery' set
                     try:
-                        document_query = overlay["document_query"]
+                        document_query = overlay["documentQuery"]
                         document_query_key = True
                         logging.debug("process_manifests:\n  document_query_key True")
                     except:
                         document_query_key = False
                         logging.debug("process_manifests:\n  document_query_key False")
-                    # see if we have a 'document_index' set
+                    # see if we have a 'documentIndex' set
                     try:
-                        document_index = overlay["document_index"]
+                        document_index = overlay["documentIndex"]
                         document_index_key = True
                         logging.debug('process_manifests:\n  document_index_key is True')
                     except:
                         document_index_key = False
                         logging.debug('process_manifests:\n  document_index_key is False')
-                # see if we have on_missing set
+                # see if we have onMissing set
                 try:
-                    on_missing = overlay["on_missing"]["action"]
+                    on_missing = overlay["onMissing"]["action"]
                     try:
-                        # see if we have an inject_path
-                        inject_path = overlay["on_missing"]["inject_path"]
+                        # see if we have an injectPath
+                        inject_path = overlay["onMissing"]["injectPath"]
                         # make it a list if it's a string
                         if isinstance(inject_path, str):
                             inject_path = [inject_path]
                         elif not isinstance(inject_path, list):
-                            print(f'warning: inject_path must be a string or list: {inject_path}.\n...ignoring inject')
-                            logging.warning(f'process_manifests:\n  inject_path must be a string or list: {inject_path}. ignoring inject')
+                            print(f'warning: injectPath must be a string or list: {inject_path}.\n...ignoring inject')
+                            logging.warning(f'process_manifests:\n  injectPath must be a string or list: {inject_path}. ignoring inject')
                             on_missing = "ignore"
                     except:
                         # validate overlay_expression otherwise set to empty
@@ -557,38 +557,38 @@ def process_manifests(overlays, manifests, manifest_path, type, stdout=False, do
                 manifest_count = 0 # to provide a doc path index on errors/warnings
                 for manifest in manifests[manifest_path]:
                     logging.debug(f'process_manifests:\n  manifest count is {manifest_count}')
-                    # if we have a qualifier like document_index or document_query,
+                    # if we have a qualifier like documentIndex or documentQuery,
                     ## act on the manifest only if we have a proper match
                     # if document_query_key and document_index_key:
                     if document_query_key and document_index_key:
-                        logging.debug('process_manifests:\n  we have a document_query key and document_index key')
+                        logging.debug('process_manifests:\n  we have a documentQuery key and documentIndex key')
                         # we have both qualifiers
                         if manifest_count in document_index:
                             doc_query_valid = test_document_query(document_query, manifest)
-                            logging.debug(f'process_manifests:\n  document_query: {doc_query}')
+                            logging.debug(f'process_manifests:\n  documentQuery: {doc_query}')
                             if doc_query_valid:
                                 # queries successfully matched
                                 manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_index_key and not document_query_key:
-                        logging.debug(f'process_manifests:\n  we have a document_index')
+                        logging.debug(f'process_manifests:\n  we have a documentIndex')
                         if manifest_count in document_index:
                             # do the overlayment, because it's an index match
                             manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     elif document_query_key and not document_index_key:
-                        logging.debug('process_manifests:\n  we have a document_query key')
+                        logging.debug('process_manifests:\n  we have a documentQuery key')
                         doc_query_valid = test_document_query(document_query, manifest)
                         logging.debug(f'process_manifests:\n  doc_query_valid: {doc_query_valid}')
                         if doc_query_valid:
                             # queries successfully matched
                             manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     else:
-                        # process all yaml-docs in manifest with top-level common_overlays and overlays first
+                        # process all yaml-docs in manifest with top-level commonOverlays and overlays first
                         manifest.merge_update(perform_overlayment(action, manifest, expression, overlay_value, on_missing, inject_path, manifest_path, manifest_count, stdout))
                     manifest_count += 1
             elif type == "document":
-                # we don't take document_query or document_index for the documents key
+                # we don't take documentQuery or documentIndex for the documents key
                 try:
-                    # it's possible to not have the specified doc index when on_missing.action == inject
+                    # it's possible to not have the specified doc index when onMissing.action == inject
                     manifests[manifest_path][document].merge_update(perform_overlayment(action, manifests[manifest_path][document], expression, overlay_value, on_missing, inject_path, manifest_path, document, stdout))
                 except:
                     # the doc path didn't exist, so lets create one
@@ -613,7 +613,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
     all_instruction_paths = [k for k in instructions.keys()]
     all_yaml_paths = list()
     for i in all_instruction_paths:
-        all_yaml_paths.extend([abspath(p["path"]) for p in instructions[i]["yaml_files"]])
+        all_yaml_paths.extend([abspath(p["path"]) for p in instructions[i]["yamlFiles"]])
     common_path = commonpath(all_yaml_paths)
     unique_paths = list(set([dirname(p.split(common_path)[1]) for p in all_yaml_paths]))
 
@@ -640,14 +640,14 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             if not stdout:
                 print(f'Wrote rendered instructions file "{output_path}"\n')
             logging.info(f'Wrote rendered instructions file "{output_path}"\n')
-        # see if we have common_overlays
+        # see if we have commonOverlays
         try:
-            common_overlays = instructions[instruction_path]["common_overlays"]
+            common_overlays = instructions[instruction_path]["commonOverlays"]
             common_overlays_key = True
         except:
             common_overlays = []
             common_overlays_key = False
-        for yaml_file in instructions[instruction_path]["yaml_files"]:
+        for yaml_file in instructions[instruction_path]["yamlFiles"]:
             logging.info(f'process_instructions:\n  processing {yaml_file["path"]}')
             manifests = Box(box_dots=True)
             try:
@@ -681,7 +681,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
                 overlays_key = False
             # we may not have overlays at top level in multi-doc yaml (optional)
             if overlays_key:
-                # Run the common_overlays on file first by extending the list with
+                # Run the commonOverlays on file first by extending the list with
                 ## the file's overlays
                 overlays = common_overlays.copy()
                 overlays.extend(yaml_file["overlays"])
@@ -702,14 +702,14 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
                         # don't care if name is not there
                         pass
                     document = doc["path"]
-                    # if we don't have top-level overlays key we need to apply common_overlays here
+                    # if we don't have top-level overlays key we need to apply commonOverlays here
                     if not overlays_key and common_overlays_key:
                         overlays = list()
                         overlays = common_overlays.copy()
                         try:
                             overlays.extend(doc["overlays"])
                         except:
-                            # just take the common_overlays
+                            # just take the commonOverlays
                             pass
                     else:
                         overlays = []
@@ -719,7 +719,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
                         # normal yaml file as path
                         manifests.merge_update(process_manifests(overlays, manifests, manifest_path, 'document', stdout, document))
 
-            # we didn't have a 'overlays' or 'documents' key for this path, apply common_overlays only if we have them
+            # we didn't have a 'overlays' or 'documents' key for this path, apply commonOverlays only if we have them
             if not overlays_key and not documents_key and common_overlays_key and not path_is_dir:
                 overlays = common_overlays.copy()
                 manifests.merge_update(process_manifests(overlays, manifests, manifest_path, 'common', stdout))
@@ -798,7 +798,6 @@ def main():
     default_file_basename = ['defaults.yaml', 'defaults.yml']
     args = get_args()
     # setup logging
-    print(args.verbosity)
     logging.basicConfig(filename=args.log_file, format='%(asctime)s - %(levelname)s: %(message)s', level=setup_logging_verbosity(args.verbosity), datefmt='%d-%b-%y %H:%M:%S')
     logging.warning('Started YAML Overlay Tool run')
     instructions_file = get_files(args.instruction_file)
