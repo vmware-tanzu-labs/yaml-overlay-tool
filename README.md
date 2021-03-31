@@ -397,7 +397,7 @@ $ tree
 ./yot -v values -i instructions.yaml -o ./output
 ```
 
-`yot` only takes values files with the file extension of `.yml` or `.yaml`, therefore the file `bar` above would not be read.  The values contained in values/defaults.yaml would be read and then the instructions file would be rendered by applying the values of foo.yaml over defaults.yaml, and then render the instructions.yaml template into memory for processing.  Then the test.yml will merge over defaults.yaml and render the instructions.yaml again, producing a total of 2 unique instruction sets.  When processing is complete, the modified yaml documents will be placed in `./output/foo` and `./output/test` respectively.  
+`yot` only takes values files with the file extension of `.yml` or `.yaml`, therefore the file `bar` above would not be read.  The values contained in values/defaults.yaml would be read and then the instructions file would be rendered by applying the values of foo.yaml over defaults.yaml, and then render the instructions.yaml template into memory for processing.  Then the test.yml will merge over defaults.yaml and render the instructions.yaml again, producing a total of 2 unique instruction sets.  When processing is complete, the modified yaml documents will be placed in `./output/yaml_files/foo` and `./output/yaml_files/test` respectively.  
 > **NOTE:**  Please be careful about naming your values files, as a values file called test.yaml and test.yml would dump both of their rendered contents into ./output/test
 
 ### 1b. Static Instructions (No Templating)
@@ -423,7 +423,7 @@ If no `commonOverlays` have been defined, processing starts at the first item of
 
 If no templating was performed, then output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output`.
 
-If values files in addition to a defaults.yaml were passed at runtime, then the output for each values file will be `<output directory>/<value file basename>`.
+If values files in addition to a defaults.yaml were passed at runtime, then the output for each values file will be `< output directory >/yaml_files/< value file basename >`.
 
 If only a defaults.yaml value file was passed, then the output will be placed in the output directory specified at runtime, or if it was not provided, the default path of `./output`.
 

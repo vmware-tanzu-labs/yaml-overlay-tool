@@ -199,10 +199,10 @@ def make_output_dirs(output_path, paths):
     Creates output paths in output dir if add'l value files provided. Otherwise,
         drops outputs to the output dir
     """
-    if not isdir(join(output_path, 'yamlFiles')):
-        mkdir(join(output_path, 'yamlFiles'))
+    if not isdir(join(output_path, 'yaml_files')):
+        mkdir(join(output_path, 'yaml_files'))
     for i in paths:
-        dir = join(join(output_path, 'yamlFiles'),splitext(basename(i))[0])
+        dir = join(join(output_path, 'yaml_files'),splitext(basename(i))[0])
         if not isdir(dir):
             mkdir(dir)
     return
@@ -626,7 +626,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
         exit_run(0)
     if not stdout:
         for dir in unique_paths:
-            makedirs(join(output_dir, 'yamlFiles') + dir, exist_ok=True)
+            makedirs(join(output_dir, 'yaml_files') + dir, exist_ok=True)
 
     for instruction_path in all_instruction_paths:
         # dump the instructions, only when templated, and before other work in
@@ -749,11 +749,11 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
             if not path_is_dir:
                 if not stdout:
                     if instruction_path == "untemplated" or instruction_path == "defaults":
-                        opath = join(output_dir, 'yamlFiles')
+                        opath = join(output_dir, 'yaml_files')
                         # drop files preserving source pathing to avoid filename collissions
                         opath += dirname(list(manifests.to_dict().keys())[0].split(common_path)[1])
                     else:
-                        opath = join(join(output_dir, 'yamlFiles'), instruction_path)
+                        opath = join(join(output_dir, 'yaml_files'), instruction_path)
                         opath += dirname(list(manifests.to_dict().keys())[0].split(common_path)[1])
 
                 # print(yaml.dump(manifests.to_dict()))
@@ -798,7 +798,6 @@ def main():
     default_file_basename = ['defaults.yaml', 'defaults.yml']
     args = get_args()
     # setup logging
-    print(args.verbosity)
     logging.basicConfig(filename=args.log_file, format='%(asctime)s - %(levelname)s: %(message)s', level=setup_logging_verbosity(args.verbosity), datefmt='%d-%b-%y %H:%M:%S')
     logging.warning('Started YAML Overlay Tool run')
     instructions_file = get_files(args.instruction_file)
