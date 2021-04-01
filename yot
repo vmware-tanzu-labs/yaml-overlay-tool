@@ -4,7 +4,8 @@
 
 from os import getcwd, getenv, listdir, mkdir, makedirs
 from jsonpath_ng import parse
-from os.path import splitext, isfile, join, abspath, basename, isdir, split, relpath, commonpath, dirname, exists
+from os.path import splitext, isfile, join, abspath, basename, isdir, split, \
+    relpath, commonpath, dirname, exists
 from jinja2 import Environment, FileSystemLoader
 from box import Box
 import re
@@ -18,21 +19,38 @@ def get_args():
     Collects command line arguments
     """
     parser = argparse.ArgumentParser(
-        description='yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2, and the application of rendered overlays "over the top" of a yaml file. yot only produces valid yaml documents on output.'
+        description='yot (YAML overlay tool) is a yaml overlay tool which \
+        allows for the templating of overlay instruction data with jinja2, \
+        and the application of rendered overlays "over the top" of a yaml file.\
+         yot only produces valid yaml documents on output.'
     )
     parser.add_argument(
         '-d',
         '--default-values-file',
         required=False,
         action='append',
-        help='Path to your default values file.  If not set, you must pass a values file of "defaults.yaml" or "defaults.yml" within a path from the "-v" option. Takes multiple default values files in case you would like to separate out some of the values. After the first default values file, each subsequent file passed with "-d" will be merged with the values from the first. If a "defaults.yaml" or "defaults.yml" file is discovered in one of your "-v" paths, it will be merged with these values last.'
+        help='Path to your default values file.  If not set, you must pass a \
+        values file of "defaults.yaml" or "defaults.yml" within a path from the\
+         "-v" option. Takes multiple default values files in case you would \
+         like to separate out some of the values. After the first default \
+         values file, each subsequent file passed with "-d" will be merged with\
+         the values from the first. If a "defaults.yaml" or "defaults.yml" file\
+          is discovered in one of your "-v" paths, it will be merged with these\
+           values last.'
     )
     parser.add_argument(
         '-v',
         '--values-path',
         required=False,
         action='append',
-        help='Values file path. May be a path to a file or directory containing value files ending in either .yml or .yaml. This option can be provided multiple times as required. A file named "defaults.yaml" or "defaults.yml" is required within the path(s) if not using the "-d" option, and you may have only 1 default value file in that scenario. Additional values files are merged over the defaults.yaml file values. Each values file is treated as a unique "site" and will render your instructions differently based on its values'
+        help='Values file path. May be a path to a file or directory containing\
+         value files ending in either .yml or .yaml. This option can be \
+         provided multiple times as required. A file named "defaults.yaml" or \
+         "defaults.yml" is required within the path(s) if not using the "-d" \
+         option, and you may have only 1 default value file in that scenario. \
+         Additional values files are merged over the defaults.yaml file values.\
+          Each values file is treated as a unique "site" and will render your \
+          instructions differently based on its values'
     )
     parser.add_argument(
         '-i',
@@ -44,34 +62,43 @@ def get_args():
         '-o',
         '--output-directory',
         default=join(getcwd(),"output"),
-        help='Path to directory to write the overlayed yaml files to. If value files were supplied in addition to a defaults.yaml/.yml then the rendered templates will land in <output dir>/<addl value file name>.'
+        help='Path to directory to write the overlayed yaml files to. If value \
+        files were supplied in addition to a defaults.yaml/.yml then the \
+        rendered templates will land in <output dir>/<addl value file name>.'
     )
     parser.add_argument(
         '-s',
         '--stdout',
         action='store_true',
         default=False,
-        help='Render output to stdout. Templated instructions files will still be output to the "--output-directory."'
+        help='Render output to stdout. Templated instructions files will still \
+        be output to the "--output-directory."'
     )
     parser.add_argument(
         '-r',
         '--dump-rendered-instructions',
         action='store_true',
         default=False,
-        help='If using a templated instructions file, you can dump the rendered instructions to stdout to allow for reviewing how they were rendered prior to a full run of yot. Equivalent to a dry-run. Exits with return code 0 prior to processing instructions'
+        help='If using a templated instructions file, you can dump the rendered\
+         instructions to stdout to allow for reviewing how they were rendered \
+         prior to a full run of yot. Equivalent to a dry-run. Exits with \
+         return code 0 prior to processing instructions'
     )
     parser.add_argument(
         '-l',
         '--log-file',
         default=join(getcwd(),"yot.log"),
-        help='debug log file output path. Where to output the log to. Defaults to ./yot.log'
+        help='debug log file output path. Where to output the log to. Defaults \
+        to ./yot.log'
     )
     parser.add_argument(
         '-V',
         '--log-verbosity',
         dest='verbosity',
         action="count",
-        help="Log level verbosity (-V for critical, -VV for error, -VVV for warning, -VVVV for info, -VVVVV for debug). Defaults to -VVV (warning and above)")
+        help="Log level verbosity (-V for critical, -VV for error, -VVV for \
+        warning, -VVVV for info, -VVVVV for debug). Defaults to -VVV (warning \
+        and above)")
     args = parser.parse_args()
     return args
 
@@ -352,7 +379,7 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
             if on_missing == "inject":
                 logging.debug('perform_overlayment: inject')
                 if len(inject_path) > 0:
-                    valid_expression = re.compile('^([a-z]*[A-Z]*[0-9]*\.*)+$')
+                    valid_expression = re.compile(r'^([a-z]*[A-Z]*[0-9]*\.*)+$')
                     for inject_p in inject_path:
                         if valid_expression.match(inject_p):
                             add_key = ""
@@ -374,7 +401,7 @@ def perform_overlayment(action, manifest, overlay_expression, overlay_value, on_
                     elif action == "replace":
                         logging.info('perform_overlayment: Performed replace action')
                 else:
-                    valid_expression = re.compile('^([a-z]*[A-Z]*[0-9]*\.*)+$')
+                    valid_expression = re.compile(r'^([a-z]*[A-Z]*[0-9]*\.*)+$')
                     if valid_expression.match(overlay_expression):
                         add_key = ""
                         for k in overlay_expression.split('.'):
