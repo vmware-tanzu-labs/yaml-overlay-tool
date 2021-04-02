@@ -1,21 +1,21 @@
 ---
-yaml_files:
+yamlFiles:
   - name: "{{ foo }} some arbitrary descriptor"
     path: "examples/manifests/test.yaml"
     overlays:
       - query: fake.*
         value: {'app.kubernetes.io/name': '{{ foo }}'}
         action: "merge"
-        on_missing:
+        onMissing:
           action: "inject"
-          inject_path: metadata.labels
+          injectPath: metadata.labels
       - query: metadata.annotations
         value: {}
         action: "delete"
       - query: x
         value: {'fake': 'value'}
         action: merge
-        on_missing:
+        onMissing:
           action: "inject"
     documents:
       - name: the manifest that does something
@@ -24,5 +24,5 @@ yaml_files:
           - query: a
             value: {}
             action: merge
-            on_missing:
+            onMissing:
               action: inject
