@@ -761,7 +761,7 @@ instructions[i]["yamlFiles"]])
             yaml.dump(instructions[instruction_path], output)
             output.close()
             if not stdout:
-                print(f'Wrote rendered instructions file "{output_path}"\n')
+                print(f'\nWrote rendered instructions file "{output_path}"\n')
             logging.info(f'Wrote rendered instructions file "{output_path}"\n')
         # see if we have commonOverlays
         try:
