@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # Copyright 2021 VMware, Inc.
 # SPDX-License-Identifier: MIT
+"""
+YAML Overlay Tool
+https://github.com/vmware-tanzu-labs/yaml-overlay-tool
+"""
 
-from os import getcwd, getenv, listdir, mkdir, makedirs
+from os import getcwd, listdir, mkdir, makedirs#, getenv
 from os.path import splitext, isfile, join, abspath, basename, isdir, split, \
     relpath, commonpath, dirname, exists
+import sys
 import re
 import json
 import argparse
@@ -107,7 +112,7 @@ def exit_run(return_code):
     """
     logging.warning('Finished YAML Overlay Tool run')
     logging.shutdown()
-    exit(return_code)
+    sys.exit(return_code)
 
 def get_file_paths(path):
     """
@@ -188,7 +193,9 @@ def get_values(files, template=False):
 
         # yaml.load_all gets all yaml docs in a file as generator, so we need
         ## to suck them into a list
+        # pylint: disable=R1721
         yaml_docs = [yaml for yaml in all_yaml_data]
+        # pylint: enable=R1721
         values.update({f: yaml_docs})
     return values
 
@@ -232,10 +239,9 @@ def make_output_dirs(output_path, paths):
     if not isdir(join(output_path, 'yaml_files')):
         mkdir(join(output_path, 'yaml_files'))
     for i in paths:
-        dir = join(join(output_path, 'yaml_files'),splitext(basename(i))[0])
-        if not isdir(dir):
-            mkdir(dir)
-    return
+        directory = join(join(output_path, 'yaml_files'),splitext(basename(i))[0])
+        if not isdir(directory):
+            mkdir(directory)
 
 def render_instructions(defaults, values, instructions_path, stdout):
     """
@@ -271,8 +277,8 @@ def render_instructions(defaults, values, instructions_path, stdout):
         instruct = template.render(defaults['values'])
         instruction_set.update({splitext(basename(defaults['file_path']))[0]: instruct})
         if not stdout:
-            print(f'Rendered instructions for "default" values')
-        logging.info(f'Rendered instructions for "default" values')
+            print('Rendered instructions for "default" values')
+        logging.info('Rendered instructions for "default" values')
     return instruction_set
 
 def load_instructions(rendered_instructions):
@@ -300,7 +306,7 @@ def transform_data(key, desired_value, orig_val, action):
     Manipulates data based on the provided action
     Accepts the actions of "merge", "replace", and "delete"
     """
-    logging.debug(f'transform_data function')
+    logging.debug('transform_data function')
     transformed = orig_val
     logging.debug(f'transform_data:\nthe orig_val: {transformed}')
     logging.debug(f'transform_data:\nkey: {key}')
@@ -350,7 +356,7 @@ def test_for_key(key, manifest):
         out.append(val)
         logging.debug(f'test_for_key:\n  Matches, returning out: {out}')
         return out
-    logging.debug(f'test_for_key:\n  No matches, returning [True]')
+    logging.debug('test_for_key:\n  No matches, returning [True]')
     return [True]
 
 def perform_overlayment(action, manifest, overlay_expression, overlay_value, \
@@ -429,7 +435,7 @@ action')
                             try:
                                 # if we're unable to set something, then it's
                                 ##  not there and needs creating
-                                test = manifest[add_key]
+                                manifest[add_key]
                             except:
                                 # force the Box to create the key
                                 manifest[add_key] = {}
@@ -489,7 +495,7 @@ def test_document_query(document_query_key, manifest):
 not have a "conditions" key:\n    {i}')
             exit_run(1)
         condition_group_matched = []
-        for c in i["conditions"]:
+        for c in conditions:
             # succeed early, since only one of these 'i' groupings needs be True
             if True in matched:
                 return True
@@ -503,7 +509,7 @@ not have a "conditions" key:\n    {i}')
 match found value {v} with {c["value"]}')
                         if c["value"] == v:
                             # we have a match in manifest
-                            logging.debug(f'test_document_query: we have a \
+                            logging.debug('test_document_query: we have a \
 match in manifest')
                             condition_group_matched.append(True)
                             logging.info(f'test_document_query:\n  matched \
@@ -524,7 +530,7 @@ documentQuery grouping check because of a non-match in 1 of the conditions')
                 ## matches if op is 'and'
                 condition_group_matched.append(False)
                 logging.info(f'test_document_query:\n  no matches returned from\
- query {q["key"]}')
+ query {c["key"]}')
                 break
         if False in condition_group_matched:
             matched.append(False)
@@ -557,7 +563,7 @@ for item:\n{i["conditions"]}')
 documentQuery items')
         return False
 
-def process_manifests(overlays, manifests, manifest_path, type, stdout=False, \
+def process_manifests(overlays, manifests, manifest_path, m_type, stdout=False, \
 document=''):
     """
     Type can be either 'common' for commonOverlays and overlays or 'document'
@@ -584,7 +590,7 @@ document=''):
         elif isinstance(value, dict):
             overlay_value = Box(overlay["value"], box_dots=True)
         else:
-            printf(f'error: value of {value} is an unsupported data type: \
+            print(f'error: value of {value} is an unsupported data type: \
 {type(value)}')
             logging.error(f'process_manifests:\n  value of {value} is an \
 unsupported data type: {type(value)}')
@@ -594,7 +600,7 @@ unsupported data type: {type(value)}')
         for expression in overlay_expression:
             # onMissing does not apply to an action of delete
             if (action == "replace") or (action == "merge"):
-                if type == "common":
+                if m_type == "common":
                     # see if we have 'documentQuery' set
                     try:
                         document_query = overlay["documentQuery"]
@@ -641,7 +647,7 @@ must be a string or list: {inject_path}. ignoring inject')
             else:
                 on_missing = None
                 inject_path = []
-            if type == "common":
+            if m_type == "common":
                 logging.debug('process_manifests: type common')
                 manifest_count = 0 # to provide a doc path index on errors/warnings
                 for manifest in manifests[manifest_path]:
@@ -658,14 +664,14 @@ documentQuery key and documentIndex key')
                             doc_query_valid = \
                             test_document_query(document_query, manifest)
                             logging.debug(f'process_manifests:\n  \
-documentQuery: {doc_query}')
+documentQuery: {document_query}')
                             if doc_query_valid:
                                 # queries successfully matched
                                 manifest.merge_update(perform_overlayment(action, \
 manifest, expression, overlay_value, on_missing, inject_path, manifest_path, \
 manifest_count, stdout))
                     elif document_index_key and not document_query_key:
-                        logging.debug(f'process_manifests:\n  we have a \
+                        logging.debug('process_manifests:\n  we have a \
 documentIndex')
                         if manifest_count in document_index:
                             # do the overlayment, because it's an index match
@@ -691,7 +697,7 @@ manifest_count, stdout))
 manifest, expression, overlay_value, on_missing, inject_path, manifest_path, \
 manifest_count, stdout))
                     manifest_count += 1
-            elif type == "document":
+            elif m_type == "document":
                 # we don't take documentQuery or documentIndex for the documents key
                 try:
                     # it's possible to not have the specified doc index when
@@ -706,7 +712,7 @@ overlay_value, on_missing, inject_path, manifest_path, document, stdout))
                         # See if the doc index is there, otherwise create
                         ## empties until we hit our specified doc index
                         try:
-                            test = manifests[manifest_path][i]
+                            manifests[manifest_path][i]
                         except:
                             manifests[manifest_path].append({})
                     # now we're ready to inject a new yaml doc
@@ -722,7 +728,7 @@ def process_instructions(instructions, output_dir, stdout, dryrun):
     """
     logging.debug('process_instructions function')
     # Setup output dir structure preservation to avoid filename collissions
-    all_instruction_paths = [k for k in instructions.keys()]
+    all_instruction_paths = instructions.keys()
     all_yaml_paths = list()
     for i in all_instruction_paths:
         all_yaml_paths.extend([abspath(p["path"]) for p in \
@@ -741,8 +747,8 @@ instructions[i]["yamlFiles"]])
 {yaml.dump(instructions[instruction_path])}')
         exit_run(0)
     if not stdout:
-        for dir in unique_paths:
-            makedirs(join(output_dir, 'yaml_files') + dir, exist_ok=True)
+        for directory in unique_paths:
+            makedirs(join(output_dir, 'yaml_files') + directory, exist_ok=True)
 
     for instruction_path in all_instruction_paths:
         # dump the instructions, only when templated, and before other work in
@@ -790,7 +796,7 @@ instructions[i]["yamlFiles"]])
                     path_is_dir = True
             else:
                 print(f'The path {manifest_path} is invalid.')
-                exit(1)
+                exit_run(1)
 
             try:
                 isinstance(yaml_file['overlays'], list)
@@ -818,7 +824,7 @@ instructions[i]["yamlFiles"]])
                 for doc in yaml_file['documents']:
                     try:
                         logging.info(f'process_instructions:\n  Processing \
-"{doc["name"]}" from "{path}" instructions in document "{doc["path"]}"')
+"{doc["name"]}" from "{instruction_path}" instructions in document "{doc["path"]}"')
                     except:
                         # don't care if name is not there
                         pass
@@ -900,9 +906,11 @@ instructions[i]["yamlFiles"]])
                         print(f'Wrote yaml file "{output_path}"')
                     else:
                         print(yaml.dump_all(new_manifests, explicit_start=True))
-    return
 
 def setup_logging_verbosity(verbosity):
+    """
+    Sets log output based on number of '-V's
+    """
     if verbosity == 5:
         return logging.DEBUG
     elif verbosity == 4:
@@ -915,6 +923,8 @@ def setup_logging_verbosity(verbosity):
         return logging.CRITICAL
     elif verbosity is None:
         # default
+        return logging.WARNING
+    else:
         return logging.WARNING
 
 def main():
@@ -954,8 +964,8 @@ def main():
 
     if args.default_values_file:
         if not stdout:
-            print(f'\nCollecting default values...\n')
-            logging.info(f'Collecting default values...')
+            print('\nCollecting default values...\n')
+            logging.info('Collecting default values...')
         default_values = get_values(get_files(args.default_values_file), template=True)
         # merge all the defaults together
         tmp_defaults = {}
