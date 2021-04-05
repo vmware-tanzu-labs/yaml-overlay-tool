@@ -1,19 +1,4 @@
-/*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-package cmd
+package commands
 
 import (
 	"errors"
@@ -36,7 +21,7 @@ var rootCmd = &cobra.Command{
 of overlay instruction data with jinja2, and the application of rendered 
 overlays "over the top" of a yaml file. yot only produces valid yaml 
 documents on output.`,
-	Version: "yaml overlay tool v0.01",
+	Version: "yaml overlay tool v0.0.1",
 	// PreRun check for default usage requirements and run example
 	// PreRunE: func(cmd *cobra.Command, args []string) error {
 	// 	return CheckRequiredFlags(cmd.Flags())
@@ -79,13 +64,75 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.yot.yaml)")
 
 	// Define with Cobra
-	rootCmd.PersistentFlags().StringP("default-values-file", "d", "", "Path to your default values file. If not set, you must \npass a values file of defaults.yaml or \ndefaults.yml within a path from the -v option. \nTakes multiple default values files in case you would \nlike to separate out some of the values. After the \nfirst default values file, each subsequent file passed \nwith -d will be merged with the values from the \nfirst. If a defaults.yaml or defaults.yml file is \ndiscovered in one of your -v paths, it will be \nmerged with these values last.")
-	rootCmd.PersistentFlags().StringP("values-path", "v", "", "Values file path. May be a path to a file or directory \ncontaining value files ending in either .yml or .yaml. \nThis option can be provided multiple times \nas required. A file named defaults.yaml or \ndefaults.yml is required within the path(s) if not \nusing the -d option, and you may have only 1 default \nvalue file in that scenario. Additional values files \nare merged over the defaults.yaml file values. Each \nvalues file is treated as a unique site and will \nrender your instructions differently based on its \nvalues")
-	rootCmd.PersistentFlags().StringP("instruction-file", "i", "", "Instruction file path. Defaults to ./instructions.yaml (required)")
+	rootCmd.PersistentFlags().StringP(
+		"default-values-file",
+		"d",
+		"",
+		`Path to your default values file. If not set, you must 
+pass a values file of defaults.yaml or 
+defaults.yml within a path from the -v option. 
+Takes multiple default values files in case you would 
+like to separate out some of the values. After the 
+first default values file, each subsequent file passed 
+with -d will be merged with the values from the 
+first. If a defaults.yaml or defaults.yml file is 
+discovered in one of your -v paths, it will be 
+merged with these values last.`,
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"values-path",
+		"v",
+		"",
+		`Values file path. May be a path to a file or directory 
+containing value files ending in either .yml or .yaml. 
+This option can be provided multiple times as required. 
+A file named defaults.yaml or defaults.yml is required 
+within the path(s) if not using the -d option, and you
+may have only 1 default value file in that scenario. 
+Additional values files are merged over the defaults.yaml
+file values. Each values file is treated as a unique site
+and will render your instructions differently based on its
+values`,
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"instruction-file",
+		"i",
+		"",
+		"Instruction file path. Defaults to ./instructions.yaml (required)",
+	)
+
 	rootCmd.MarkPersistentFlagRequired("instruction-file")
-	rootCmd.PersistentFlags().StringP("output-directory", "o", "", "Path to directory to write the overlayed yaml files \nto. If value files were supplied in addition to a \ndefaults.yaml/.yml then the rendered templates will \nland in <output dir>/<addl value file name>.")
-	rootCmd.PersistentFlags().StringP("stdout", "s", "", "Render output to stdout. Templated instructions files \nwill still be output to the --output-directory.")
-	rootCmd.PersistentFlags().StringP("dump-rendered-instructions", "r", "", "If using a templated instructions file, you can dump \nthe rendered instructions to stdout to allow for \nreviewing how they were rendered prior to a full run \nof yot. Equivalent to a dry-run. Exits with return \ncode 0 prior to processing instructions")
+
+	rootCmd.PersistentFlags().StringP(
+		"output-directory",
+		"o",
+		"",
+		`Path to directory to write the overlayed yaml files to.
+If value files were supplied in addition to a 
+defaults.yaml/.yml then the rendered templates will land
+in <output dir>/<addl value file name>.`,
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"stdout",
+		"s",
+		"",
+		`Render output to stdout. Templated instructions files 
+will still be output to the --output-directory.`,
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"dump-rendered-instructions",
+		"r",
+		"",
+		`If using a templated instructions file, you can dump 
+the rendered instructions to stdout to allow for 
+reviewing how they were rendered prior to a full run 
+of yot. Equivalent to a dry-run. Exits with return
+code 0 prior to processing instructions`,
+	)
 
 	// Bind w/ viper
 	viper.BindPFlag("default-values-file", rootCmd.PersistentFlags().Lookup("default-values-file"))
@@ -145,5 +192,6 @@ func CheckRequiredFlags(flags *pflag.FlagSet) error {
 	if requiredError {
 		return errors.New("yot: error: the following arguments are required: `" + flagName + "` has not been set")
 	}
+
 	return nil
 }

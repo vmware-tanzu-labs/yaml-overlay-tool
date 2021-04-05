@@ -1,9 +1,9 @@
-package main
+package models
 
-type InstructionSchema struct {
-	CommonOverlays []Overlay  `yaml:"commonOverlays"`
-	YamlFiles      []YamlFile `yaml:"yamlFiles"`
-	// Documents     []YamlDocuments `yaml:"documents"`
+type Instructions struct {
+	CommonOverlays []Overlay       `yaml:"commonOverlays"`
+	YamlFiles      []YamlFile      `yaml:"yamlFiles"`
+	Documents      []YamlDocuments `yaml:"documents"`
 }
 
 type Overlay struct {
