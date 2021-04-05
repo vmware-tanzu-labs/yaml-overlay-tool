@@ -1,0 +1,1 @@
+should not be detected by passing '-v examples/values' as it does not end in .yml or .yaml

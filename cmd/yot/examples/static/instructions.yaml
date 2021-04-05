@@ -1,39 +1,12 @@
-/*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-package main
-
-import (
-	"fmt"
-	"log"
-	"yot/cmd"
-
-	"gopkg.in/yaml.v2"
-)
-
-func main() {
-	var data = `
 ---
-# the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
-commonOverlays:
+# the common_overlays apply to all yaml_files listed out in 'yaml_files' and are processed first on each file
+common_overlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels
     value: {'namespace': 'tanzu-dns'}
     action: merge
     # qualifier to further refine when this overlay is applied
-    documentQuery:
+    document_query:
       # default operator behavior is 'and' and has been omitted as an example of
       ## this behavior
       # all of the 'and' operator queries must match or any one of the 'or'
@@ -50,7 +23,7 @@ commonOverlays:
     query: metadata.labels
     value: {'cool_label': 'bro'}
     action: merge
-yamlFiles: # what to overlay onto
+yaml_files: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
@@ -62,13 +35,13 @@ yamlFiles: # what to overlay onto
       query: metadata.labels
       value: {'some': 'thing'}
       action: "merge"
-      onMissing:
+      on_missing:
         action: "inject" # inject | ignore
     - name: "Change the apiVersion to v2alpha1"
       query: apiVersion
       value: v2alpha1
       action: replace
-    # on the following 2 items, notice that the onMissing is not set
+    # on the following 2 items, notice that the on_missing is not set
     ## these will only affect the yaml docs that have matches, otherwise ignore
     - name: "Merge in a list item"
       query: spec.ports
@@ -87,7 +60,7 @@ yamlFiles: # what to overlay onto
           protocol: TCP
           targetPort: dns-tcp
       action: replace
-    # next one shouldn't do anything because no onMissing = implicit ignore
+    # next one shouldn't do anything because no on_missing = implicit ignore
     - query: status
       value: {}
       action: "merge"
@@ -95,18 +68,18 @@ yamlFiles: # what to overlay onto
       query: fake.key1.*
       value: {'fake': 'content1'}
       action: "merge"
-      onMissing:
+      on_missing:
         action: "inject"
-    # same as previous, but with an injectPath (actually does this one)
-    - name: "Show same example but with an injectPath"
+    # same as previous, but with an inject_path (actually does this one)
+    - name: "Show same example but with an inject_path"
       query: fake.key2.*
       value: {'fake': 'content2'}
       action: "merge"
-      onMissing:
+      on_missing:
         action: "inject"
-        injectPath: fake2.key2
+        inject_path: fake2.key2
       # qualifier to only apply to the first doc in the yaml file
-      documentIndex:
+      document_index:
         - 0
     documents: # optional and only used for multi-doc yaml files
     # need to refer to them by their index
@@ -116,40 +89,27 @@ yamlFiles: # what to overlay onto
         - query: a.b.c.d
           value: {'foo': 'bar'}
           action: merge
-          onMissing:
+          on_missing:
             action: "inject"
         - query: metadata.labels
           value: {'some': 'one'}
           action: merge
-          onMissing:
+          on_missing:
             action: "inject"
         # demos multiple inject paths on missing
         - query: x.*
           value: {'x': 'x'}
           action: merge
-          onMissing:
+          on_missing:
             action: "inject"
-            injectPath:
+            inject_path:
               - x
               - y
               - z
-  # demoing application of 'commonOverlays' without a 'overlays' or 'documents' key
+  # demoing application of 'common_overlays' without a 'overlays' or 'documents' key
   - name: "another file"
     path: "examples/manifests/another.yaml"
-    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with commonOverlays {'cool_label': 'bro'}
-    documents:
-      - path: 0
-      - path: 2
-`
-
-	cmd.Execute()
-
-	var t InstructionSchema
-
-	err := yaml.Unmarshal([]byte(data), &t)
-	if err != nil {
-		log.Printf("error: %v", err)
-	}
-	//fmt.Printf("--- t:\n%v\n\n", t)
-	fmt.Printf("%+v", t.CommonOverlays[0].DocumentQuery[0])
-}
+    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with common_overlays {'cool_label': 'bro'}
+    # documents:
+    #   - path: 0
+    #   - path: 2

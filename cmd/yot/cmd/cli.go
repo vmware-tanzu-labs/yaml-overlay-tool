@@ -13,17 +13,42 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package main
+
+package cmd
 
 import (
+	// "bufio"
+	// "encoding/json"
 	"fmt"
 	"log"
-	"yot/cmd"
 
 	"gopkg.in/yaml.v2"
+	// "os"
+	// "strings"
+	// "time"
 )
 
-func main() {
+type StaticYamlFiles struct {
+	Yaml_files []Name `yaml:"yaml_files,omitempty"`
+}
+
+type Name struct {
+	Name     string     `yaml:"name"`
+	Path     string     `yaml:"path"`
+	Overlays []Overlays `yaml:"overlays"`
+}
+
+type Overlays struct {
+	Name   string `yaml:"name"`
+	Query  string `yaml:"query"`
+	Value  string `yaml:"value"`
+	Action string `yaml:"action"`
+}
+
+func instructFile(fn string) error {
+
+	// teams full example to play with
+
 	var data = `
 ---
 # the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
@@ -142,14 +167,51 @@ yamlFiles: # what to overlay onto
       - path: 2
 `
 
-	cmd.Execute()
+	// temporary delet this example either before PR or after PR
+	s := `
+--- 
+yaml_files:
+- name: "some arbitrary descriptor"
+  path: "examples/manifests/test.yaml"
+  overlays:
+  - name: "delete all annotations"
+    query: metadata.annotations
+    value: "test"
+    action: "delete"
+`
+
+	var test StaticYamlFiles
+	// var errFile error
+	// var data []byte
+	// filename := fn
+
+	// Catch No file passed
+	// if data, errFile = ioutil.ReadFile(filename); errFile != nil {
+	// 	return errFile
+	// }
+
+	err := yaml.Unmarshal([]byte(s), &test)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+
+	fmt.Printf("--- t:\n%v\n\n", test)
+
+	d, err := yaml.Marshal(&test)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+	}
+	fmt.Printf("--- t dump:\n%s\n\n", string(d))
 
 	var t InstructionSchema
 
-	err := yaml.Unmarshal([]byte(data), &t)
-	if err != nil {
-		log.Printf("error: %v", err)
+	err2 := yaml.Unmarshal([]byte(data), &t)
+	if err2 != nil {
+		log.Printf("error: %v", err2)
 	}
 	//fmt.Printf("--- t:\n%v\n\n", t)
 	fmt.Printf("%+v", t.CommonOverlays[0].DocumentQuery[0])
+
+	// fmt.Printf("File contents: %s", data)
+	return nil
 }
