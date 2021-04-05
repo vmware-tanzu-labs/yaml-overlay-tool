@@ -1,4 +1,7 @@
-package main
+package cmd
+
+// TODO: (maybe) team may want to concider placing current schema, and future schemas, in ther own package (ex: models). this will
+// provide an area to conintuously add various shcemas
 
 type InstructionSchema struct {
 	CommonOverlays []Overlay  `yaml:"commonOverlays"`
