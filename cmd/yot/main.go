@@ -5,9 +5,6 @@ import (
 	"log"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/models"
-
-	cmd "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
-
 	"gopkg.in/yaml.v3"
 )
 
@@ -130,14 +127,17 @@ yamlFiles: # what to overlay onto
       - path: 2
 `
 
-	cmd.Execute()
+	//cmd.Execute()
 
-	var t models.Instructions
+	var t yaml.Node
+	var ts []models.Overlay
 
 	err := yaml.Unmarshal([]byte(data), &t)
 	if err != nil {
 		log.Printf("error: %v", err)
 	}
 	//fmt.Printf("--- t:\n%v\n\n", t)
-	fmt.Printf("%+v", t.CommonOverlays[0].DocumentQuery[0])
+	fmt.Printf("%+v\n", t.Content[0].Content[1])
+	t.Content[0].Content[1].Decode(&ts)
+	fmt.Printf("%+v", ts[0].Name)
 }
