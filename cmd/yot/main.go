@@ -8,7 +8,7 @@ import (
 
 	cmd "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 func main() {

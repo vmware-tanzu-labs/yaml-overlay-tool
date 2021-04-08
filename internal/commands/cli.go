@@ -5,25 +5,8 @@ import (
 	"log"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/models"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
-
-type StaticYamlFiles struct {
-	Yaml_files []Name `yaml:"yaml_files,omitempty"`
-}
-
-type Name struct {
-	Name     string     `yaml:"name"`
-	Path     string     `yaml:"path"`
-	Overlays []Overlays `yaml:"overlays"`
-}
-
-type Overlays struct {
-	Name   string `yaml:"name"`
-	Query  string `yaml:"query"`
-	Value  string `yaml:"value"`
-	Action string `yaml:"action"`
-}
 
 func instructFile(fn string) error {
 
@@ -150,7 +133,7 @@ yamlFiles: # what to overlay onto
 	// temporary delet this example either before PR or after PR
 	s := `
 --- 
-yaml_files:
+yamlFiles:
 - name: "some arbitrary descriptor"
   path: "examples/manifests/test.yaml"
   overlays:
@@ -160,7 +143,7 @@ yaml_files:
     action: "delete"
 `
 
-	var test StaticYamlFiles
+	var test models.Instructions
 	// var errFile error
 	// var data []byte
 	// filename := fn
