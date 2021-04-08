@@ -1,9 +1,8 @@
 package models
 
 type Instructions struct {
-	CommonOverlays []Overlay       `yaml:"commonOverlays,omitempty"`
-	YamlFiles      []YamlFile      `yaml:"yamlFiles,omitempty"`
-	Documents      []YamlDocuments `yaml:"documents,omitempty"`
+	CommonOverlays []Overlay  `yaml:"commonOverlays,omitempty"`
+	YamlFiles      []YamlFile `yaml:"yamlFiles,omitempty"`
 }
 
 type Overlay struct {
