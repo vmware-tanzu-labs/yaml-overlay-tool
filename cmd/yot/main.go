@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/edit"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/models"
 	"gopkg.in/yaml.v3"
 )
@@ -140,4 +141,7 @@ yamlFiles: # what to overlay onto
 	fmt.Printf("%+v\n", t.Content[0].Content[1])
 	t.Content[0].Content[1].Decode(&ts)
 	fmt.Printf("%+v", ts[0].Name)
+	edit.DeleteSeqNode(t.Content[0].Content[3], "name", "another file")
+	o, _ := yaml.Marshal(&t)
+	fmt.Print(string(o))
 }
