@@ -1,9 +1,14 @@
 package main
 
 import (
-	cmd "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
+	"os"
+
+	command "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
 )
 
 func main() {
-	cmd.Execute()
+	cmd := command.New()
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }
