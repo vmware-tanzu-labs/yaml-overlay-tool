@@ -32,20 +32,23 @@ type Condition struct {
 }
 
 type YamlFile struct {
-	Name      string    `yaml:"name,omitempty"`
-	Path      string    `yaml:"path,omitempty"`
-	Overlays  []Overlay `yaml:"overlays,omitempty"`
-	Documents []Overlay `yaml:"documents,omitempty"`
+	Name      string     `yaml:"name,omitempty"`
+	Path      string     `yaml:"path,omitempty"`
+	Overlays  []Overlay  `yaml:"overlays,omitempty"`
+	Documents []YamlFile `yaml:"documents,omitempty"`
 	Node      *yaml.Node
+	Reader    io.Reader
 }
 
 type OnMissing struct {
-	Action     string `yaml:"action,omitempty"`
-	InjectPath string `yaml:"injectPath,omitempty"`
+	Action     string      `yaml:"action,omitempty"`
+	InjectPath interface{} `yaml:"injectPath,omitempty"`
 }
 
-type YamlDocuments struct {
-	Path string `yaml:"path,omitempty"`
+type YamlDocument struct {
+	Name     string    `yaml:"name,omitempty"`
+	Index    int       `yaml:"path,omitempty"`
+	Overlays []Overlay `yaml:"overlays,omitempty"`
 }
 
 func (i *Instructions) ReadYamlFiles() error {
