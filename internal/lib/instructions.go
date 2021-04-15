@@ -6,28 +6,26 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReadInstructionFile(fileName *string) error {
+func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
 	fmt.Printf("Instructions File: %s\n\n", *fileName)
 
 	reader, err := ReadStream(*fileName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dc := yaml.NewDecoder(reader)
 	if err := dc.Decode(&instructions); err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Println(instructions)
 
 	if err := instructions.ReadYamlFiles(); err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Print(instructions.YamlFiles[0].Node)
-
-	return nil
+	return &instructions, nil
 }

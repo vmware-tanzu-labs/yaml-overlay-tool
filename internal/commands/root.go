@@ -28,12 +28,12 @@ func New() *cobra.Command {
 	documents on output.`,
 		Version: "yaml overlay tool v0.0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := lib.ReadInstructionFile(&instructionFile)
+			instructions, err := lib.ReadInstructionFile(&instructionFile)
 			if err != nil {
 				return err
 			}
 
-			return nil
+			return lib.Process(instructions)
 		},
 	}
 
