@@ -19,7 +19,7 @@ type Overlay struct {
 	Action        string          `yaml:"action,omitempty"`
 	DocumentQuery []DocumentQuery `yaml:"documentQuery,omitempty"`
 	OnMissing     OnMissing       `yaml:"onMissing,omitempty"`
-	DocumentIndex []string        `yaml:"documentIndex,omitempty"`
+	DocumentIndex []int           `yaml:"documentIndex,omitempty"`
 }
 
 type DocumentQuery struct {
@@ -37,7 +37,6 @@ type YamlFile struct {
 	Overlays  []Overlay  `yaml:"overlays,omitempty"`
 	Documents []YamlFile `yaml:"documents,omitempty"`
 	Node      *yaml.Node
-	Reader    io.Reader
 }
 
 type OnMissing struct {
