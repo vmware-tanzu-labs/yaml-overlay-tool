@@ -59,18 +59,18 @@ func (o *Overlay) process(f *YamlFile, i int) {
 
 	var node = f.Nodes[i]
 
-	fmt.Printf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
+	log.Printf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
 
 	result, err := edit.IteratePath(node, o.Query)
 	if err != nil {
-		fmt.Println("Call OnMissing Here")
+		log.Println("Call OnMissing Here")
 	}
 
 	b, _ := yaml.Marshal(&result)
 	p, _ := yaml.Marshal(o.Value)
 
-	fmt.Println("Current:")
-	fmt.Println(string(b))
-	fmt.Println("Proposed:")
-	fmt.Println(string(p))
+	log.Println("Current:")
+	log.Println(string(b))
+	log.Println("Proposed:")
+	log.Println(string(p))
 }
