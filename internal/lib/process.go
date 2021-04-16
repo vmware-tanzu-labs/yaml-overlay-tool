@@ -70,7 +70,7 @@ func (o *Overlay) process(f *YamlFile, i int) {
 	p, _ := yaml.Marshal(o.Value)
 
 	log.Println("Current:")
-	log.Println(string(b))
+	log.Printf(">>>\n%s\n", b)
 	log.Println("Proposed:")
-	log.Println(string(p))
+	log.Printf(">>>\n%s\n", p)
 }
