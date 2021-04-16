@@ -28,11 +28,11 @@ yamlFiles: # what to overlay onto
     path: "examples/manifests/test.yaml"
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
-        query: metadata.annotations
+        query: .metadata.annotations
         value: {}
         action: "delete"
       - name: "add in a new label"
-        query: metadata.labels
+        query: .metadata.labels
         value: { "some": "thing" }
         action: "merge"
         onMissing:

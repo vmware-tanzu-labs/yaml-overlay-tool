@@ -1,6 +1,11 @@
 package edit
 
-import "gopkg.in/yaml.v3"
+import (
+	"fmt"
+	"strings"
+
+	"gopkg.in/yaml.v3"
+)
 
 func IterateNode(node *yaml.Node, identifier string) *yaml.Node {
 	returnNode := false
@@ -24,4 +29,20 @@ func IterateNode(node *yaml.Node, identifier string) *yaml.Node {
 	}
 
 	return nil
+}
+
+func IteratePath(node *yaml.Node, path string) (*yaml.Node, error) {
+	components := strings.Split(path, ".")
+	pn := node
+
+	for _, c := range components {
+		node = IterateNode(pn, c)
+		if node == nil {
+			return pn, fmt.Errorf("subpath: %s not found in Path: %s ", c, path)
+		}
+
+		pn = node
+	}
+
+	return node, nil
 }
