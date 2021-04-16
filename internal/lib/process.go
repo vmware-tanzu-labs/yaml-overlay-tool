@@ -67,5 +67,10 @@ func (o *Overlay) process(f *YamlFile, i int) {
 	}
 
 	b, _ := yaml.Marshal(&result)
+	p, _ := yaml.Marshal(o.Value)
+
+	fmt.Println("Current:")
 	fmt.Println(string(b))
+	fmt.Println("Proposed:")
+	fmt.Println(string(p))
 }
