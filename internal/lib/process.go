@@ -11,19 +11,19 @@ import (
 func Process(instructions *Instructions) error {
 	for fileIndex, file := range instructions.YamlFiles {
 		for nodeIndex := range file.Nodes {
-			log.Printf("Processing Common Overlays in File %s on Document %d\n", file.Path, nodeIndex)
+			log.Printf("Processing Common Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for i := range instructions.CommonOverlays {
 				instructions.CommonOverlays[i].process(&instructions.YamlFiles[fileIndex], nodeIndex)
 			}
 
-			log.Printf("Processing File Overlays in File %s on Document %d\n", file.Path, nodeIndex)
+			log.Printf("Processing File Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for i := range file.Overlays {
 				file.Overlays[i].process(&instructions.YamlFiles[fileIndex], nodeIndex)
 			}
 
-			log.Printf("Processing Document Overlays in File %s on Document %d\n", file.Path, nodeIndex)
+			log.Printf("Processing Document Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for docIndex, doc := range file.Documents {
 				if doc.Path != fmt.Sprint(docIndex) {
