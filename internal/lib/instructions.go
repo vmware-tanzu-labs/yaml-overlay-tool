@@ -21,7 +21,7 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 		return nil, err
 	}
 
-	fmt.Println(instructions)
+	fmt.Printf("%v\n\n", instructions)
 
 	if err := instructions.ReadYamlFiles(); err != nil {
 		return nil, err

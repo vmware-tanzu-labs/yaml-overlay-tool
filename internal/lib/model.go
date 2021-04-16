@@ -36,7 +36,7 @@ type YamlFile struct {
 	Path      string     `yaml:"path,omitempty"`
 	Overlays  []Overlay  `yaml:"overlays,omitempty"`
 	Documents []YamlFile `yaml:"documents,omitempty"`
-	Node      *yaml.Node
+	Nodes     []*yaml.Node
 }
 
 type OnMissing struct {
@@ -52,23 +52,27 @@ type YamlDocument struct {
 
 func (i *Instructions) ReadYamlFiles() error {
 	for index, file := range i.YamlFiles {
-		var y yaml.Node
-
 		reader, err := ReadStream(file.Path)
 		if err != nil {
 			return err
 		}
 
 		dc := yaml.NewDecoder(reader)
-		if err := dc.Decode(&y); err == io.EOF {
-			if reader, ok := reader.(*os.File); ok {
-				CloseFile(reader)
-			}
-		} else if err != nil {
-			return err
-		}
 
-		i.YamlFiles[index].Node = &y
+		for {
+			var y yaml.Node
+
+			if err := dc.Decode(&y); err == io.EOF {
+				if reader, ok := reader.(*os.File); ok {
+					CloseFile(reader)
+					break
+				}
+			} else if err != nil {
+				return err
+			}
+
+			i.YamlFiles[index].Nodes = append(i.YamlFiles[index].Nodes, &y)
+		}
 	}
 
 	return nil
