@@ -18,9 +18,8 @@ import (
 )
 
 func New() *cobra.Command {
-
 	// rootCmd represents the base command when called without any subcommands.
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "yot [-h] [-d DEFAULT_VALUES_FILE] [-v VALUES_PATH] -i INSTRUCTION_FILE [-o OUTPUT_DIRECTORY] [-s] [-r] [-l LOG_FILE] [-V]",
 		Short: "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2",
 		Long: `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
@@ -38,10 +37,10 @@ func New() *cobra.Command {
 		},
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			cmd.SetOut(cmd.OutOrStdout())
-			var format = logging.MustStringFormatter(
+			format := logging.MustStringFormatter(
 				`%{color}%{time:15:04:05} [%{level}]%{color:reset} %{message}`,
 			)
-			var backend = logging.AddModuleLevel(
+			backend := logging.AddModuleLevel(
 				logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
 
 			if verbose {

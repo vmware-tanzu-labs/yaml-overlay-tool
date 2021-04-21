@@ -54,7 +54,7 @@ func Process(instructions *Instructions) error {
 }
 
 func (o *Overlay) process(f *YamlFile, i int) {
-	var indexFound = true
+	indexFound := true
 	if o.DocumentIndex != nil {
 		indexFound = false
 
@@ -70,7 +70,7 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		return
 	}
 
-	var node = f.Nodes[i]
+	node := f.Nodes[i]
 
 	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
 

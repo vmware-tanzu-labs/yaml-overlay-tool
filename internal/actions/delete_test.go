@@ -14,7 +14,7 @@ import (
 )
 
 func testInit() *yaml.Node {
-	var data = `
+	data := `
 apiVersion: v1
 kind: Service
 metadata:
@@ -150,11 +150,18 @@ spec:
 		t.Run(tt.name, func(t *testing.T) {
 			yp, _ := yamlpath.NewPath(tt.args.path)
 			child, _ := yp.Find(tt.args.root)
+
 			actions.Delete(tt.args.root, child[0])
+
 			buf := new(bytes.Buffer)
 			ye := yaml.NewEncoder(buf)
+
 			ye.SetIndent(2)
-			ye.Encode(tt.args.root)
+
+			if err := ye.Encode(tt.args.root); err != nil {
+				t.Errorf("Encountered Error on creating encoder: %s", err)
+			}
+
 			if buf.String() != tt.expectedValue {
 				t.Errorf("Delete() =\n%s, want \n%s", buf.String(), tt.expectedValue)
 			}
