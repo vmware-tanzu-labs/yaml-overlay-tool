@@ -5,28 +5,31 @@ package lib
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/edit"
+	"github.com/op/go-logging"
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
+
+var log = logging.MustGetLogger("lib")
 
 func Process(instructions *Instructions) error {
 	for fileIndex, file := range instructions.YamlFiles {
 		for nodeIndex := range file.Nodes {
-			log.Printf("Processing Common Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
+			log.Infof("Processing Common Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for i := range instructions.CommonOverlays {
 				instructions.CommonOverlays[i].process(&instructions.YamlFiles[fileIndex], nodeIndex)
 			}
 
-			log.Printf("Processing File Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
+			log.Infof("Processing File Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for i := range file.Overlays {
 				file.Overlays[i].process(&instructions.YamlFiles[fileIndex], nodeIndex)
 			}
 
-			log.Printf("Processing Document Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
+			log.Infof("Processing Document Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
 			for docIndex, doc := range file.Documents {
 				if doc.Path != fmt.Sprint(docIndex) {
@@ -37,6 +40,13 @@ func Process(instructions *Instructions) error {
 					file.Documents[docIndex].Overlays[i].process(&instructions.YamlFiles[fileIndex], nodeIndex)
 				}
 			}
+
+			output, err := yaml.Marshal(file.Nodes[nodeIndex])
+			if err != nil {
+				log.Errorf("unable to marshal final document %s, error: %s", file.Path, err)
+			}
+
+			log.Noticef("Final: >>>\n%s\n", output)
 		}
 	}
 
@@ -62,18 +72,34 @@ func (o *Overlay) process(f *YamlFile, i int) {
 
 	var node = f.Nodes[i]
 
-	log.Printf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
+	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
 
-	result, err := edit.IteratePath(node, o.Query)
+	yp, err := yamlpath.NewPath(o.Query)
 	if err != nil {
-		log.Println("Call OnMissing Here")
+		log.Errorf("an error occurred parsing the query path %v\n%v", o.Query, err)
 	}
 
-	b, _ := yaml.Marshal(&result)
-	p, _ := yaml.Marshal(o.Value)
+	results, err := yp.Find(node)
+	if err != nil || results == nil {
+		log.Debugf("Call OnMissing Here")
+	}
 
-	log.Println("Current:")
-	log.Printf(">>>\n%s\n", b)
-	log.Println("Proposed:")
-	log.Printf(">>>\n%s\n", p)
+	for i := range results {
+		b, _ := yaml.Marshal(&results[i])
+		p, _ := yaml.Marshal(o.Value)
+
+		log.Debugf("Current: >>>\n%s\n", b)
+		log.Debugf("Proposed: >>>\n%s\n", p)
+
+		// do something with the results based on the provided overlay action
+		switch o.Action {
+		case "delete":
+			actions.DeleteNode(results[i])
+
+		case "replace":
+		case "merge":
+		default:
+			log.Errorf("Invalid overlay action: %v", o.Action)
+		}
+	}
 }
