@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package edit
+package actions
 
 import "gopkg.in/yaml.v3"
 

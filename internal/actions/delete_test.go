@@ -1,13 +1,13 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package edit_test
+package actions_test
 
 import (
 	"log"
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/edit"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
 
@@ -144,7 +144,7 @@ func TestDeleteSeqNode(t *testing.T) {
 	y := testInit()
 
 	t.Run("Delete Test", func(t *testing.T) {
-		edit.DeleteSeqNode(y.Content[0].Content[3], "name", "another file")
+		actions.DeleteSeqNode(y.Content[0].Content[3], "name", "another file")
 		o, _ := yaml.Marshal(y)
 		ll := len(o)
 		if ll != 3936 {
