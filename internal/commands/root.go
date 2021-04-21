@@ -6,17 +6,15 @@ package commands
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
+	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/lib"
-)
-
-var (
-	instructionFile = ""
 )
 
 func New() *cobra.Command {
@@ -38,6 +36,22 @@ func New() *cobra.Command {
 
 			return lib.Process(instructions)
 		},
+		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+			cmd.SetOut(cmd.OutOrStdout())
+			var format = logging.MustStringFormatter(
+				`%{color}%{time:15:04:05} [%{level}]%{color:reset} %{message}`,
+			)
+			var backend = logging.AddModuleLevel(
+				logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
+
+			if verbose {
+				backend.SetLevel(logging.DEBUG, "")
+			} else {
+				backend.SetLevel(logging.ERROR, "")
+			}
+
+			logging.SetBackend(backend)
+		},
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -45,7 +59,7 @@ func New() *cobra.Command {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "V", false, "verbose mode")
 	rootCmd.PersistentFlags().StringP(
 		"config",
 		"c",
@@ -94,7 +108,9 @@ values`,
 		"Instruction file path. Defaults to ./instructions.yaml (required)",
 	)
 
-	rootCmd.MarkPersistentFlagRequired("instruction-file")
+	if err := rootCmd.MarkPersistentFlagRequired("instruction-file"); err != nil {
+		log.Fatal("InstructionsFile (-i) is required")
+	}
 
 	rootCmd.PersistentFlags().StringP(
 		"output-directory",

@@ -7,8 +7,6 @@ import (
 	"bufio"
 	"io"
 	"os"
-
-	"log"
 )
 
 func ReadStream(fileName string) (io.Reader, error) {
@@ -22,6 +20,6 @@ func ReadStream(fileName string) (io.Reader, error) {
 func CloseFile(file *os.File) {
 	err := file.Close()
 	if err != nil {
-		log.Printf("error closing file!: %s", err)
+		log.Error("error closing file!: %s", err)
 	}
 }
