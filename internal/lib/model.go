@@ -18,7 +18,7 @@ type Instructions struct {
 type Overlay struct {
 	Name          string          `yaml:"name,omitempty"`
 	Query         string          `yaml:"query,omitempty"`
-	Value         interface{}     `yaml:"value,omitempty"`
+	Value         yaml.Node       `yaml:"value,omitempty"`
 	Action        string          `yaml:"action,omitempty"`
 	DocumentQuery []DocumentQuery `yaml:"documentQuery,omitempty"`
 	OnMissing     OnMissing       `yaml:"onMissing,omitempty"`

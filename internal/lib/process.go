@@ -94,9 +94,12 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		// do something with the results based on the provided overlay action
 		switch o.Action {
 		case "delete":
-			actions.DeleteNode(results[i])
+			if err := actions.Delete(node, results[i], o.Query); err != nil {
+				log.Errorf("%s", err)
+			}
 
 		case "replace":
+			actions.Replace(results[i], &o.Value)
 		case "merge":
 		default:
 			log.Errorf("Invalid overlay action: %v", o.Action)
