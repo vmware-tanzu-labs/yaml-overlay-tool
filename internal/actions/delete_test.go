@@ -154,7 +154,7 @@ spec:
 		t.Run(tt.name, func(t *testing.T) {
 			yp, _ := yamlpath.NewPath(tt.args.path)
 			child, _ := yp.Find(tt.args.root)
-			err := actions.Delete(tt.args.root, child[0], tt.args.path)
+			err := actions.Delete(tt.args.root, child[0])
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}

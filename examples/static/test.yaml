@@ -2,9 +2,9 @@
 # the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
-    query: metadata.labels
-    value: { "namespace": "tanzu-dns" }
-    action: replace
+    query: metadata.labels['app.kubernetes.io/name']
+    value: {}
+    action: delete
     # qualifier to further refine when this overlay is applied
     documentQuery:
       # default operator behavior is 'and' and has been omitted as an example of
@@ -14,14 +14,15 @@ commonOverlays:
       - conditions:
           - key: kind
             value: Service
-          - key: metadata.labels.'app.kubernetes.io/name'
+          - key: metadata.labels['app.kubernetes.io/name']
             value: external-dns
       - conditions:
           - key: metadata.name
             value: pvc-var-cache-bind
   - name: "add a common label to everything"
     query: metadata.labels
-    value: { "cool_label": "bro" }
+    value: 
+      app.kubernetes.io/potato: "bro"
     action: replace
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
@@ -35,26 +36,16 @@ yamlFiles: # what to overlay onto
         query: metadata.namespace
         value: {}
         action: "delete"
-      - name: "add in a new label"
-        query: metadata.labels
-        value: { "some": "thing" }
-        action: "merge"
-        onMissing:
-          action: "inject" # inject | ignore
       - name: "Change the apiVersion to v2alpha1"
         query: apiVersion
         value: v2alpha1
         action: replace
       # on the following 2 items, notice that the onMissing is not set
       ## these will only affect the yaml docs that have matches, otherwise ignore
-      - name: "Merge in a list item"
-        query: spec.ports
-        value:
-          - name: dns-tcp
-            port: 53
-            protocol: TCP
-            targetPort: dns-tcp
-        action: merge
+      - name: "test Deleting a Seq Node"
+        query: spec.accessModes[1]
+        value: {}
+        action: delete
       # not really a real-world example, but showing off functionality
       - name: "now replace the merged list with just the new port"
         query: spec.ports

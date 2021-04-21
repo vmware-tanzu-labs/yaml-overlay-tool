@@ -4,103 +4,48 @@
 package actions
 
 import (
-	"strings"
-
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
-// TODO: add delete caps for sequence nodes.
-func Delete(root, child *yaml.Node, path string) error {
-	pc := strings.Split(path, ".")
-	parentPath := strings.Join(pc[:len(pc)-1], ".")
-
-	// if we are searching at root we need to add the root anchor to unwrap the document node so thing process correctly
-	if parentPath == "" {
-		parentPath = "$"
-	}
-
-	yp, err := yamlpath.NewPath(parentPath)
-	if err != nil {
-		return err
-	}
-
-	parentNodes, err := yp.Find(root)
-	if err != nil {
-		return err
-	}
-
-	for _, pn := range parentNodes {
-		if err := deleteNode(pn, child); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func deleteNode(pn, child *yaml.Node) error {
+func Delete(pn, child *yaml.Node) error {
 	for i, c := range pn.Content {
-		if c != nil {
-			if c.Kind == yaml.SequenceNode {
-				if err := deleteNode(c, child); err != nil {
+		// we are comparing against the memory address of the pointer not the value
+		// so this will only find one result in the yaml tree
+		if c != child {
+			if c.Content != nil {
+				if err := Delete(c, child); err != nil {
 					return err
 				}
 			}
-		}
 
-		if c != child {
 			continue
 		}
 
+		// when working with sequance nodes we only need to delete one node
+		// however when working with scalars or maps we need to delete both the key and the value
 		length := len(pn.Content)
-		floor := 1
-		roof := 2
+
+		// start is the the subtractor needed to get to the first key to delete
+		// for maps/scalars this would be -1 since the key is always the index right before the value
+		// for sequences this would be 0 since we only have one vlaue to delete, the one we are currently on
+		start := 1
+
+		// nodes to delete is the amount of nodes needed to be deleted
+		// for sequence nodes this would be 1
+		// for maps and scalars this would be 2
+		nodesToDelete := 2
 
 		if pn.Kind == yaml.SequenceNode {
-			floor--
-			roof--
+			start--
+			nodesToDelete--
 		}
 
-		copy(pn.Content[i-floor:], pn.Content[i+1:])
-		pn.Content[length-roof] = nil
-		pn.Content = pn.Content[:length-roof]
+		copy(pn.Content[i-start:], pn.Content[i+1:])
+		pn.Content[length-nodesToDelete] = nil
+		pn.Content = pn.Content[:length-nodesToDelete]
 
 		return nil
 	}
 
 	return nil
-}
-
-func DeleteSeqNode(n *yaml.Node, key, value string) {
-	state := -1
-	indexRemove := -1
-
-	for index, pn := range n.Content {
-		for _, cn := range pn.Content {
-			if key == cn.Value && state == -1 {
-				state++
-
-				continue // found expected move onto next
-			}
-
-			if value == cn.Value && state == 0 {
-				state++
-
-				indexRemove = index
-
-				break // found the target exit out of the loop
-			} else if state == 0 {
-				state = -1
-			}
-		}
-	}
-
-	if state == 1 {
-		// Remove node from contents
-		length := len(n.Content)
-		copy(n.Content[indexRemove:], n.Content[indexRemove+1:])
-		n.Content[length-1] = nil
-		n.Content = n.Content[:length-1]
-	}
 }
