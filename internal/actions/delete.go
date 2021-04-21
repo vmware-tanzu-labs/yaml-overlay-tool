@@ -7,15 +7,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Delete(pn, child *yaml.Node) error {
+func Delete(pn, child *yaml.Node) {
 	for i, c := range pn.Content {
 		// we are comparing against the memory address of the pointer not the value
 		// so this will only find one result in the yaml tree
 		if c != child {
 			if c.Content != nil {
-				if err := Delete(c, child); err != nil {
-					return err
-				}
+				Delete(c, child)
 			}
 
 			continue
@@ -44,8 +42,6 @@ func Delete(pn, child *yaml.Node) error {
 		pn.Content[length-nodesToDelete] = nil
 		pn.Content = pn.Content[:length-nodesToDelete]
 
-		return nil
+		return
 	}
-
-	return nil
 }

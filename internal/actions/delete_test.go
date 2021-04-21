@@ -62,7 +62,6 @@ func TestDelete(t *testing.T) {
 	tests := []struct {
 		name          string
 		args          args
-		wantErr       bool
 		expectedValue string
 	}{
 		{
@@ -71,7 +70,6 @@ func TestDelete(t *testing.T) {
 				root: testYaml,
 				path: "kind",
 			},
-			wantErr: false,
 			expectedValue: `apiVersion: v1
 metadata:
   name: bind-udp
@@ -103,7 +101,6 @@ spec:
 				root: testYaml,
 				path: "metadata.annotations",
 			},
-			wantErr: false,
 			expectedValue: `apiVersion: v1
 metadata:
   name: bind-udp
@@ -131,7 +128,6 @@ spec:
 				root: testYaml,
 				path: "spec.ports[0]",
 			},
-			wantErr: false,
 			expectedValue: `apiVersion: v1
 metadata:
   name: bind-udp
@@ -154,10 +150,7 @@ spec:
 		t.Run(tt.name, func(t *testing.T) {
 			yp, _ := yamlpath.NewPath(tt.args.path)
 			child, _ := yp.Find(tt.args.root)
-			err := actions.Delete(tt.args.root, child[0])
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			actions.Delete(tt.args.root, child[0])
 			buf := new(bytes.Buffer)
 			ye := yaml.NewEncoder(buf)
 			ye.SetIndent(2)

@@ -94,10 +94,7 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		// do something with the results based on the provided overlay action
 		switch o.Action {
 		case "delete":
-			if err := actions.Delete(node, results[i]); err != nil {
-				log.Errorf("%s", err)
-			}
-
+			actions.Delete(node, results[i])
 		case "replace":
 			actions.Replace(results[i], &o.Value)
 		case "merge":
