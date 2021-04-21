@@ -3,8 +3,48 @@
 
 package actions
 
-import "gopkg.in/yaml.v3"
+import (
+	"strings"
 
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
+	"gopkg.in/yaml.v3"
+)
+
+func Delete(root, child *yaml.Node, path string) error {
+	pc := strings.Split(path, ".")
+	parentPath := strings.Join(pc[:len(pc)-1], ".")
+
+	// if we are searching at root we need to add the root anchor to unwrap the document node so thing process correctly
+	if parentPath == "" {
+		parentPath = "$"
+	}
+
+	yp, err := yamlpath.NewPath(parentPath)
+	if err != nil {
+		return err
+	}
+
+	parentNodes, err := yp.Find(root)
+	if err != nil {
+		return err
+	}
+
+	for _, pn := range parentNodes {
+		for i, c := range pn.Content {
+			if c != child {
+				continue
+			}
+
+			length := len(pn.Content)
+
+			copy(pn.Content[i-1:], pn.Content[i+1:])
+			pn.Content[length-2] = nil
+			pn.Content = pn.Content[:length-2]
+		}
+	}
+
+	return nil
+}
 func DeleteNode(n *yaml.Node) {
 	n.Content = []*yaml.Node{}
 }

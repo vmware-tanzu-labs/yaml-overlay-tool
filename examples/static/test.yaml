@@ -4,7 +4,7 @@ commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels
     value: { "namespace": "tanzu-dns" }
-    action: merge
+    action: replace
     # qualifier to further refine when this overlay is applied
     documentQuery:
       # default operator behavior is 'and' and has been omitted as an example of
@@ -22,7 +22,7 @@ commonOverlays:
   - name: "add a common label to everything"
     query: metadata.labels
     value: { "cool_label": "bro" }
-    action: merge
+    action: replace
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
@@ -59,10 +59,13 @@ yamlFiles: # what to overlay onto
       - name: "now replace the merged list with just the new port"
         query: spec.ports
         value:
-          - name: dns-tcp
+          #Test Head Comment
+          - name: dns-tcp # Test Line Comment
             port: 53
+            #Test Head Comment
             protocol: TCP
             targetPort: dns-tcp
+            #Test Tail Comment
         action: replace
       # next one shouldn't do anything because no onMissing = implicit ignore
       - query: status

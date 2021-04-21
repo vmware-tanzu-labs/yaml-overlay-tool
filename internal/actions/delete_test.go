@@ -4,151 +4,162 @@
 package actions_test
 
 import (
+	"bytes"
 	"log"
 	"testing"
 
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
 
 func testInit() *yaml.Node {
 	var data = `
----
-# the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
-commonOverlays:
-  - name: "add a label to certain yaml documents with refined criteria"
-    query: metadata.labels
-    value: {'namespace': 'tanzu-dns'}
-    action: merge
-    # qualifier to further refine when this overlay is applied
-    documentQuery:
-      # default operator behavior is 'and' and has been omitted as an example of
-      ## this behavior
-      # all of the 'and' operator queries must match or any one of the 'or'
-      ## operator queries
-    - conditions:
-      - key: kind
-        value: Service
-      - key: metadata.labels.'app.kubernetes.io/name'
-        value: external-dns
-    - conditions:
-      - key: metadata.name
-        value: pvc-var-cache-bind
-  - name: "add a common label to everything"
-    query: metadata.labels
-    value: {'cool_label': 'bro'}
-    action: merge
-yamlFiles: # what to overlay onto
-  - name: "some arbitrary descriptor" # Name is Optional
-    path: "examples/manifests/test.yaml"
-    overlays: # if multi-doc yaml file, applies to all docs, gets applied first
-    - name: "delete all annotations"
-      query: metadata.annotations
-      value: {}
-      action: "delete"
-    - name: "add in a new label"
-      query: metadata.labels
-      value: {'some': 'thing'}
-      action: "merge"
-      onMissing:
-        action: "inject" # inject | ignore
-    - name: "Change the apiVersion to v2alpha1"
-      query: apiVersion
-      value: v2alpha1
-      action: replace
-    # on the following 2 items, notice that the onMissing is not set
-    ## these will only affect the yaml docs that have matches, otherwise ignore
-    - name: "Merge in a list item"
-      query: spec.ports
-      value:
-        - name: dns-tcp
-          port: 53
-          protocol: TCP
-          targetPort: dns-tcp
-      action: merge
-    # not really a real-world example, but showing off functionality
-    - name: "now replace the merged list with just the new port"
-      query: spec.ports
-      value:
-        - name: dns-tcp
-          port: 53
-          protocol: TCP
-          targetPort: dns-tcp
-      action: replace
-    # next one shouldn't do anything because no onMissing = implicit ignore
-    - query: status
-      value: {}
-      action: "merge"
-    - name: "Demo the need for an inject path"
-      query: fake.key1.*
-      value: {'fake': 'content1'}
-      action: "merge"
-      onMissing:
-        action: "inject"
-    # same as previous, but with an injectPath (actually does this one)
-    - name: "Show same example but with an injectPath"
-      query: fake.key2.*
-      value: {'fake': 'content2'}
-      action: "merge"
-      onMissing:
-        action: "inject"
-        injectPath: fake2.key2
-      # qualifier to only apply to the first doc in the yaml file
-      documentIndex:
-        - 0
-    documents: # optional and only used for multi-doc yaml files
-    # need to refer to them by their index
-    - name: the manifest that does something
-      path: 0
-      overlays:
-        - query: a.b.c.d
-          value: {'foo': 'bar'}
-          action: merge
-          onMissing:
-            action: "inject"
-        - query: metadata.labels
-          value: {'some': 'one'}
-          action: merge
-          onMissing:
-            action: "inject"
-        # demos multiple inject paths on missing
-        - query: x.*
-          value: {'x': 'x'}
-          action: merge
-          onMissing:
-            action: "inject"
-            injectPath:
-              - x
-              - y
-              - z
-  # demoing application of 'commonOverlays' without a 'overlays' or 'documents' key
-  - name: "another file"
-    path: "examples/manifests/another.yaml"
-    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with commonOverlays {'cool_label': 'bro'}
-    documents:
-      - path: 0
-      - path: 2
+apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
 `
 
 	var t yaml.Node
 
 	err := yaml.Unmarshal([]byte(data), &t)
 	if err != nil {
-		log.Fatal("Error Unmarshalling")
+		log.Fatalf("Error Unmarshalling: %s", err)
 	}
 
 	return &t
 }
 
-func TestDeleteSeqNode(t *testing.T) {
-	y := testInit()
+func TestDelete(t *testing.T) {
+	testYaml := testInit()
 
-	t.Run("Delete Test", func(t *testing.T) {
-		actions.DeleteSeqNode(y.Content[0].Content[3], "name", "another file")
-		o, _ := yaml.Marshal(y)
-		ll := len(o)
-		if ll != 3936 {
-			t.Errorf("Document does not match expected length, got %d; want 3936", ll)
-		}
-	})
+	type args struct {
+		root *yaml.Node
+		path string
+	}
+
+	tests := []struct {
+		name          string
+		args          args
+		wantErr       bool
+		expectedValue string
+	}{
+		{
+			name: "Delete Scalar Node",
+			args: args{
+				root: testYaml,
+				path: "kind",
+			},
+			wantErr: false,
+			expectedValue: `apiVersion: v1
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+`,
+		},
+		{
+			name: "Delete Map Node",
+			args: args{
+				root: testYaml,
+				path: "metadata.annotations",
+			},
+			wantErr: false,
+			expectedValue: `apiVersion: v1
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+`,
+		},
+		{
+			name: "Delete Seq Node",
+			args: args{
+				root: testYaml,
+				path: "spec.ports",
+			},
+			wantErr: false,
+			expectedValue: `apiVersion: v1
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+`,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			yp, _ := yamlpath.NewPath(tt.args.path)
+			child, _ := yp.Find(tt.args.root)
+			err := actions.Delete(tt.args.root, child[0], tt.args.path)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			buf := new(bytes.Buffer)
+			ye := yaml.NewEncoder(buf)
+			ye.SetIndent(2)
+			ye.Encode(tt.args.root)
+			if buf.String() != tt.expectedValue {
+				t.Errorf("Delete() =\n%s, want \n%s", buf.String(), tt.expectedValue)
+			}
+		})
+	}
 }
