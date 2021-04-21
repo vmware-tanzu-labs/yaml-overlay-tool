@@ -129,7 +129,7 @@ spec:
 			name: "Delete Seq Node",
 			args: args{
 				root: testYaml,
-				path: "spec.ports",
+				path: "spec.ports[0]",
 			},
 			wantErr: false,
 			expectedValue: `apiVersion: v1
@@ -142,6 +142,11 @@ spec:
   selector:
     app.kubernetes.io/name: external-dns
   type: LoadBalancer
+  ports:
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
 `,
 		},
 	}

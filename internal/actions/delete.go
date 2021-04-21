@@ -10,6 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// TODO: add delete caps for sequence nodes.
 func Delete(root, child *yaml.Node, path string) error {
 	pc := strings.Split(path, ".")
 	parentPath := strings.Join(pc[:len(pc)-1], ".")
@@ -30,23 +31,45 @@ func Delete(root, child *yaml.Node, path string) error {
 	}
 
 	for _, pn := range parentNodes {
-		for i, c := range pn.Content {
-			if c != child {
-				continue
-			}
-
-			length := len(pn.Content)
-
-			copy(pn.Content[i-1:], pn.Content[i+1:])
-			pn.Content[length-2] = nil
-			pn.Content = pn.Content[:length-2]
+		if err := deleteNode(pn, child); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
-func DeleteNode(n *yaml.Node) {
-	n.Content = []*yaml.Node{}
+
+func deleteNode(pn, child *yaml.Node) error {
+	for i, c := range pn.Content {
+		if c != nil {
+			if c.Kind == yaml.SequenceNode {
+				if err := deleteNode(c, child); err != nil {
+					return err
+				}
+			}
+		}
+
+		if c != child {
+			continue
+		}
+
+		length := len(pn.Content)
+		floor := 1
+		roof := 2
+
+		if pn.Kind == yaml.SequenceNode {
+			floor--
+			roof--
+		}
+
+		copy(pn.Content[i-floor:], pn.Content[i+1:])
+		pn.Content[length-roof] = nil
+		pn.Content = pn.Content[:length-roof]
+
+		return nil
+	}
+
+	return nil
 }
 
 func DeleteSeqNode(n *yaml.Node, key, value string) {
