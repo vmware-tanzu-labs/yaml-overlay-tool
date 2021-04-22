@@ -4,6 +4,8 @@
 package lib
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"os"
 
@@ -65,13 +67,14 @@ func (i *Instructions) ReadYamlFiles() error {
 		for {
 			var y yaml.Node
 
-			if err := dc.Decode(&y); err == io.EOF {
+			if err := dc.Decode(&y); errors.Is(err, io.EOF) {
 				if reader, ok := reader.(*os.File); ok {
 					CloseFile(reader)
+
 					break
 				}
 			} else if err != nil {
-				return err
+				return fmt.Errorf("failed to read file %s: %w", file.Path, err)
 			}
 
 			i.YamlFiles[index].Nodes = append(i.YamlFiles[index].Nodes, &y)

@@ -18,8 +18,7 @@ func ReadStream(fileName string) (io.Reader, error) {
 }
 
 func CloseFile(file *os.File) {
-	err := file.Close()
-	if err != nil {
+	if err := file.Close(); err != nil {
 		log.Error("error closing file!: %s", err)
 	}
 }

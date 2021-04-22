@@ -52,10 +52,9 @@ spec:
 }
 
 func TestDelete(t *testing.T) {
-	testYaml := testInit()
+	t.Parallel()
 
 	type args struct {
-		root *yaml.Node
 		path string
 	}
 
@@ -67,7 +66,6 @@ func TestDelete(t *testing.T) {
 		{
 			name: "Delete Scalar Node",
 			args: args{
-				root: testYaml,
 				path: "kind",
 			},
 			expectedValue: `apiVersion: v1
@@ -98,10 +96,10 @@ spec:
 		{
 			name: "Delete Map Node",
 			args: args{
-				root: testYaml,
 				path: "metadata.annotations",
 			},
 			expectedValue: `apiVersion: v1
+kind: Service
 metadata:
   name: bind-udp
   namespace: tanzu-dns
@@ -125,15 +123,19 @@ spec:
 		{
 			name: "Delete Seq Node",
 			args: args{
-				root: testYaml,
 				path: "spec.ports[0]",
 			},
 			expectedValue: `apiVersion: v1
+kind: Service
 metadata:
   name: bind-udp
   namespace: tanzu-dns
   labels:
     app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
   selector:
     app.kubernetes.io/name: external-dns
@@ -147,22 +149,25 @@ spec:
 		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			yp, _ := yamlpath.NewPath(tt.args.path)
-			child, _ := yp.Find(tt.args.root)
+		testYaml := testInit()
+		testCase := tt
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
+			yp, _ := yamlpath.NewPath(testCase.args.path)
+			child, _ := yp.Find(testYaml)
 
-			actions.Delete(tt.args.root, child[0])
+			actions.Delete(testYaml, child[0])
 
 			buf := new(bytes.Buffer)
 			ye := yaml.NewEncoder(buf)
 
 			ye.SetIndent(2)
 
-			if err := ye.Encode(tt.args.root); err != nil {
+			if err := ye.Encode(testYaml); err != nil {
 				t.Errorf("Encountered Error on creating encoder: %s", err)
 			}
 
-			if buf.String() != tt.expectedValue {
+			if buf.String() != testCase.expectedValue {
 				t.Errorf("Delete() =\n%s, want \n%s", buf.String(), tt.expectedValue)
 			}
 		})

@@ -61,6 +61,7 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		for di := range o.DocumentIndex {
 			if i == o.DocumentIndex[di] {
 				indexFound = true
+
 				break
 			}
 		}
