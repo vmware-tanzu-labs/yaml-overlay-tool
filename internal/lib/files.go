@@ -5,6 +5,7 @@ package lib
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 )
@@ -14,7 +15,12 @@ func ReadStream(fileName string) (io.Reader, error) {
 		return bufio.NewReader(os.Stdin), nil
 	}
 
-	return os.Open(fileName)
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, fmt.Errorf("unable to open file %s: %w", fileName, err)
+	}
+
+	return file, nil
 }
 
 func CloseFile(file *os.File) {

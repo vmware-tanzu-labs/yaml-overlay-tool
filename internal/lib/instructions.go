@@ -12,7 +12,7 @@ import (
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
-	fmt.Printf("Instructions File: %s\n\n", *fileName)
+	log.Debugf("Instructions File: %s\n\n", *fileName)
 
 	reader, err := ReadStream(*fileName)
 	if err != nil {
@@ -21,10 +21,10 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 
 	dc := yaml.NewDecoder(reader)
 	if err := dc.Decode(&instructions); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to read instructions file %s: %w", *fileName, err)
 	}
 
-	fmt.Printf("%v\n\n", instructions)
+	log.Debugf("%v\n\n", instructions)
 
 	if err := instructions.ReadYamlFiles(); err != nil {
 		return nil, err
