@@ -85,8 +85,8 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		log.Debugf("Call OnMissing Here")
 	}
 
-	for i := range results {
-		b, _ := yaml.Marshal(&results[i])
+	for ri := range results {
+		b, _ := yaml.Marshal(&results[ri])
 		p, _ := yaml.Marshal(o.Value)
 
 		log.Debugf("Current: >>>\n%s\n", b)
@@ -95,9 +95,14 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		// do something with the results based on the provided overlay action
 		switch o.Action {
 		case "delete":
-			actions.Delete(node, results[i])
+			actions.Delete(node, results[ri])
 		case "replace":
-			actions.Replace(results[i], &o.Value)
+			actions.Replace(results[ri], &o.Value)
+		case "format":
+			err := actions.Format(results[ri], &o.Value)
+			if err != nil {
+				log.Errorf("%s, skipping format for %s result %d in file %s on Document %d", err, o.Query, ri, f.Path, i)
+			}
 		case "merge":
 		default:
 			log.Errorf("Invalid overlay action: %v", o.Action)
