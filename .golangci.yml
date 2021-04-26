@@ -63,56 +63,76 @@ linters:
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
   disable-all: true
   enable:
+    - asciicheck
     - bodyclose
+    - cyclop
     - deadcode
     - depguard
     - dogsled
     - dupl
+    - durationcheck
     - errcheck
-    - exportloopref
+    - errorlint
     - exhaustive
+    - exhaustivestruct
+    - exportloopref
+    - forbidigo
+    - forcetypeassert
     - funlen
+    - gci
+    - gochecknoglobals
     - gochecknoinits
+    - gocognit
     - goconst
     - gocritic
     - gocyclo
+    - godot
+    - godox
+    - goerr113
     - gofmt
+    - goheader
     - goimports
     - golint
     - gomnd
+    - gomoddirectives
+    - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - ifshort
+    - importas
     - ineffassign
+    - interfacer
     - lll
+    - makezero
     - misspell
     - nakedret
+    - nestif
+    - nilerr
+    - nlreturn
     - noctx
     - nolintlint
+    - paralleltest
+    - prealloc
+    - predeclared
+    - revive
     - rowserrcheck
+    - sqlclosecheck
     - staticcheck
     - structcheck
     - stylecheck
+    - testpackage
+    - thelper
+    - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
     - varcheck
+    - wastedassign
     - whitespace
-    - asciicheck
-    - scopelint
-    #- gochecknoglobals
-    - gocognit
-    - godot
-    - godox
-    - goerr113
-    - interfacer
-    - maligned
-    - nestif
-    - prealloc
-    - testpackage
-    - revive
+    - wrapcheck
     - wsl
 
 issues:
@@ -122,6 +142,10 @@ issues:
       linters:
         - gomnd
         - funlen
+        - scopelint
+    - path: internal/commands/*\.go
+      linters:
+        - gochecknoglobals
 
     # https://github.com/go-critic/go-critic/issues/926
     - linters:
