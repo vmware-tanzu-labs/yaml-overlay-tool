@@ -4,20 +4,29 @@
 package actions
 
 import (
+	"errors"
 	"fmt"
 
+	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v3"
 )
 
-func Format(node, value *yaml.Node) error {
-	if node.Kind == yaml.ScalarNode && value.Kind == yaml.ScalarNode {
-		value.Value = CondSprintf(value.Value, node.Value)
-		*node = *value
+var ErrFormatOnlyForScalars = errors.New("format action can only be used on scalar values")
+
+func Format(originalValue, newValue *yaml.Node) error {
+	if originalValue.Kind == yaml.ScalarNode && newValue.Kind == yaml.ScalarNode {
+		ov := originalValue.Value
+
+		if err := mergo.Merge(originalValue, *newValue, mergo.WithOverride); err != nil {
+			return fmt.Errorf("failed to merge prior to formatting: %w", err)
+		}
+
+		originalValue.Value = CondSprintf(originalValue.Value, ov)
 
 		return nil
 	}
 
-	return fmt.Errorf("action format can only be used on scalar values")
+	return ErrFormatOnlyForScalars
 }
 
 func CondSprintf(format string, v ...interface{}) string {

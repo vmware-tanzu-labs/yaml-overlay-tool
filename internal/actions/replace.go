@@ -1,7 +1,21 @@
 package actions
 
-import "gopkg.in/yaml.v3"
+import (
+	"fmt"
 
-func Replace(original, replaceValue *yaml.Node) {
-	*original = *replaceValue
+	"github.com/jinzhu/copier"
+	"gopkg.in/yaml.v3"
+)
+
+func Replace(original, replaceValue *yaml.Node) error {
+	options := copier.Option{
+		IgnoreEmpty: false,
+		DeepCopy:    true,
+	}
+
+	if err := copier.CopyWithOption(original, replaceValue, options); err != nil {
+		return fmt.Errorf("failed to replace value: %w", err)
+	}
+
+	return nil
 }
