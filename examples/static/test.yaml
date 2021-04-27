@@ -3,8 +3,8 @@
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: metadata.labels['app.kubernetes.io/name']
-    value: {}
-    action: delete
+    value: "potato" #Need to determine what the placeholder should be
+    action: replace
     # qualifier to further refine when this overlay is applied
     documentQuery:
       # default operator behavior is 'and' and has been omitted as an example of
@@ -22,7 +22,7 @@ commonOverlays:
   - name: "add a common label to everything"
     query: metadata.labels
     value: 
-      app.kubernetes.io/potato: "bro"
+      app.kubernetes.io/name: "test"
     action: replace
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
@@ -76,24 +76,44 @@ yamlFiles: # what to overlay onto
         onMissing:
           action: "inject"
           injectPath: fake2.key2
-        # qualifier to only apply to the first doc in the yaml file
+      # qualifier to only apply to the first doc in the yaml file
         documentIndex:
           - 0
+      # test out some merges
+      - name: "add some more text to existing label (string concatenation test)"
+        query: metadata.labels['app.kubernetes.io/name']
+        value: "ing"
+        action: merge
+      - name: "add to a sequence (array extension)"
+        query: spec.accessModes
+        value:
+          - sequenceMergeTest
+        action: merge
+      - name: "add 1 to service port number (integer concatenation test)"
+        query: spec.ports[0].port
+        value: 1 # expect port 54 to come out (yes this is weird)
+        action: merge
+      - name: "add some new labels to a manifest"
+        query: metadata.labels
+        value:
+          potato: "test"
+          app.kubernes.io/name: thatsYachty
+          app.kubernetes.io/owner: vmware-tanzu-labs
+          app.kubernetes.io/purpose: dns
+        action: merge
+      - name: "Apply kapp change group annotations"
+        query: "metadata.annotations"
+        value:
+          kapp.k14s.io/change-group: "external-dns"
+          kapp.k14s.io/change-rule: "upsert after upserting external-dns"
+          kapp.k14s.io/update-strategy: "skip"
+          kapp.k14s.io/create-strategy: "fallback-on-update"
+        action: "merge"
     documents: # optional and only used for multi-doc yaml files
       # need to refer to them by their index
       - name: the manifest that does something
         path: 0
         overlays:
-          - query: a.b.c.d
-            value: { "foo": "bar" }
-            action: merge
-            onMissing:
-              action: "inject"
-          - query: metadata.labels
-            value: { "some": "one" }
-            action: merge
-            onMissing:
-              action: "inject"
           # demos multiple inject paths on missing
           - query: x.*
             value: { "x": "x" }
@@ -107,7 +127,11 @@ yamlFiles: # what to overlay onto
   # demoing application of 'commonOverlays' without a 'overlays' or 'documents' key
   - name: "another file"
     path: "examples/manifests/another.yaml"
-    # uncomment the following 3 lines to see this affect 2 of 3 docs in 'another.yaml' with commonOverlays {'cool_label': 'bro'}
-    # documents:
-    #   - path: 0
-    #   - path: 2
+    overlays:
+      - name: "Replace image name"
+        query: "..[?(@.image=~/.*/)].image" 
+        value: 
+          #Test Comment
+          "registry-harbor.vmware.com/docker-hub-cache/%s"
+          #Test Foot Comment
+        action: format
