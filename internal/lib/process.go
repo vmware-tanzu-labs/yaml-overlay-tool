@@ -4,6 +4,7 @@
 package lib
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/op/go-logging"
@@ -12,9 +13,17 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var log = logging.MustGetLogger("lib")
+var (
+	log              = logging.MustGetLogger("lib") //nolint:gochecknoglobals
+	ErrInvalidAction = errors.New("invalid overlay action")
+)
 
-func Process(instructions *Instructions) error {
+func Process(options *Options) error {
+	instructions, err := ReadInstructionFile(&options.InstructionsFile)
+	if err != nil {
+		return err
+	}
+
 	for fileIndex, file := range instructions.YamlFiles {
 		for nodeIndex := range file.Nodes {
 			log.Infof("Processing Common Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
@@ -47,6 +56,9 @@ func Process(instructions *Instructions) error {
 			}
 
 			log.Noticef("Final: >>>\n%s\n", output)
+			// added so we can quickly see the results of the run
+			fmt.Printf("---\n%s", output)
+			// Save to File
 		}
 	}
 
@@ -54,20 +66,7 @@ func Process(instructions *Instructions) error {
 }
 
 func (o *Overlay) process(f *YamlFile, i int) {
-	indexFound := true
-	if o.DocumentIndex != nil {
-		indexFound = false
-
-		for di := range o.DocumentIndex {
-			if i == o.DocumentIndex[di] {
-				indexFound = true
-
-				break
-			}
-		}
-	}
-
-	if !indexFound {
+	if ok := checkIndex(i, o.DocumentIndex); !ok {
 		return
 	}
 
@@ -77,7 +76,7 @@ func (o *Overlay) process(f *YamlFile, i int) {
 
 	yp, err := yamlpath.NewPath(o.Query)
 	if err != nil {
-		log.Errorf("an error occurred parsing the query path %v\n%v", o.Query, err)
+		log.Errorf("an error occurred parsing the query path %v\n%w", o.Query, err)
 	}
 
 	results, err := yp.Find(node)
@@ -85,6 +84,26 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		log.Debugf("Call OnMissing Here")
 	}
 
+	if err := processActions(node, results, o); err != nil {
+		log.Errorf("%w in file %s on Document %d", err, f.Path, i)
+	}
+}
+
+func checkIndex(current int, filter []int) bool {
+	if filter != nil {
+		for f := range filter {
+			if current == filter[f] {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return true
+}
+
+func processActions(node *yaml.Node, results []*yaml.Node, o *Overlay) error {
 	for ri := range results {
 		b, _ := yaml.Marshal(&results[ri])
 		p, _ := yaml.Marshal(o.Value)
@@ -97,15 +116,21 @@ func (o *Overlay) process(f *YamlFile, i int) {
 		case "delete":
 			actions.Delete(node, results[ri])
 		case "replace":
-			actions.Replace(results[ri], &o.Value)
+			if err := actions.Replace(results[ri], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping replace for %s result %d", err, o.Query, ri)
+			}
 		case "format":
-			err := actions.Format(results[ri], &o.Value)
-			if err != nil {
-				log.Errorf("%s, skipping format for %s result %d in file %s on Document %d", err, o.Query, ri, f.Path, i)
+			if err := actions.Format(results[ri], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping format for %s result %d", err, o.Query, ri)
 			}
 		case "merge":
+			if err := actions.Merge(results[ri], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping merge for %s result %d", err, o.Query, ri)
+			}
 		default:
-			log.Errorf("Invalid overlay action: %v", o.Action)
+			return fmt.Errorf("%w: %s", ErrInvalidAction, o.Action)
 		}
 	}
+
+	return nil
 }

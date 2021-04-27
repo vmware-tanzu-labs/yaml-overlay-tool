@@ -12,6 +12,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Options struct {
+	Verbose          bool
+	InstructionsFile string
+	OutputDir        string
+	StdOut           bool
+}
+
 type Instructions struct {
 	CommonOverlays []Overlay  `yaml:"commonOverlays,omitempty"`
 	YamlFiles      []YamlFile `yaml:"yamlFiles,omitempty"`
