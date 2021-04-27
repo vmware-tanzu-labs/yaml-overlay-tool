@@ -4,7 +4,6 @@
 package commands
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -16,6 +15,8 @@ import (
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/lib"
 )
 
+var ErrMissingRequired = fmt.Errorf("missing required arguments")
+
 func New() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
@@ -24,24 +25,15 @@ func New() *cobra.Command {
 		Long:    yotLong,
 		Version: "yaml overlay tool v0.0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return lib.Process(&options)
-		},
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
-			cmd.SetOut(cmd.OutOrStdout())
-			format := logging.MustStringFormatter(
-				`%{color}%{time:15:04:05} [%{level}]%{color:reset} %{message}`,
-			)
-			backend := logging.AddModuleLevel(
-				logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
+			if err := lib.Execute(&options); err != nil {
+				cmd.SilenceUsage = true
 
-			if options.Verbose {
-				backend.SetLevel(logging.DEBUG, "")
-			} else {
-				backend.SetLevel(logging.ERROR, "")
+				return fmt.Errorf("%w", err)
 			}
 
-			logging.SetBackend(backend)
+			return nil
 		},
+		PersistentPreRun: SetupLogging,
 	}
 
 	cobra.OnInitialize(initConfig)
@@ -98,8 +90,26 @@ func CheckRequiredFlags(flags *pflag.FlagSet) error {
 	})
 
 	if requiredError {
-		return errors.New("yot: error: the following arguments are required: `" + flagName + "` has not been set")
+		return fmt.Errorf("%w: %q has not been set", ErrMissingRequired, flagName)
 	}
 
 	return nil
+}
+
+func SetupLogging(cmd *cobra.Command, args []string) {
+	cmd.SetOut(cmd.OutOrStdout())
+
+	format := logging.MustStringFormatter(
+		`%{color}%{time:15:04:05} [%{level}]%{color:reset} %{message}`,
+	)
+	backend := logging.AddModuleLevel(
+		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
+
+	if options.Verbose {
+		backend.SetLevel(logging.DEBUG, "")
+	} else {
+		backend.SetLevel(logging.ERROR, "")
+	}
+
+	logging.SetBackend(backend)
 }

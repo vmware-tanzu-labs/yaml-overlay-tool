@@ -47,4 +47,6 @@ the rendered instructions to stdout to allow for
 reviewing how they were rendered prior to a full run 
 of yot. Equivalent to a dry-run. Exits with return
 code 0 prior to processing instructions`
+
+	helpIndentLevel = `Number of spaces to be used for indenting YAML output (default: 2) (min: 2, max: 9)`
 )

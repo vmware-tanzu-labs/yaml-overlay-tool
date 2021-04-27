@@ -4,11 +4,15 @@
 package lib
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"path"
 
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,6 +21,7 @@ type Options struct {
 	InstructionsFile string
 	OutputDir        string
 	StdOut           bool
+	Indent           int
 }
 
 type Instructions struct {
@@ -56,12 +61,6 @@ type OnMissing struct {
 	InjectPath interface{} `yaml:"injectPath,omitempty"`
 }
 
-type YamlDocument struct {
-	Name     string    `yaml:"name,omitempty"`
-	Index    int       `yaml:"path,omitempty"`
-	Overlays []Overlay `yaml:"overlays,omitempty"`
-}
-
 func (i *Instructions) ReadYamlFiles() error {
 	for index, file := range i.YamlFiles {
 		reader, err := ReadStream(file.Path)
@@ -85,6 +84,83 @@ func (i *Instructions) ReadYamlFiles() error {
 			}
 
 			i.YamlFiles[index].Nodes = append(i.YamlFiles[index].Nodes, &y)
+		}
+	}
+
+	return nil
+}
+
+func (f *YamlFile) processOverlays(o []Overlay, nodeIndex int) error {
+	for i := range o {
+		if err := o[i].process(f, nodeIndex); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (o *Overlay) process(f *YamlFile, i int) error {
+	if ok := checkDocIndex(i, o.DocumentIndex); !ok {
+		return nil
+	}
+
+	node := f.Nodes[i]
+
+	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
+
+	yp, err := yamlpath.NewPath(o.Query)
+	if err != nil {
+		return fmt.Errorf("failed to parse the query path %s due to %w", o.Query, err)
+	}
+
+	results, err := yp.Find(node)
+	if err != nil || results == nil {
+		log.Debugf("Call OnMissing Here")
+	}
+
+	if err := processActions(node, results, o); err != nil {
+		if errors.Is(err, ErrInvalidAction) {
+			return fmt.Errorf("%w in instructions file", err)
+		}
+
+		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, i)
+	}
+
+	return nil
+}
+
+func (f *YamlFile) Save(o *Options) error {
+	b, err := yaml.Marshal(f.Nodes)
+	if err != nil {
+		return fmt.Errorf("failed to marshal %s: %w", f.Path, err)
+	}
+
+	fileName := path.Base(f.Path)
+	outputFileName := path.Join(o.OutputDir, fileName)
+	//nolint:gosec //output files with read and write permissions so that end-users can continue to leverage these files
+	if err := ioutil.WriteFile(outputFileName, b, 0644); err != nil {
+		return fmt.Errorf("failed to save file %s: %w", outputFileName, err)
+	}
+
+	return nil
+}
+
+func (f *YamlFile) doPostProcessing(o *Options) error {
+	output := new(bytes.Buffer)
+	ye := yaml.NewEncoder(output)
+	ye.SetIndent(o.Indent)
+
+	for _, node := range f.Nodes {
+		err := ye.Encode(node)
+		if err != nil {
+			return fmt.Errorf("unable to marshal final document %s, error: %w", f.Path, err)
+		}
+
+		log.Noticef("Final: >>>\n%s\n", output)
+		// added so we can quickly see the results of the run
+		if o.StdOut {
+			fmt.Printf("---\n%s", output) //nolint:forbidigo
 		}
 	}
 

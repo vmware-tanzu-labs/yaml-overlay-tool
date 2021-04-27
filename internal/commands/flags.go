@@ -41,7 +41,7 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		&options.InstructionsFile,
 		"instruction-file",
 		"i",
-		"",
+		"f",
 		helpInstructionsFile,
 	)
 
@@ -72,6 +72,14 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		helpDumpRenderedInstructions,
 	)
 
+	rootCmd.PersistentFlags().IntVarP(
+		&options.Indent,
+		"indent-level",
+		"I",
+		2,
+		helpIndentLevel,
+	)
+
 	// Bind w/ viper
 	viper.BindPFlag("default-values-file", rootCmd.PersistentFlags().Lookup("default-values-file"))
 	viper.BindPFlag("values-path", rootCmd.PersistentFlags().Lookup("values-path"))
@@ -79,8 +87,4 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 	viper.BindPFlag("output-directory", rootCmd.PersistentFlags().Lookup("output-directory"))
 	viper.BindPFlag("stdout", rootCmd.PersistentFlags().Lookup("stdout"))
 	viper.BindPFlag("dump-rendered-instructions", rootCmd.PersistentFlags().Lookup("dump-rendered-instructions"))
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
