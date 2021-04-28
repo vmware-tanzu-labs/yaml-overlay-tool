@@ -2,7 +2,7 @@
 # the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
-    query: metadata.labels['app.kubernetes.io/name']
+    query: spec.selector['app.kubernetes.io/name']
     value: "potato" #Need to determine what the placeholder should be
     action: replace
     # qualifier to further refine when this overlay is applied
@@ -19,11 +19,11 @@ commonOverlays:
       - conditions:
           - key: metadata.name
             value: pvc-var-cache-bind
-  - name: "add a common label to everything"
-    query: metadata.labels
-    value: 
-      app.kubernetes.io/name: "test"
-    action: replace
+  #- name: "add a common label to everything"
+  #  query: metadata.labels
+  #  value: 
+  #    app.kubernetes.io/name: "test"
+  #  action: replace
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
@@ -93,14 +93,14 @@ yamlFiles: # what to overlay onto
         query: spec.ports[0].port
         value: 1 # expect port 54 to come out (yes this is weird)
         action: merge
-      - name: "add some new labels to a manifest"
-        query: metadata.labels
-        value:
-          potato: "test"
-          app.kubernes.io/name: thatsYachty
-          app.kubernetes.io/owner: vmware-tanzu-labs
-          app.kubernetes.io/purpose: dns
-        action: merge
+#      - name: "add some new labels to a manifest"
+#        query: metadata.labels
+#        value:
+#          potato: "test"
+#          app.kubernes.io/name: thatsYachty
+#          app.kubernetes.io/owner: vmware-tanzu-labs
+#          app.kubernetes.io/purpose: dns
+#        action: merge
       - name: "Apply kapp change group annotations"
         query: "metadata.annotations"
         value:
@@ -129,7 +129,7 @@ yamlFiles: # what to overlay onto
     path: "examples/manifests/another.yaml"
     overlays:
       - name: "Replace image name"
-        query: "..[?(@.image=~/.*/)].image" 
+        query: "..[?(@.name=~/manager/)].image" 
         value: 
           #Test Comment
           "registry-harbor.vmware.com/docker-hub-cache/%s"
