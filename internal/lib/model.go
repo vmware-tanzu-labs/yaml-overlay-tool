@@ -127,12 +127,12 @@ func (o *Overlay) process(f *YamlFile, i int) error {
 
 	results, err := yp.Find(node)
 	if err != nil {
-		return fmt.Errorf("faild to find results for %s, %w", o.Query, err)
+		return fmt.Errorf("failed to find results for %s, %w", o.Query, err)
 	}
 
 	if results == nil {
 		log.Debugf("Call OnMissing Here")
-		o.onMissing(f, i)
+		// o.processOnMissing(f, i)
 	}
 
 	if err := processActions(node, results, o); err != nil {
@@ -227,3 +227,61 @@ func (o *Overlay) doDocumentQuery(node *yaml.Node) (bool, error) {
 
 	return false, nil
 }
+
+// func (o *Overlay) processOnMissing(f *YamlFile, i int) error {
+// 	switch t := o.OnMissing.InjectPath.(type) {
+// 	case []string:
+// 		fmt.Println("yo")
+
+// 	case string:
+// 		fmt.Println("howdy")
+
+// 		if ok := checkDocIndex(i, o.DocumentIndex); !ok {
+// 			return nil
+// 		}
+
+// 		node := f.Nodes[i]
+
+// 		yp, err := yamlpath.NewPath(t)
+// 		if err != nil {
+// 			return fmt.Errorf("failed to parse the query path %s due to %w", t, err)
+// 		}
+
+// 		results, err := yp.Find(node)
+// 		if results != nil {
+// 			// use replace
+
+// } else {
+// 	// check if query is dot notation (must be)
+// 	m, err := regexp.MatchString(`^(\*|(\[\?\()|\.\.)`, t)
+// 	if err != nil {
+// 		return fmt.Errorf("error, %w", err)
+// 	}
+// 	if m {
+// 		return fmt.Errorf("injectPath must be a fully qualified dot notation path")
+// 	}
+
+// var b map[string]interface{}
+// addKey := ""
+
+// build map
+// for _, k := range strings.Split(string(t), ".") {
+// 	if addKey == "" {
+// 		addKey = k
+// 		b[k] = ""
+// 	} else {
+// 		addKey += "." + k
+// 		b[addKey] = ""
+// 	}
+// 	fmt.Println(b)
+// }
+
+// add map into original yamlNode
+
+// use replace to insert the value as yamlNode into original yamlNode (which will preserve comments)
+
+// 		}
+// 	}
+
+// 	return nil
+// }
