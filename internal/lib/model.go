@@ -109,7 +109,7 @@ func (o *Overlay) process(f *YamlFile, i int) error {
 
 	node := f.Nodes[i]
 
-	ok, err := o.doDocumentQuery(node)
+	ok, err := o.checkDocumentQuery(node)
 	if err != nil {
 		return err
 	}
@@ -183,7 +183,7 @@ func (f *YamlFile) doPostProcessing(o *Options) error {
 	return nil
 }
 
-func (o *Overlay) doDocumentQuery(node *yaml.Node) (bool, error) {
+func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 	log.Debugf("Checking Document Queries for %s", o.Query)
 
 	if o.DocumentQuery == nil {
@@ -194,7 +194,7 @@ func (o *Overlay) doDocumentQuery(node *yaml.Node) (bool, error) {
 
 	conditionsMet := false
 
-	options := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
+	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
 	for i := range o.DocumentQuery {
 		for ci := range o.DocumentQuery[i].Conditions {
@@ -209,7 +209,7 @@ func (o *Overlay) doDocumentQuery(node *yaml.Node) (bool, error) {
 			}
 
 			for _, result := range results {
-				conditionsMet = cmp.Equal(*result, o.DocumentQuery[i].Conditions[ci].Value, options)
+				conditionsMet = cmp.Equal(*result, o.DocumentQuery[i].Conditions[ci].Value, compareOptions)
 				if !conditionsMet {
 					break
 				}
