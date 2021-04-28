@@ -70,7 +70,7 @@ func appendValues(ov, nv *yaml.Node) error {
 		ov.Value = strconv.FormatBool(o && n)
 
 	default:
-		ov.Value += ov.Value
+		ov.Value += nv.Value
 	}
 
 	return nil
