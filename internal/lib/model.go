@@ -200,7 +200,7 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 		for ci := range o.DocumentQuery[i].Conditions {
 			yp, err := yamlpath.NewPath(o.DocumentQuery[i].Conditions[ci].Key)
 			if err != nil {
-				return false, fmt.Errorf("failed to parse the query path %s due to %w", o.DocumentQuery[i].Conditions[ci].Key, err)
+				return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", o.DocumentQuery[i].Conditions[ci].Key, err)
 			}
 
 			results, err := yp.Find(node)
