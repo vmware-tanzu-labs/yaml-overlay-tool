@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 
 	"gopkg.in/yaml.v3"
@@ -19,16 +20,18 @@ func (f *YamlFile) processOverlays(o []Overlay, nodeIndex int) error {
 	return nil
 }
 
-func (f *YamlFile) Save(o *Options) error {
-	b, err := yaml.Marshal(f.Nodes)
-	if err != nil {
-		return fmt.Errorf("failed to marshal %s: %w", f.Path, err)
+func (f *YamlFile) Save(o *Options, buf *bytes.Buffer) error {
+	fileName := path.Base(f.Path)
+
+	if _, err := os.Stat(o.OutputDir); os.IsNotExist(err) {
+		if err := os.MkdirAll(o.OutputDir, 0755); err != nil {
+			return fmt.Errorf("failed to create output directory %s, %w", o.OutputDir, err)
+		}
 	}
 
-	fileName := path.Base(f.Path)
 	outputFileName := path.Join(o.OutputDir, fileName)
 	//nolint:gosec //output files with read and write permissions so that end-users can continue to leverage these files
-	if err := ioutil.WriteFile(outputFileName, b, 0644); err != nil {
+	if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to save file %s: %w", outputFileName, err)
 	}
 
@@ -51,6 +54,10 @@ func (f *YamlFile) doPostProcessing(o *Options) error {
 	// added so we can quickly see the results of the run
 	if o.StdOut {
 		fmt.Printf("---\n%s", output) //nolint:forbidigo
+	}
+
+	if err := f.Save(o, output); err != nil {
+		return fmt.Errorf("failed to save, %w", err)
 	}
 
 	return nil
