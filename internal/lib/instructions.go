@@ -63,7 +63,7 @@ func (i *Instructions) applyOverlays(options *Options) error {
 		}
 
 		if err := file.doPostProcessing(options); err != nil {
-			return fmt.Errorf("failed to preform post processing on %s: %w", file.Path, err)
+			return fmt.Errorf("failed to perform post processing on %s: %w", file.Path, err)
 		}
 	}
 
