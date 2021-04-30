@@ -20,10 +20,10 @@ var ErrMissingRequired = fmt.Errorf("missing required arguments")
 func New() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
-		Use:     yotUsage,
+		Use:     "yot",
 		Short:   yotShort,
 		Long:    yotLong,
-		Version: "yaml overlay tool v0.0.1",
+		Version: "v0.0.1",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := lib.Execute(&options); err != nil {
 				cmd.SilenceUsage = true
