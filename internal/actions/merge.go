@@ -12,12 +12,12 @@ import (
 var ErrMergeMustBeOfSameKind = errors.New("both values must be of same type to use 'merge' action")
 
 func Merge(originalValue, newValue *yaml.Node) error {
-	if originalValue.Kind != newValue.Kind {
+	if originalValue.Kind != newValue.Kind && originalValue.Kind != 0 {
 		// are both originalValue and newValue the same 'Kind'?
 		return ErrMergeMustBeOfSameKind
 	}
 
-	switch originalValue.Kind {
+	switch newValue.Kind {
 	case yaml.ScalarNode:
 		// scalar:
 		//   orig + new
@@ -30,10 +30,18 @@ func Merge(originalValue, newValue *yaml.Node) error {
 		originalValue.Content = append(originalValue.Content, newValue.Content...)
 
 		return nil
-	case yaml.MappingNode, yaml.DocumentNode, yaml.AliasNode:
+	case yaml.MappingNode, yaml.AliasNode:
 		// maps:
 		//	 recursive merge of data
-		if err := mergo.Merge(originalValue, *newValue, mergo.WithOverride); err != nil {
+		if err := mergo.Merge(originalValue, *newValue, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
+			return fmt.Errorf("an error occurred during merge: %w", err)
+		}
+	case yaml.DocumentNode:
+		if err := mergo.Merge(originalValue.Content[0], *newValue.Content[0], mergo.WithAppendSlice); err != nil {
+			return fmt.Errorf("an error occurred during merge: %w", err)
+		}
+	case 0:
+		if err := mergo.Merge(originalValue, *newValue); err != nil {
 			return fmt.Errorf("an error occurred during merge: %w", err)
 		}
 	}
