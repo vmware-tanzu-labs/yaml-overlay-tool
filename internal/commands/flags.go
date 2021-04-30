@@ -30,22 +30,23 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		helpDefaultValueFile,
 	)
 
-	rootCmd.PersistentFlags().StringSliceP(
-		"values-path",
-		"v",
+	rootCmd.PersistentFlags().StringSliceVarP(
+		&options.ValuesPath,
+		"values",
+		"f",
 		[]string{},
 		helpValuesPath,
 	)
 
 	rootCmd.PersistentFlags().StringVarP(
 		&options.InstructionsFile,
-		"instruction-file",
+		"instructions",
 		"i",
-		"f",
+		"",
 		helpInstructionsFile,
 	)
 
-	if err := rootCmd.MarkPersistentFlagRequired("instruction-file"); err != nil {
+	if err := rootCmd.MarkPersistentFlagRequired("instructions"); err != nil {
 		log.Fatal("InstructionsFile (-i) is required")
 	}
 
