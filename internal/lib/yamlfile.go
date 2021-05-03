@@ -54,6 +54,7 @@ func (f *YamlFile) doPostProcessing(o *Options) error {
 	// added so we can quickly see the results of the run
 	if o.StdOut {
 		fmt.Printf("---\n%s", output) //nolint:forbidigo
+
 		return nil
 	}
 
