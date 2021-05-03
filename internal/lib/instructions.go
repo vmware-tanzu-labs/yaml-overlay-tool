@@ -51,8 +51,8 @@ func (i *Instructions) applyOverlays(options *Options) error {
 
 			log.Infof("Processing Document Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
 
-			for docIndex, doc := range file.Documents {
-				if doc.Path != fmt.Sprint(docIndex) {
+			for docIndex, docOverlay := range file.Documents {
+				if docOverlay.Path != fmt.Sprint(nodeIndex) {
 					continue
 				}
 
