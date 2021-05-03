@@ -5,51 +5,83 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v3"
 )
 
-var ErrMergeMustBeOfSameKind = errors.New("both values must be of same type to use 'merge' action")
+var (
+	ErrMergeMustBeOfSameKind = errors.New("both values must be of same type to use 'merge' action")
+	ErrMergeUnsupportedType  = errors.New("not a supported yaml type for merging")
+)
 
-func Merge(originalValue, newValue *yaml.Node) error {
-	if originalValue.Kind != newValue.Kind && originalValue.Kind != 0 {
+func Merge(o, n *yaml.Node) error {
+	if o.Kind != n.Kind && o.Kind != 0 {
 		// are both originalValue and newValue the same 'Kind'?
 		return ErrMergeMustBeOfSameKind
 	}
 
-	switch newValue.Kind {
+	switch o.Kind {
+	case yaml.DocumentNode:
+		return mergeDocument(o, n)
+	case yaml.MappingNode:
+		return mergeMap(o, n)
+	case yaml.SequenceNode:
+		mergeArray(o, n)
 	case yaml.ScalarNode:
-		// scalar:
-		//   orig + new
-		if err := appendValues(originalValue, newValue); err != nil {
+		return mergeScalar(o, n)
+	case yaml.AliasNode:
+		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
+	}
+
+	return nil
+}
+
+func mergeDocument(o, n *yaml.Node) error {
+	if o.Content != nil && n.Content != nil {
+		if err := Merge(o.Content[0], n.Content[0]); err != nil {
 			return err
 		}
-	case yaml.SequenceNode:
-		// sequence:
-		//   originalValue extended with newValue
-		originalValue.Content = append(originalValue.Content, newValue.Content...)
 
-		return nil
-	case yaml.MappingNode, yaml.AliasNode:
-		// maps:
-		//	 recursive merge of data
-		if err := mergo.Merge(originalValue, *newValue, mergo.WithOverride, mergo.WithAppendSlice); err != nil {
-			return fmt.Errorf("an error occurred during merge: %w", err)
-		}
-	case yaml.DocumentNode:
-		if err := mergo.Merge(originalValue.Content[0], *newValue.Content[0], mergo.WithAppendSlice); err != nil {
-			return fmt.Errorf("an error occurred during merge: %w", err)
-		}
-	case 0:
-		if err := mergo.Merge(originalValue, *newValue); err != nil {
-			return fmt.Errorf("an error occurred during merge: %w", err)
+		mergeComments(o, n)
+	}
+
+	return nil
+}
+
+func mergeMap(o, n *yaml.Node) error {
+	if o.Content != nil && n.Content != nil {
+		for ni := 0; ni < len(n.Content)-1; ni += 2 {
+			resultFound := false
+
+			for oi := 0; oi < len(o.Content)-1; oi += 2 {
+				if o.Content[oi].Value == n.Content[ni].Value {
+					resultFound = true
+
+					if err := Merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
+						return err
+					}
+
+					mergeComments(o.Content[oi], n.Content[ni])
+
+					break
+				}
+			}
+
+			if !resultFound {
+				o.Content = append(o.Content, n.Content[ni:ni+2]...)
+			}
 		}
 	}
 
 	return nil
 }
 
-func appendValues(ov, nv *yaml.Node) error {
+func mergeArray(o, n *yaml.Node) {
+	if o.Content != nil && n.Content != nil {
+		o.Content = append(o.Content, n.Content...)
+	}
+}
+
+func mergeScalar(ov, nv *yaml.Node) error {
 	switch ov.Tag {
 	case "!!int":
 		o, err := strconv.Atoi(ov.Value)
@@ -81,5 +113,18 @@ func appendValues(ov, nv *yaml.Node) error {
 		ov.Value += nv.Value
 	}
 
+	mergeComments(ov, nv)
+
 	return nil
+}
+
+func mergeComments(o, n *yaml.Node) {
+	switch {
+	case n.HeadComment != "":
+		o.HeadComment += n.HeadComment
+	case n.LineComment != "":
+		o.LineComment += n.LineComment
+	case n.FootComment != "":
+		o.FootComment += n.FootComment
+	}
 }
