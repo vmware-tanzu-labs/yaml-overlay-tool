@@ -12,7 +12,7 @@ documents on output.`
 
 	helpDefaultValueFile = `Path to your default values file. If not set, you must 
 pass a values file of defaults.yaml or 
-defaults.yml within a path from the -v option. 
+defaults.yml within a path from the -f option. 
 Takes multiple default values files in case you would 
 like to separate out some of the values. After the 
 first default values file, each subsequent file passed 

@@ -8,15 +8,22 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/path"
 	"gopkg.in/yaml.v3"
 )
 
-func (o *Overlay) process(f *YamlFile, i int) error {
-	if ok := o.checkDocumentIndex(i); !ok {
+var (
+	ErrOnMissingNoInjectAction = errors.New("no matches and no onMissing.action of 'inject'")
+	ErrOnMissingNoInjectPath   = errors.New("no matches and no onMissing.injectPath")
+	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
+)
+
+func (o *Overlay) process(f *YamlFile, docIndex int) error {
+	if ok := o.checkDocumentIndex(docIndex); !ok {
 		return nil
 	}
 
-	node := f.Nodes[i]
+	node := f.Nodes[docIndex]
 
 	ok, err := o.checkDocumentQuery(node)
 	if err != nil {
@@ -27,21 +34,17 @@ func (o *Overlay) process(f *YamlFile, i int) error {
 		return nil
 	}
 
-	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, i)
+	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, docIndex)
 
-	yp, err := yamlpath.NewPath(o.Query)
+	results, err := searchPath(o.Query, node)
 	if err != nil {
-		return fmt.Errorf("failed to parse the query path %s due to %w", o.Query, err)
-	}
-
-	results, err := yp.Find(node)
-	if err != nil {
-		return fmt.Errorf("failed to find results for %s, %w", o.Query, err)
+		return err
 	}
 
 	if results == nil {
-		log.Debugf("Call OnMissing Here")
-		// o.processOnMissing(f, i)
+		if err := o.onMissing(f, docIndex); err != nil {
+			return err
+		}
 	}
 
 	if err := o.processActions(node, results); err != nil {
@@ -49,7 +52,7 @@ func (o *Overlay) process(f *YamlFile, i int) error {
 			return fmt.Errorf("%w in instructions file", err)
 		}
 
-		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, i)
+		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
 	}
 
 	return nil
@@ -63,24 +66,8 @@ func (o *Overlay) processActions(node *yaml.Node, results []*yaml.Node) error {
 		log.Debugf("Current: >>>\n%s\n", b)
 		log.Debugf("Proposed: >>>\n%s\n", p)
 
-		// do something with the results based on the provided overlay action
-		switch o.Action {
-		case "delete":
-			actions.Delete(node, results[ri])
-		case "replace":
-			if err := actions.Replace(results[ri], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping replace for %s query result %d", err, o.Query, ri)
-			}
-		case "format":
-			if err := actions.Format(results[ri], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping format for %s query result %d", err, o.Query, ri)
-			}
-		case "merge":
-			if err := actions.Merge(results[ri], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping merge for %s query result %d", err, o.Query, ri)
-			}
-		default:
-			return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
+		if err := o.doAction(node, results[ri]); err != nil {
+			return fmt.Errorf("%w for %s query result %d", err, o.Query, ri)
 		}
 	}
 
@@ -146,60 +133,119 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 	return false, nil
 }
 
-// func (o *Overlay) processOnMissing(f *YamlFile, i int) error {
-// 	switch t := o.OnMissing.InjectPath.(type) {
-// 	case []string:
-// 		fmt.Println("yo")
+func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
+	// check if the query has a match
+	// if no match then we require an inject path
+	// we need to then check if each inject path is valid (does it exist)
+	// if we had an inject path(s) then we inject the value to those locations
+	// if we didn't have an inject path we have an implicit onMissing: ignore and we put out a warning if not stdout option to terminal
+	switch o.OnMissing.Action {
+	case "ignore", "":
+		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectAction)
 
-// 	case string:
-// 		fmt.Println("howdy")
+		return nil
+	case "inject":
+		if o.OnMissing.InjectPath == nil {
+			log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectPath)
 
-// 		if ok := checkDocIndex(i, o.DocumentIndex); !ok {
-// 			return nil
-// 		}
+			return nil
+		}
 
-// 		node := f.Nodes[i]
+		injectPaths, err := o.OnMissing.getInjectPaths()
+		if err != nil {
+			return err
+		}
 
-// 		yp, err := yamlpath.NewPath(t)
-// 		if err != nil {
-// 			return fmt.Errorf("failed to parse the query path %s due to %w", t, err)
-// 		}
+		for _, injectPath := range injectPaths {
+			if err := o.doInjectPath(injectPath, f.Nodes[docIndex]); err != nil {
+				return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
+			}
+		}
+	default:
+		return fmt.Errorf("%w for onMissing of type '%s'", ErrInvalidAction, o.Action)
+	}
 
-// 		results, err := yp.Find(node)
-// 		if results != nil {
-// 			// use replace
+	return nil
+}
 
-// } else {
-// 	// check if query is dot notation (must be)
-// 	m, err := regexp.MatchString(`^(\*|(\[\?\()|\.\.)`, t)
-// 	if err != nil {
-// 		return fmt.Errorf("error, %w", err)
-// 	}
-// 	if m {
-// 		return fmt.Errorf("injectPath must be a fully qualified dot notation path")
-// 	}
+func searchPath(q string, node *yaml.Node) ([]*yaml.Node, error) {
+	yp, err := yamlpath.NewPath(q)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse the query path %s due to %w", q, err)
+	}
 
-// var b map[string]interface{}
-// addKey := ""
+	results, err := yp.Find(node)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find results for %s, %w", q, err)
+	}
 
-// build map
-// for _, k := range strings.Split(string(t), ".") {
-// 	if addKey == "" {
-// 		addKey = k
-// 		b[k] = ""
-// 	} else {
-// 		addKey += "." + k
-// 		b[addKey] = ""
-// 	}
-// 	fmt.Println(b)
-// }
+	return results, nil
+}
 
-// add map into original yamlNode
+func (om *OnMissing) getInjectPaths() ([]string, error) {
+	var injectPaths []string
+	switch injectPath := om.InjectPath.(type) {
+	case string:
+		injectPaths = append(injectPaths, injectPath)
+	case []interface{}:
+		for _, v := range injectPath {
+			injectPaths = append(injectPaths, v.(string))
+		}
+	default:
+		return nil, fmt.Errorf("%w: %T", ErrOnMissingInvalidType, injectPath)
+	}
 
-// use replace to insert the value as yamlNode into original yamlNode (which will preserve comments)
+	return injectPaths, nil
+}
 
-// 		}
-// 	}
+func (o *Overlay) doInjectPath(ip string, node *yaml.Node) error {
+	y, err := path.Build(ip)
+	if err != nil {
+		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
+	}
 
-// 	return nil
-// }
+	err = actions.Merge(node, y)
+	if err != nil {
+		return fmt.Errorf("failed to merge injectpath scaffolding %s with document, %w", ip, err)
+	}
+
+	results, err := searchPath(ip, node)
+	if err != nil {
+		return fmt.Errorf("%w, on injectPath %s", err, ip)
+	}
+
+	for i := range results {
+		if err := actions.Replace(results[i], &o.Value); err != nil {
+			if errors.Is(err, ErrInvalidAction) {
+				return fmt.Errorf("%w in instructions file", err)
+			}
+
+			return fmt.Errorf("%w for onMissing.InjectPath", err)
+		}
+	}
+
+	return nil
+}
+
+func (o *Overlay) doAction(root, node *yaml.Node) error {
+	switch o.Action {
+	case "delete":
+		actions.Delete(root, node)
+	case "replace":
+		if err := actions.Replace(node, &o.Value); err != nil {
+			return fmt.Errorf("%w, skipping replace", err)
+		}
+	case "format":
+		if err := actions.Format(node, &o.Value); err != nil {
+			return fmt.Errorf("%w, skipping format", err)
+		}
+	case "merge":
+		if err := actions.Merge(node, &o.Value); err != nil {
+			return fmt.Errorf("%w, skipping merge", err)
+		}
+	default:
+		return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
+	}
+
+	return nil
+}

@@ -13,6 +13,7 @@ type Options struct {
 	OutputDir        string
 	StdOut           bool
 	Indent           int
+	ValuesPath       []string
 }
 
 type Instructions struct {
