@@ -145,27 +145,18 @@ func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
 
 		return nil
 	case "inject":
-		if o.OnMissing.InjectPath == nil {
-			log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectPath)
-
-			return nil
-		}
-
-		injectPaths, err := o.OnMissing.getInjectPaths()
-		if err != nil {
-			return err
-		}
-
-		for _, injectPath := range injectPaths {
-			if err := o.doInjectPath(injectPath, f.Nodes[docIndex]); err != nil {
-				return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
-			}
+		_, err := path.Build(o.Query)
+		switch {
+		case err == nil:
+			return o.doInjectPath(o.Query, f.Nodes[docIndex])
+		case errors.Is(err, path.ErrInvalidPathSyntax):
+			return o.handleInjectPath(f, docIndex)
+		default:
+			return fmt.Errorf("%w, for onMissing", err)
 		}
 	default:
 		return fmt.Errorf("%w for onMissing of type '%s'", ErrInvalidAction, o.Action)
 	}
-
-	return nil
 }
 
 func searchPath(q string, node *yaml.Node) ([]*yaml.Node, error) {
@@ -245,6 +236,32 @@ func (o *Overlay) doAction(root, node *yaml.Node) error {
 		}
 	default:
 		return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
+	}
+
+	return nil
+}
+
+func (o *Overlay) handleInjectPath(f *YamlFile, docIndex int) error {
+	_, err := path.Build(o.Query)
+	if !errors.Is(err, path.ErrInvalidPathSyntax) {
+		return o.doInjectPath(o.Query, f.Nodes[docIndex])
+	}
+
+	if o.OnMissing.InjectPath == nil {
+		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectPath)
+
+		return nil
+	}
+
+	injectPaths, err := o.OnMissing.getInjectPaths()
+	if err != nil {
+		return err
+	}
+
+	for _, injectPath := range injectPaths {
+		if err := o.doInjectPath(injectPath, f.Nodes[docIndex]); err != nil {
+			return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
+		}
 	}
 
 	return nil
