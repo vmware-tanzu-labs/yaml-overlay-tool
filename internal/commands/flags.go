@@ -24,11 +24,23 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 
 	// Define with Cobra
 	rootCmd.PersistentFlags().StringP(
-		"default-values-file",
+		"common-values",
 		"d",
+		"",
+		helpCommonValues,
+	)
+
+	rootCmd.PersistentFlags().StringP(
+		"default-values-file",
+		"",
 		"",
 		helpDefaultValueFile,
 	)
+
+	err := rootCmd.PersistentFlags().MarkDeprecated("default-values-file", helpDefaultValuesFileDeprecated)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	rootCmd.PersistentFlags().StringSliceVarP(
 		&options.ValuesPath,

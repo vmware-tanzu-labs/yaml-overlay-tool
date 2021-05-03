@@ -1,8 +1,6 @@
 package commands
 
 const (
-	yotUsage = "yot [-h] [-d DEFAULT_VALUES_FILE] [-v VALUES_PATH] -i INSTRUCTION_FILE [-o OUTPUT_DIRECTORY] [-s] [-r] [-l LOG_FILE] [-V]"
-
 	yotShort = "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2"
 
 	yotLong = `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
@@ -18,7 +16,20 @@ like to separate out some of the values. After the
 first default values file, each subsequent file passed 
 with -d will be merged with the values from the 
 first. If a defaults.yaml or defaults.yml file is 
-discovered in one of your -v paths, it will be 
+discovered in one of your -f paths, it will be 
+merged with these values last.`
+
+	helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
+
+	helpCommonValues = `Path to your common values file. If not set, you must 
+pass a values file of common.yaml or 
+common.yml within a path from the -f option. 
+Takes multiple common values files in case you would 
+like to separate out some of the values. After the 
+first common values file, each subsequent file passed 
+with -d will be merged with the values from the 
+first. If a common.yaml or common.yml file is 
+discovered in one of your -f paths, it will be 
 merged with these values last.`
 
 	helpValuesPath = `Values file path. May be a path to a file or directory 
