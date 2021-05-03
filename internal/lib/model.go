@@ -41,11 +41,12 @@ type Condition struct {
 }
 
 type YamlFile struct {
-	Name      string     `yaml:"name,omitempty"`
-	Path      string     `yaml:"path,omitempty"`
-	Overlays  []Overlay  `yaml:"overlays,omitempty"`
-	Documents []YamlFile `yaml:"documents,omitempty"`
-	Nodes     []*yaml.Node
+	Name       string     `yaml:"name,omitempty"`
+	Path       string     `yaml:"path,omitempty"`
+	Overlays   []Overlay  `yaml:"overlays,omitempty"`
+	Documents  []YamlFile `yaml:"documents,omitempty"`
+	Nodes      []*yaml.Node
+	outputPath string
 }
 
 type OnMissing struct {

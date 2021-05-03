@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -26,6 +27,8 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	if err := dc.Decode(&instructions); err != nil {
 		return nil, fmt.Errorf("unable to read instructions file %s: %w", *fileName, err)
 	}
+
+	instructions.setOutputPath()
 
 	if err := instructions.readYamlFiles(); err != nil {
 		return nil, err
@@ -97,4 +100,17 @@ func (i *Instructions) readYamlFiles() error {
 	}
 
 	return nil
+}
+
+func (i *Instructions) setOutputPath() {
+	p := make([]string, 0, len(i.YamlFiles))
+	for _, yf := range i.YamlFiles {
+		p = append(p, yf.Path)
+	}
+
+	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
+
+	for yi := range i.YamlFiles {
+		i.YamlFiles[yi].outputPath = strings.TrimPrefix(i.YamlFiles[yi].Path, pathPrefix)
+	}
 }

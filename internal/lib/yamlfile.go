@@ -21,18 +21,18 @@ func (f *YamlFile) processOverlays(o []Overlay, nodeIndex int) error {
 }
 
 func (f *YamlFile) Save(o *Options, buf *bytes.Buffer) error {
-	fileName := path.Base(f.Path)
+	fileName := path.Join(o.OutputDir, "yamlFiles", f.outputPath)
+	dirName := path.Dir(fileName)
 
-	if _, err := os.Stat(o.OutputDir); os.IsNotExist(err) {
-		if err := os.MkdirAll(o.OutputDir, 0755); err != nil {
-			return fmt.Errorf("failed to create output directory %s, %w", o.OutputDir, err)
+	if _, err := os.Stat(dirName); os.IsNotExist(err) {
+		if err := os.MkdirAll(dirName, 0755); err != nil {
+			return fmt.Errorf("failed to create output directory %s, %w", dirName, err)
 		}
 	}
 
-	outputFileName := path.Join(o.OutputDir, fileName)
 	//nolint:gosec //output files with read and write permissions so that end-users can continue to leverage these files
-	if err := ioutil.WriteFile(outputFileName, buf.Bytes(), 0644); err != nil {
-		return fmt.Errorf("failed to save file %s: %w", outputFileName, err)
+	if err := ioutil.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
+		return fmt.Errorf("failed to save file %s: %w", fileName, err)
 	}
 
 	return nil
