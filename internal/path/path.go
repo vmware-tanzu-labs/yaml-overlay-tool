@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var ErrInvalidPathSyntax = errors.New("invalid path syntax")
+
 // Build constructs a Path from a string expression.
 func Build(path string) (*yaml.Node, error) {
 	return build(lex("Path lexer", path), nil)
@@ -19,7 +21,7 @@ func build(l *lexer, y *yaml.Node) (*yaml.Node, error) {
 
 	switch lx.typ {
 	case lexemeError:
-		return nil, errors.New(lx.val)
+		return nil, fmt.Errorf("%w, %s", ErrInvalidPathSyntax, lx.val)
 
 	case lexemeIdentity, lexemeEOF:
 		return identity()
@@ -53,7 +55,7 @@ func build(l *lexer, y *yaml.Node) (*yaml.Node, error) {
 		childName := strings.TrimPrefix(lx.val, ".")
 
 		if childName == "*" {
-			return nil, fmt.Errorf("wildcard notation not allowed for build")
+			return nil, fmt.Errorf("%w, wildcard notation not allowed for build", ErrInvalidPathSyntax)
 		}
 
 		childName = unescape(childName)
@@ -70,7 +72,7 @@ func build(l *lexer, y *yaml.Node) (*yaml.Node, error) {
 		return bracketChildThen(l, childNames, y)
 	}
 
-	return nil, errors.New("invalid path syntax")
+	return nil, ErrInvalidPathSyntax
 }
 
 func identity() (*yaml.Node, error) {
