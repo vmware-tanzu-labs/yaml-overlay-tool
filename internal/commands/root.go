@@ -40,8 +40,6 @@ func New() *cobra.Command {
 
 	initializeGlobalFlags(rootCmd)
 
-	rootCmd.AddCommand(createVersionCommand())
-
 	return rootCmd
 }
 
