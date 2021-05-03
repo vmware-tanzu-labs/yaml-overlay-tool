@@ -3,7 +3,7 @@
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: spec.selector['app.kubernetes.io/name']
-    value: "potato" #Need to determine what the placeholder should be
+    value: app.kubernetes.io/newName #+workload:certManagerResourceName:default="cert-manager":type=string
     action: replace
     # qualifier to further refine when this overlay is applied
     documentQuery:
@@ -19,22 +19,20 @@ commonOverlays:
       - conditions:
           - key: metadata.name
             value: pvc-var-cache-bind
-  #- name: "add a common label to everything"
-  #  query: metadata.labels
-  #  value: 
-  #    app.kubernetes.io/name: "test"
-  #  action: replace
+  - name: "add a common label to everything"
+    query: metadata.labels
+    value: 
+      app.kubernetes.io/name: "test"
+    action: replace
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
     path: "examples/manifests/test.yaml"
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
         query: metadata.annotations
-        value: {}
         action: "delete"
       - name: "delete namespace"
         query: metadata.namespace
-        value: {}
         action: "delete"
       - name: "Change the apiVersion to v2alpha1"
         query: apiVersion
@@ -44,7 +42,6 @@ yamlFiles: # what to overlay onto
       ## these will only affect the yaml docs that have matches, otherwise ignore
       - name: "test Deleting a Seq Node"
         query: spec.accessModes[1]
-        value: {}
         action: delete
       # not really a real-world example, but showing off functionality
       - name: "now replace the merged list with just the new port"
@@ -64,14 +61,16 @@ yamlFiles: # what to overlay onto
         action: "merge"
       - name: "Demo the need for an inject path"
         query: fake.key1.*
-        value: { "fake": "content1" }
+        value: 
+          fake: content1
         action: "merge"
         onMissing:
           action: "inject"
       # same as previous, but with an injectPath (actually does this one)
       - name: "Show same example but with an injectPath"
         query: fake.key2.*
-        value: { "fake": "content2" }
+        value: 
+          fake: "content2"
         action: "merge"
         onMissing:
           action: "inject"
@@ -93,14 +92,13 @@ yamlFiles: # what to overlay onto
         query: spec.ports[0].port
         value: 1 # expect port 54 to come out (yes this is weird)
         action: merge
-#      - name: "add some new labels to a manifest"
-#        query: metadata.labels
-#        value:
-#          potato: "test"
-#          app.kubernes.io/name: thatsYachty
-#          app.kubernetes.io/owner: vmware-tanzu-labs
-#          app.kubernetes.io/purpose: dns
-#        action: merge
+      - name: "add some new labels to a manifest"
+        query: metadata.labels
+        value:
+          potato: "test"
+          app.kubernetes.io/owner: vmware-tanzu-labs
+          app.kubernetes.io/purpose: dns
+        action: merge
       - name: "Apply kapp change group annotations"
         query: "metadata.annotations"
         value:
@@ -109,6 +107,9 @@ yamlFiles: # what to overlay onto
           kapp.k14s.io/update-strategy: "skip"
           kapp.k14s.io/create-strategy: "fallback-on-update"
         action: "merge"
+        onMissing:
+          action: inject
+          injectPath: metadata.annotations
     documents: # optional and only used for multi-doc yaml files
       # need to refer to them by their index
       - name: the manifest that does something
@@ -116,7 +117,8 @@ yamlFiles: # what to overlay onto
         overlays:
           # demos multiple inject paths on missing
           - query: x.*
-            value: { "x": "x" }
+            value: 
+              x: x
             action: merge
             onMissing:
               action: "inject"
@@ -129,7 +131,7 @@ yamlFiles: # what to overlay onto
     path: "examples/manifests/another.yaml"
     overlays:
       - name: "Replace image name"
-        query: "..[?(@.name=~/manager/)].image" 
+        query: "..image" 
         value: 
           #Test Comment
           "registry-harbor.vmware.com/docker-hub-cache/%s"
