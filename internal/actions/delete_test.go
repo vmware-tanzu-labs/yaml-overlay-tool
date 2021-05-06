@@ -18,7 +18,7 @@ func TestDelete(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		path string
+		query string
 	}
 
 	tests := []struct {
@@ -29,7 +29,7 @@ func TestDelete(t *testing.T) {
 		{
 			name: "Delete Scalar Node",
 			args: args{
-				path: "kind",
+				query: "kind",
 			},
 			expectedValue: `apiVersion: v1
 metadata:
@@ -59,7 +59,7 @@ spec:
 		{
 			name: "Delete Map Node",
 			args: args{
-				path: "metadata.annotations",
+				query: "metadata.annotations",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -86,7 +86,7 @@ spec:
 		{
 			name: "Delete Seq Node",
 			args: args{
-				path: "spec.ports[0]",
+				query: "spec.ports[0]",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -112,11 +112,12 @@ spec:
 		},
 	}
 	for _, tt := range tests {
+		// passing in "" to testInit, because it requires a string (value), but is not needed for deletions
 		testYaml, _ := testInit("")
 		testCase := tt
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			yp, _ := yamlpath.NewPath(testCase.args.path)
+			yp, _ := yamlpath.NewPath(testCase.args.query)
 			child, _ := yp.Find(testYaml)
 
 			actions.Delete(testYaml, child[0])

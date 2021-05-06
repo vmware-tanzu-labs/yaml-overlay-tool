@@ -18,7 +18,7 @@ func TestFormat(t *testing.T) {
 	t.Parallel()
 
 	type args struct {
-		path  string
+		query string
 		value string
 	}
 
@@ -30,7 +30,7 @@ func TestFormat(t *testing.T) {
 		{
 			name: "Format Scalar Node (only type accepted for format action)",
 			args: args{
-				path:  "kind",
+				query: "kind",
 				value: "My%s",
 			},
 			expectedValue: `apiVersion: v1
@@ -62,7 +62,7 @@ spec:
 		{
 			name: "Format Scalar Node Key",
 			args: args{
-				path:  "spec.ports~",
+				query: "spec.ports~",
 				value: "s%s",
 			},
 			expectedValue: `apiVersion: v1
@@ -96,7 +96,7 @@ spec:
 			// The quotation happens below in value via escaped double-quotes
 			name: "Format Scalar Node in Array with head, line, foot comments",
 			args: args{
-				path:  "spec.ports[0].name",
+				query: "spec.ports[0].name",
 				value: "# head\n\"%s-port\" # line\n# foot",
 			},
 			expectedValue: `apiVersion: v1
@@ -134,7 +134,7 @@ spec:
 		testCase := tt
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
-			yp, _ := yamlpath.NewPath(testCase.args.path)
+			yp, _ := yamlpath.NewPath(testCase.args.query)
 			results, _ := yp.Find(testYaml)
 
 			if err := actions.Format(results[0], val.Content[0]); err != nil {
