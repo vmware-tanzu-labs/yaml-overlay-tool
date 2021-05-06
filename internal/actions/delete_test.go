@@ -1,55 +1,18 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
+// contains tests for the yaml-overlay-tool 'delete' action
+
 package actions_test
 
 import (
 	"bytes"
-	"log"
 	"testing"
 
 	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
-
-func testInit() *yaml.Node {
-	data := `
-apiVersion: v1
-kind: Service
-metadata:
-  name: bind-udp
-  namespace: tanzu-dns
-  labels:
-    app.kubernetes.io/name: external-dns
-  annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
-    ## This annotation will be ignored on other cloud providers
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-spec:
-  selector:
-    app.kubernetes.io/name: external-dns
-  type: LoadBalancer
-  ports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: dns-udp
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: dns-tcp
-`
-
-	var t yaml.Node
-
-	err := yaml.Unmarshal([]byte(data), &t)
-	if err != nil {
-		log.Fatalf("Error Unmarshalling: %s", err)
-	}
-
-	return &t
-}
 
 func TestDelete(t *testing.T) {
 	t.Parallel()
@@ -149,7 +112,7 @@ spec:
 		},
 	}
 	for _, tt := range tests {
-		testYaml := testInit()
+		testYaml, _ := testInit("")
 		testCase := tt
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
@@ -164,11 +127,11 @@ spec:
 			ye.SetIndent(2)
 
 			if err := ye.Encode(testYaml); err != nil {
-				t.Errorf("Encountered Error on creating encoder: %s", err)
+				t.Errorf("Encountered Error creating encoder: %s", err)
 			}
 
 			if buf.String() != testCase.expectedValue {
-				t.Errorf("Delete() =\n%s, want \n%s", buf.String(), tt.expectedValue)
+				t.Errorf("Delete() =\n%s, want:\n%s", buf.String(), tt.expectedValue)
 			}
 		})
 	}
