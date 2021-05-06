@@ -151,7 +151,7 @@ spec:
 			}
 
 			if buf.String() != testCase.expectedValue {
-				t.Errorf("Format() =\n%s, want:\n%s", buf.String(), tt.expectedValue)
+				t.Errorf("Format() =\n%swant:\n%s", buf.String(), tt.expectedValue)
 			}
 		})
 	}

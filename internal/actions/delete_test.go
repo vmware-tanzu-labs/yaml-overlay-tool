@@ -132,7 +132,7 @@ spec:
 			}
 
 			if buf.String() != testCase.expectedValue {
-				t.Errorf("Delete() =\n%s, want:\n%s", buf.String(), tt.expectedValue)
+				t.Errorf("Delete() =\n%swant:\n%s", buf.String(), tt.expectedValue)
 			}
 		})
 	}
