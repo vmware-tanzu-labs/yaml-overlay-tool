@@ -1,4 +1,0 @@
-pyyaml
-jinja2
-jsonpath-ng
-python-box
