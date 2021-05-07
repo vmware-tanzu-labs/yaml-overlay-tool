@@ -183,5 +183,5 @@ spec:
 `,
 		},
 	}
-	tests.runTests("merge", t)
+	tests.runTests(t, "merge")
 }

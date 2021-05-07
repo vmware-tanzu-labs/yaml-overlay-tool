@@ -99,5 +99,5 @@ spec:
 		},
 	}
 
-	tests.runTests("delete", t)
+	tests.runTests(t, "delete")
 }

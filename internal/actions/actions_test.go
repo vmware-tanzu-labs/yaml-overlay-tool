@@ -28,7 +28,7 @@ type testCase struct {
 
 type testCases []testCase
 
-func testInit(v string) (*yaml.Node, *yaml.Node) {
+func testInit(v string) (orig, test *yaml.Node) {
 	data := `
 apiVersion: v1
 kind: Service
@@ -75,7 +75,9 @@ spec:
 	return &t, &val
 }
 
-func (tst testCases) runTests(a string, t *testing.T) {
+func (tst testCases) runTests(t *testing.T, a string) {
+	t.Helper()
+
 	for _, tt := range tst {
 		testYaml, val := testInit(tt.args.value)
 		testCase := tt
@@ -84,22 +86,7 @@ func (tst testCases) runTests(a string, t *testing.T) {
 			yp, _ := yamlpath.NewPath(testCase.args.query)
 			results, _ := yp.Find(testYaml)
 
-			switch a {
-			case "merge":
-				if err := actions.Merge(results[0], val.Content[0]); err != nil {
-					t.Errorf("Encountered Error on merge action: %s", err)
-				}
-			case "replace":
-				if err := actions.Replace(results[0], val.Content[0]); err != nil {
-					t.Errorf("Encountered Error on replace action: %s", err)
-				}
-			case "format":
-				if err := actions.Format(results[0], val.Content[0]); err != nil {
-					t.Errorf("Encountered Error on format action: %s", err)
-				}
-			case "delete":
-				actions.Delete(testYaml, results[0])
-			}
+			testAction(t, a, results[0], testYaml, val.Content...)
 
 			buf := new(bytes.Buffer)
 			ye := yaml.NewEncoder(buf)
@@ -114,5 +101,26 @@ func (tst testCases) runTests(a string, t *testing.T) {
 				t.Errorf("%s() =\n%swant:\n%s", a, buf.String(), tt.expectedValue)
 			}
 		})
+	}
+}
+
+func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testValue ...*yaml.Node) {
+	t.Helper()
+
+	switch action {
+	case "merge":
+		if err := actions.Merge(result, testValue[0]); err != nil {
+			t.Errorf("Encountered Error on merge action: %s", err)
+		}
+	case "replace":
+		if err := actions.Replace(result, testValue[0]); err != nil {
+			t.Errorf("Encountered Error on replace action: %s", err)
+		}
+	case "format":
+		if err := actions.Format(result, testValue[0]); err != nil {
+			t.Errorf("Encountered Error on format action: %s", err)
+		}
+	case "delete":
+		actions.Delete(testYaml, result)
 	}
 }

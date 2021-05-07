@@ -115,5 +115,5 @@ spec:
 		},
 	}
 
-	tests.runTests("format", t)
+	tests.runTests(t, "format")
 }

@@ -125,8 +125,12 @@ func mergeComments(o, n *yaml.Node) {
 	switch {
 	case n.HeadComment != "":
 		o.HeadComment += n.HeadComment
+
+		fallthrough
 	case n.LineComment != "":
 		o.LineComment += n.LineComment
+
+		fallthrough
 	case n.FootComment != "":
 		o.FootComment += n.FootComment
 	}

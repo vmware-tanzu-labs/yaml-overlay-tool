@@ -119,5 +119,5 @@ spec:
 		},
 	}
 
-	tests.runTests("replace", t)
+	tests.runTests(t, "replace")
 }
