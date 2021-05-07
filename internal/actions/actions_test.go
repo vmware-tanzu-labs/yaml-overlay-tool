@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-// contains common test functions for yaml-overlay-tool actions
+// contains common test functions and types for yaml-overlay-tool actions
 
 package actions_test
 
