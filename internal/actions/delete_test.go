@@ -6,26 +6,13 @@
 package actions_test
 
 import (
-	"bytes"
 	"testing"
-
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"gopkg.in/yaml.v3"
 )
 
 func TestDelete(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		query string
-	}
-
-	tests := []struct {
-		name          string
-		args          args
-		expectedValue string
-	}{
+	tests := testCases{
 		{
 			name: "Delete Scalar Node",
 			args: args{
@@ -111,29 +98,6 @@ spec:
 `,
 		},
 	}
-	for _, tt := range tests {
-		// passing in "" to testInit, because it requires a string (value), but is not needed for deletions
-		testYaml, _ := testInit("")
-		testCase := tt
-		t.Run(testCase.name, func(t *testing.T) {
-			t.Parallel()
-			yp, _ := yamlpath.NewPath(testCase.args.query)
-			child, _ := yp.Find(testYaml)
 
-			actions.Delete(testYaml, child[0])
-
-			buf := new(bytes.Buffer)
-			ye := yaml.NewEncoder(buf)
-
-			ye.SetIndent(2)
-
-			if err := ye.Encode(testYaml); err != nil {
-				t.Errorf("Encountered Error creating encoder: %s", err)
-			}
-
-			if buf.String() != testCase.expectedValue {
-				t.Errorf("Delete() =\n%swant:\n%s", buf.String(), tt.expectedValue)
-			}
-		})
-	}
+	tests.runTests("delete", t)
 }

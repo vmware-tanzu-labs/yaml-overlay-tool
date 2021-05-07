@@ -6,27 +6,13 @@
 package actions_test
 
 import (
-	"bytes"
 	"testing"
-
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"gopkg.in/yaml.v3"
 )
 
 func TestReplace(t *testing.T) {
 	t.Parallel()
 
-	type args struct {
-		query string
-		value string
-	}
-
-	tests := []struct {
-		name          string
-		args          args
-		expectedValue string
-	}{
+	tests := testCases{
 		{
 			name: "Replace Scalar Node (string)",
 			args: args{
@@ -133,30 +119,5 @@ spec:
 		},
 	}
 
-	for _, tt := range tests {
-		testYaml, val := testInit(tt.args.value)
-		testCase := tt
-		t.Run(testCase.name, func(t *testing.T) {
-			t.Parallel()
-			yp, _ := yamlpath.NewPath(testCase.args.query)
-			results, _ := yp.Find(testYaml)
-
-			if err := actions.Replace(results[0], val.Content[0]); err != nil {
-				t.Errorf("Encountered Error on replace action: %s", err)
-			}
-
-			buf := new(bytes.Buffer)
-			ye := yaml.NewEncoder(buf)
-
-			ye.SetIndent(2)
-
-			if err := ye.Encode(testYaml); err != nil {
-				t.Errorf("Encountered Error creating encoder: %s", err)
-			}
-
-			if buf.String() != testCase.expectedValue {
-				t.Errorf("Replace() =\n%swant:\n%s", buf.String(), tt.expectedValue)
-			}
-		})
-	}
+	tests.runTests("replace", t)
 }
