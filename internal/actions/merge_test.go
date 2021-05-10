@@ -43,6 +43,10 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 		{
@@ -75,6 +79,10 @@ spec:
       port: 106
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 		{
@@ -111,6 +119,10 @@ spec:
       port: 22
       protocol: TCP
       targetPort: sshd
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 		{
@@ -146,6 +158,154 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Merge Scalar Node - true boolean with false boolean",
+			args: args{
+				query: "spec.boolTest.case0",
+				value: "true",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Merge Scalar Node - false boolean with false boolean",
+			args: args{
+				query: "spec.boolTest.case0",
+				value: "false",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Merge Scalar Node - true boolean with true boolean",
+			args: args{
+				query: "spec.boolTest.case1",
+				value: "true",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Merge Scalar Node - false boolean with true boolean",
+			args: args{
+				query: "spec.boolTest.case1",
+				value: "false",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: false
 `,
 		},
 		{
@@ -180,6 +340,10 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 	}
