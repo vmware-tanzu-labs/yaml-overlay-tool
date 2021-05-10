@@ -165,6 +165,81 @@ spec:
 `,
 		},
 		{
+			name: "Merge map (inject line comment)",
+			args: args{
+				query: "metadata.labels",
+				value: "foo: bar\nbar: foo\npotato: badayda # sometimes encountered in the northeast",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+    foo: bar
+    bar: foo
+    potato: badayda # sometimes encountered in the northeast
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Merge map (with line comment)",
+			args: args{
+				query: "metadata.labels",
+				value: "app.kubernetes.io/name: # test",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns # test
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
 			name: "Merge Scalar Node - true boolean with false boolean",
 			args: args{
 				query: "spec.boolTest.case0",
