@@ -43,6 +43,10 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 		{
@@ -75,6 +79,10 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 		{
@@ -111,6 +119,10 @@ spec:
       port: 53
       protocol: TCP
       targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
 `,
 		},
 	}
