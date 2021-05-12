@@ -95,7 +95,7 @@ To build on the previous example, there are often times when you may want to rem
 
 ```yaml
 commonOverlays:
-  - name: Remove all annotations
+  - name: Remove all annotations with conditions
     query: metadata.annotations
     action: delete
     documentQuery:
