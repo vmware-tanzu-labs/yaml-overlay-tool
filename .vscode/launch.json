@@ -13,18 +13,5 @@
             "args": ["-i", "examples/static/test.yaml", "-V"],
             "cwd": "${workspaceFolder}"
         },
-        {
-            "name": "Launch Yot testcase",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/cmd/yot/main.go",
-            "args": [
-                "-i",
-                "examples/kubernetes/removeAnnotationsWithConditions.yaml",
-                "-V"
-            ],
-            "cwd": "${workspaceFolder}"
-        }
     ]
 }
