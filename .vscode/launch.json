@@ -12,6 +12,6 @@
             "program": "${workspaceFolder}/cmd/yot/main.go",
             "args": ["-i", "examples/static/test.yaml", "-V"],
             "cwd": "${workspaceFolder}"
-        }
+        },
     ]
 }

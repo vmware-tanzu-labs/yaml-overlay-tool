@@ -1,0 +1,18 @@
+commonOverlays:
+  - name: Add additional labels
+    query: 
+      - metadata.labels
+      - spec.template.metadata.labels
+      - spec.selector.matchLabels
+      - spec.selector
+    value:
+      app.kubernetes.io/owner: Jeff Smith
+      app.kubernetes.io/purpose: static-webpage
+    action: merge
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests/my-app.yaml
+  
+  - name: asdf
+    path: ./examples/kubernetes/manifests/my-service.yaml
