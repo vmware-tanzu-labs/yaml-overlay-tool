@@ -122,6 +122,10 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 					break
 				}
 			}
+
+			if !conditionsMet {
+				break
+			}
 		}
 
 		if conditionsMet {
