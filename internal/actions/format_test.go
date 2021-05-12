@@ -109,9 +109,10 @@ spec:
     app.kubernetes.io/name: external-dns
   type: LoadBalancer
   ports:
-	# head
-    - name: dns-udp-port # line
-	# foot
+    - name: "dns-udp-port" # line
+      # foot
+
+      # head
       port: 53
       protocol: UDP
       targetPort: dns-udp
