@@ -1,0 +1,10 @@
+commonOverlays:
+  - name: Set our private container registry in manifests
+    query: ..image
+    value: my-private-reg/%s
+    action: format
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+  #  path: /tmp/k8s
+    path: ./examples/kubernetes/manifests/my-app.yaml

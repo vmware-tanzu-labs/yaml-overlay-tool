@@ -1,0 +1,11 @@
+commonOverlays:
+  - name: Update name label's key to app.kubernetes.io/name
+    query: metadata.labels.name~
+    value: app.kubernetes.io/%s
+    action: format
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests/my-app.yaml
+  - name: asdf
+    path: ./examples/kubernetes/manifests/my-service.yaml
