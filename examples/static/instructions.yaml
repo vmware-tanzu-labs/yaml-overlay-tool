@@ -7,10 +7,6 @@ commonOverlays:
     action: merge
     # qualifier to further refine when this overlay is applied
     documentQuery:
-      # default operator behavior is 'and' and has been omitted as an example of
-      ## this behavior
-      # all of the 'and' operator queries must match or any one of the 'or'
-      ## operator queries
       - conditions:
           - key: kind
             value: Service
