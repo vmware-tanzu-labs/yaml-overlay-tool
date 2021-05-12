@@ -16,18 +16,28 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().BoolVarP(&options.Verbose, "verbose", "V", false, "verbose mode")
+	rootCmd.PersistentFlags().BoolVarP(
+		&options.Verbose,
+		"verbose",
+		"V",
+		false,
+		"verbose mode",
+	)
 
-	rootCmd.PersistentFlags().StringVarP(
+	rootCmd.Flags().StringVarP(
 		&options.InstructionsFile,
 		"instructions",
 		"i",
 		"",
-		helpInstructionsFile,
+		HelpInstructionsFile,
 	)
 
-	if err := rootCmd.MarkPersistentFlagRequired("instructions"); err != nil {
-		log.Fatal("InstructionsFile (-i) is required")
+	if err := rootCmd.MarkFlagFilename("instructions"); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := rootCmd.MarkFlagRequired("instructions"); err != nil {
+		log.Fatal(err)
 	}
 
 	rootCmd.PersistentFlags().StringVarP(
@@ -35,15 +45,19 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		"output-directory",
 		"o",
 		"./output",
-		helpOutputDirectory,
+		HelpOutputDirectory,
 	)
+
+	if err := rootCmd.MarkPersistentFlagDirname("output-directory"); err != nil {
+		log.Fatal(err)
+	}
 
 	rootCmd.PersistentFlags().BoolVarP(
 		&options.StdOut,
 		"stdout",
 		"s",
 		false,
-		helpRenderStdOut,
+		HelpRenderStdOut,
 	)
 
 	rootCmd.PersistentFlags().IntVarP(
@@ -51,6 +65,6 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		"indent-level",
 		"I",
 		2,
-		helpIndentLevel,
+		HelpIndentLevel,
 	)
 }

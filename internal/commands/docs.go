@@ -4,9 +4,11 @@
 package commands
 
 const (
-	yotShort = "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2"
+	Version = "v0.1.0"
 
-	yotLong = `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
+	YotShort = "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2"
+
+	YotLong = `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
 of overlay instruction data with jinja2, and the application of rendered 
 overlays "over the top" of a yaml file. yot only produces valid yaml 
 documents on output.`
@@ -46,14 +48,14 @@ documents on output.`
 	and will render your instructions differently based on its
 	values`
 	*/
-	helpInstructionsFile = "Instruction file path. Defaults to ./instructions.yaml (required)"
+	HelpInstructionsFile = "Instruction file path. Defaults to ./instructions.yaml (required)"
 
-	helpOutputDirectory = `Path to directory to write the overlayed yaml files to.
+	HelpOutputDirectory = `Path to directory to write the overlayed yaml files to.
 If value files were supplied in addition to a 
 defaults.yaml/.yml then the rendered templates will land
 in <output dir>/<addl value file name>.`
 
-	helpRenderStdOut = `Render output to stdout. Templated instructions files 
+	HelpRenderStdOut = `Render output to stdout. Templated instructions files 
 will still be output to the --output-directory.`
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -62,5 +64,48 @@ will still be output to the --output-directory.`
 		of yot. Equivalent to a dry-run. Exits with return
 		code 0 prior to processing instructions`
 	*/
-	helpIndentLevel = `Number of spaces to be used for indenting YAML output (default: 2) (min: 2, max: 9)`
+	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (default: 2) (min: 2, max: 9)`
+
+	CompletionUse   = "completion [bash|zsh|fish|powershell]"
+	CompletionShort = "Generate completion script"
+
+	CompletionLong = `To load completions:
+
+Bash:
+
+  $ source <(yourprogram completion bash)
+
+  # To load completions for each session, execute once:
+  # Linux:
+  $ yourprogram completion bash > /etc/bash_completion.d/yourprogram
+  # macOS:
+  $ yourprogram completion bash > /usr/local/etc/bash_completion.d/yourprogram
+
+Zsh:
+
+  # If shell completion is not already enabled in your environment,
+  # you will need to enable it.  You can execute the following once:
+
+  $ echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+  # To load completions for each session, execute once:
+  $ yourprogram completion zsh > "${fpath[1]}/_yourprogram"
+
+  # You will need to start a new shell for this setup to take effect.
+
+fish:
+
+  $ yourprogram completion fish | source
+
+  # To load completions for each session, execute once:
+  $ yourprogram completion fish > ~/.config/fish/completions/yourprogram.fish
+
+PowerShell:
+
+  PS> yourprogram completion powershell | Out-String | Invoke-Expression
+
+  # To load completions for every new session, run:
+  PS> yourprogram completion powershell > yourprogram.ps1
+  # and source this file from your PowerShell profile.
+`
 )

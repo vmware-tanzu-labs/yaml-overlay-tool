@@ -7,6 +7,7 @@ package actions_test
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"testing"
 
@@ -24,6 +25,7 @@ type testCase struct {
 	name          string
 	args          args
 	expectedValue string
+	wantErr       bool
 }
 
 type testCases []testCase
@@ -90,7 +92,9 @@ func (tst testCases) runTests(t *testing.T, a string) {
 			yp, _ := yamlpath.NewPath(testCase.args.query)
 			results, _ := yp.Find(testYaml)
 
-			testAction(t, a, results[0], testYaml, val.Content...)
+			if err := testAction(t, a, results[0], testYaml, val.Content...); (err != nil) != testCase.wantErr {
+				t.Errorf("Error: %w, WantErr: %v", err, testCase.wantErr)
+			}
 
 			buf := new(bytes.Buffer)
 			ye := yaml.NewEncoder(buf)
@@ -108,23 +112,25 @@ func (tst testCases) runTests(t *testing.T, a string) {
 	}
 }
 
-func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testValue ...*yaml.Node) {
+func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testValue ...*yaml.Node) error {
 	t.Helper()
 
 	switch action {
 	case "merge":
 		if err := actions.Merge(result, testValue[0]); err != nil {
-			t.Errorf("Encountered Error on merge action: %s", err)
+			return fmt.Errorf("encountered Error on merge action: %w", err)
 		}
 	case "replace":
 		if err := actions.Replace(result, testValue[0]); err != nil {
-			t.Errorf("Encountered Error on replace action: %s", err)
+			return fmt.Errorf("encountered Error on replace action: %w", err)
 		}
 	case "format":
 		if err := actions.Format(result, testValue[0]); err != nil {
-			t.Errorf("Encountered Error on format action: %s", err)
+			return fmt.Errorf("encountered Error on format action: %w", err)
 		}
 	case "delete":
 		actions.Delete(testYaml, result)
 	}
+
+	return nil
 }
