@@ -399,9 +399,10 @@ metadata:
   annotations:
     # NOTE: this only works on 1.19.1+vmware.1+, but not prior
     ## This annotation will be ignored on other cloud providers
-	# head
-    service.beta.kubernetes.io/aws-load-balancer-type: nlbs # line
-	# foot
+    service.beta.kubernetes.io/aws-load-balancer-type: nlbs #line
+    # foot
+
+    # head
 spec:
   selector:
     app.kubernetes.io/name: external-dns

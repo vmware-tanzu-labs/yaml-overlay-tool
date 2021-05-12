@@ -39,7 +39,7 @@ func (o *Overlay) process(f *YamlFile, docIndex int) error {
 
 	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, docIndex)
 
-	results, err := searchPath(o.Query, node)
+	results, err := searchYAMLPaths(o.Query, node)
 	if err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
 
 		return nil
 	case "inject":
-		_, err := path.Build(o.Query)
+		_, err := path.BuildMulti(o.Query)
 		switch {
 		case err == nil:
 			return o.doInjectPath(o.Query, f.Nodes[docIndex])
@@ -162,38 +162,30 @@ func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
 	}
 }
 
-func searchPath(q string, node *yaml.Node) ([]*yaml.Node, error) {
-	yp, err := yamlpath.NewPath(q)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse the query path %s due to %w", q, err)
-	}
+func searchYAMLPaths(paths []string, node *yaml.Node) ([]*yaml.Node, error) {
+	var results []*yaml.Node
 
-	results, err := yp.Find(node)
-	if err != nil {
-		return nil, fmt.Errorf("failed to find results for %s, %w", q, err)
+	for _, p := range paths {
+		log.Debugf("searching path %s\n", p)
+
+		yp, err := yamlpath.NewPath(p)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse the query path %s due to %w", p, err)
+		}
+
+		result, err := yp.Find(node)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find results for %s, %w", p, err)
+		}
+
+		results = append(results, result...)
 	}
 
 	return results, nil
 }
 
-func (om *OnMissing) getInjectPaths() ([]string, error) {
-	var injectPaths []string
-	switch injectPath := om.InjectPath.(type) {
-	case string:
-		injectPaths = append(injectPaths, injectPath)
-	case []interface{}:
-		for _, v := range injectPath {
-			injectPaths = append(injectPaths, v.(string))
-		}
-	default:
-		return nil, fmt.Errorf("%w: %T", ErrOnMissingInvalidType, injectPath)
-	}
-
-	return injectPaths, nil
-}
-
-func (o *Overlay) doInjectPath(ip string, node *yaml.Node) error {
-	y, err := path.Build(ip)
+func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
+	y, err := path.BuildMulti(ip)
 	if err != nil {
 		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
 	}
@@ -203,7 +195,7 @@ func (o *Overlay) doInjectPath(ip string, node *yaml.Node) error {
 		return fmt.Errorf("failed to merge injectpath scaffolding %s with document, %w", ip, err)
 	}
 
-	results, err := searchPath(ip, node)
+	results, err := searchYAMLPaths(ip, node)
 	if err != nil {
 		return fmt.Errorf("%w, on injectPath %s", err, ip)
 	}
@@ -245,7 +237,7 @@ func (o *Overlay) doAction(root, node *yaml.Node) error {
 }
 
 func (o *Overlay) handleInjectPath(f *YamlFile, docIndex int) error {
-	_, err := path.Build(o.Query)
+	_, err := path.BuildMulti(o.Query)
 	if !errors.Is(err, path.ErrInvalidPathSyntax) {
 		return o.doInjectPath(o.Query, f.Nodes[docIndex])
 	}
@@ -256,15 +248,8 @@ func (o *Overlay) handleInjectPath(f *YamlFile, docIndex int) error {
 		return nil
 	}
 
-	injectPaths, err := o.OnMissing.getInjectPaths()
-	if err != nil {
-		return err
-	}
-
-	for _, injectPath := range injectPaths {
-		if err := o.doInjectPath(injectPath, f.Nodes[docIndex]); err != nil {
-			return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
-		}
+	if err := o.doInjectPath(o.OnMissing.InjectPath, f.Nodes[docIndex]); err != nil {
+		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
 	}
 
 	return nil

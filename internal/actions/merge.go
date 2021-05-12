@@ -16,7 +16,23 @@ var (
 	ErrMergeUnsupportedType  = errors.New("not a supported yaml type for merging")
 )
 
-func Merge(o, n *yaml.Node) error {
+func Merge(nodes ...*yaml.Node) error {
+	if len(nodes) <= 1 {
+		return nil
+	}
+
+	o := nodes[0]
+
+	for _, n := range nodes[1:] {
+		if err := merge(o, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func merge(o, n *yaml.Node) error {
 	if o.Kind != n.Kind && o.Kind != 0 {
 		// are both originalValue and newValue the same 'Kind'?
 		return ErrMergeMustBeOfSameKind
@@ -40,7 +56,7 @@ func Merge(o, n *yaml.Node) error {
 
 func mergeDocument(o, n *yaml.Node) error {
 	if o.Content != nil && n.Content != nil {
-		if err := Merge(o.Content[0], n.Content[0]); err != nil {
+		if err := merge(o.Content[0], n.Content[0]); err != nil {
 			return err
 		}
 
@@ -59,7 +75,7 @@ func mergeMap(o, n *yaml.Node) error {
 				if o.Content[oi].Value == n.Content[ni].Value {
 					resultFound = true
 
-					if err := Merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
+					if err := merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
 						return err
 					}
 

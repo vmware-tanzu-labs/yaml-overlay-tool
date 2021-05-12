@@ -4,6 +4,8 @@
 package lib
 
 import (
+	"strings"
+
 	"gopkg.in/yaml.v3"
 )
 
@@ -23,7 +25,7 @@ type Instructions struct {
 
 type Overlay struct {
 	Name          string          `yaml:"name,omitempty"`
-	Query         string          `yaml:"query,omitempty"`
+	Query         multiString     `yaml:"query,omitempty"`
 	Value         yaml.Node       `yaml:"value,omitempty"`
 	Action        string          `yaml:"action,omitempty"`
 	DocumentQuery []DocumentQuery `yaml:"documentQuery,omitempty"`
@@ -51,5 +53,24 @@ type YamlFile struct {
 
 type OnMissing struct {
 	Action     string      `yaml:"action,omitempty"`
-	InjectPath interface{} `yaml:"injectPath,omitempty"`
+	InjectPath multiString `yaml:"injectPath,omitempty"`
+}
+
+type multiString []string
+
+func (ms *multiString) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err == nil {
+		*ms = []string{s}
+
+		return nil
+	}
+
+	type ss []string
+
+	return unmarshal((*ss)(ms))
+}
+
+func (ms multiString) String() string {
+	return strings.Join(ms, ",")
 }

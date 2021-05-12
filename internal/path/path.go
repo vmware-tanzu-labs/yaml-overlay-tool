@@ -9,10 +9,30 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
 
 var ErrInvalidPathSyntax = errors.New("invalid path syntax")
+
+func BuildMulti(paths []string) (*yaml.Node, error) {
+	var yamlNodes []*yaml.Node
+
+	for _, path := range paths {
+		yamlNode, err := Build(path)
+		if err != nil {
+			return nil, err
+		}
+
+		yamlNodes = append(yamlNodes, yamlNode)
+	}
+
+	if err := actions.Merge(yamlNodes...); err != nil {
+		return nil, err
+	}
+
+	return yamlNodes[0], nil
+}
 
 // Build constructs a Path from a string expression.
 func Build(path string) (*yaml.Node, error) {
