@@ -12,6 +12,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type YamlFile struct {
+	Name      string     `yaml:"name,omitempty"`
+	Path      string     `yaml:"path,omitempty"`
+	Overlays  []Overlay  `yaml:"overlays,omitempty"`
+	Documents []YamlFile `yaml:"documents,omitempty"`
+	Source    []Source
+}
+
 func (yf *YamlFile) readYamlFile(path string) error {
 	source := &Source{
 		Origin: "file",

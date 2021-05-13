@@ -6,6 +6,7 @@ package lib
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/path"
@@ -17,6 +18,40 @@ var (
 	ErrOnMissingNoInjectPath   = errors.New("no matches and no onMissing.injectPath")
 	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
 )
+
+type Overlay struct {
+	Name          string          `yaml:"name,omitempty"`
+	Query         multiString     `yaml:"query,omitempty"`
+	Value         yaml.Node       `yaml:"value,omitempty"`
+	Action        Action          `yaml:"action,omitempty"`
+	DocumentQuery []DocumentQuery `yaml:"documentQuery,omitempty"`
+	OnMissing     OnMissing       `yaml:"onMissing,omitempty"`
+	DocumentIndex []int           `yaml:"documentIndex,omitempty"`
+}
+
+type OnMissing struct {
+	Action     OnMissingAction `yaml:"action,omitempty"`
+	InjectPath multiString     `yaml:"injectPath,omitempty"`
+}
+
+type multiString []string
+
+func (ms *multiString) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err == nil {
+		*ms = []string{s}
+
+		return nil
+	}
+
+	type ss []string
+
+	return unmarshal((*ss)(ms))
+}
+
+func (ms multiString) String() string {
+	return strings.Join(ms, ",")
+}
 
 func (o *Overlay) applyOverlay(src *Source, docIndex int) error {
 	if ok := o.checkDocumentIndex(docIndex); !ok {
@@ -98,11 +133,11 @@ func (o *Overlay) onMissing(src *Source, docIndex int) error {
 	// if we had an inject path(s) then we inject the value to those locations
 	// if we didn't have an inject path we have an implicit onMissing: ignore and we put out a warning if not stdout option to terminal
 	switch o.OnMissing.Action {
-	case "ignore", "":
+	case Ignore:
 		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, src.Path, docIndex, ErrOnMissingNoInjectAction)
 
 		return nil
-	case "inject":
+	case Inject:
 		_, err := path.BuildMulti(o.Query)
 		if err != nil {
 			if errors.Is(err, path.ErrInvalidPathSyntax) {
@@ -156,17 +191,17 @@ func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 		log.Debugf("Proposed: >>>\n%s\n", p)
 
 		switch o.Action {
-		case "delete":
+		case Delete:
 			actions.Delete(root, nodes[i])
-		case "replace":
+		case Replace:
 			if err := actions.Replace(nodes[i], &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping replace", err)
 			}
-		case "format":
+		case Format:
 			if err := actions.Format(nodes[i], &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping format", err)
 			}
-		case "merge":
+		case Merge:
 			if err := actions.Merge(nodes[i], &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping merge", err)
 			}

@@ -13,6 +13,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Source struct {
+	Nodes      []*yaml.Node
+	Origin     string
+	Path       string
+	outputPath string
+}
+
 func (src *Source) processOverlays(o []Overlay, nodeIndex int) error {
 	for i := range o {
 		if err := o[i].applyOverlay(src, nodeIndex); err != nil {
