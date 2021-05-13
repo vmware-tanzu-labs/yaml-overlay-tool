@@ -5,4 +5,4 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests/my-service.yaml
+    path: ./examples/kubernetes/manifests
