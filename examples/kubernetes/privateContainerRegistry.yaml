@@ -6,5 +6,4 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-  #  path: /tmp/k8s
-    path: ./examples/kubernetes/manifests/my-app.yaml
+    path: ./examples/kubernetes/manifests
