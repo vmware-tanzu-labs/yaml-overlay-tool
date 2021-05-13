@@ -6,12 +6,11 @@ package commands
 const (
 	Version = "v0.1.0"
 
-	YotShort = "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2"
+	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
 
-	YotLong = `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
-of overlay instruction data with jinja2, and the application of rendered 
-overlays "over the top" of a yaml file. yot only produces valid yaml 
-documents on output.`
+	YotLong = `yot (YAML Overlay Tool) is a YAML overlay tool which uses a YAML schema to 
+	define overlay operations on a set of YAML documents. yot only produces valid YAML 
+	documents on output, and can preserve and inject comments.`
 
 	/*helpDefaultValueFile = `Path to your default values file. If not set, you must
 	pass a values file of defaults.yaml or
@@ -50,13 +49,14 @@ documents on output.`
 	*/
 	HelpInstructionsFile = "Instruction file path. Defaults to ./instructions.yaml (required)"
 
-	HelpOutputDirectory = `Path to directory to write the overlayed yaml files to.
-If value files were supplied in addition to a 
-defaults.yaml/.yml then the rendered templates will land
-in <output dir>/<addl value file name>.`
+	HelpOutputDirectory = `Path to directory to write the overlayed YAML files to.`
+	/*	`If value files were supplied in addition to a
+		defaults.yaml/.yml then the rendered templates will land
+		in <output dir>/<addl value file name>.`
+	*/
 
-	HelpRenderStdOut = `Render output to stdout. Templated instructions files 
-will still be output to the --output-directory.`
+	HelpRenderStdOut = `Render output to stdout.`
+	// `Templated instructions files will still be output to the --output-directory.`
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
 		the rendered instructions to stdout to allow for
