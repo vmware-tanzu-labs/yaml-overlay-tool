@@ -20,5 +20,5 @@ func Execute(options *Options) error {
 		return err
 	}
 
-	return instructions.applyOverlays(options)
+	return instructions.processYamlFiles(options)
 }

@@ -15,7 +15,7 @@ import (
 
 func (src *Source) processOverlays(o []Overlay, nodeIndex int) error {
 	for i := range o {
-		if err := o[i].process(src, nodeIndex); err != nil {
+		if err := o[i].applyOverlay(src, nodeIndex); err != nil {
 			return err
 		}
 	}
