@@ -4,15 +4,10 @@
 package lib
 
 import (
-	"errors"
-
 	"github.com/op/go-logging"
 )
 
-var (
-	log              = logging.MustGetLogger("lib") //nolint:gochecknoglobals
-	ErrInvalidAction = errors.New("invalid overlay action")
-)
+var log = logging.MustGetLogger("lib") //nolint:gochecknoglobals
 
 func Execute(options *Options) error {
 	instructions, err := ReadInstructionFile(&options.InstructionsFile)

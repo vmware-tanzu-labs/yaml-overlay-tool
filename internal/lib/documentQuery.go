@@ -12,6 +12,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type DocumentQuery struct {
+	Conditions []Condition `yaml:"conditions,omitempty"`
+}
+
+type Condition struct {
+	Key   string    `yaml:"key,omitempty"`
+	Value yaml.Node `yaml:"value,omitempty"`
+}
+
 func (dq *DocumentQuery) checkQuery(node *yaml.Node) (bool, error) {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 

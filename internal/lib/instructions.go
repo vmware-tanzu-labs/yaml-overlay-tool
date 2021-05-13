@@ -11,6 +11,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Instructions struct {
+	CommonOverlays []Overlay  `yaml:"commonOverlays,omitempty"`
+	YamlFiles      []YamlFile `yaml:"yamlFiles,omitempty"`
+}
+
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
