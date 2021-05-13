@@ -1,4 +1,4 @@
-[Back to Actions](actions.md#merge)  
+[Back to Actions](actions.md#3-merge)  
 [Back to Table of Contents](../documentation.md)
 
 ## Details on How Data Types are Handled with Merge Actions
@@ -136,5 +136,5 @@ metadata:
 
 This will render three versions of the file test.yaml for DEV, QA, and PROD, where the metadata.name field will have been extended as such `my-cool-app-DEV`, `my-cool-app-QA`, and `my-cool-app-PROD`.
 
-[Back to Actions](actions.md#merge)  
+[Back to Actions](actions.md#3-merge)  
 [Back to Table of Contents](../documentation.md)
