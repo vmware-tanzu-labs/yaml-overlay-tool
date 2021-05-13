@@ -1,4 +1,15 @@
-## YAML Overlay Tool - Common Kubernetes Use-Cases
+[Back to Table of Contents](../documentation.md)
+
+## Kubernetes Common Use-Cases and Patterns
+
+The following set of examples will help you quickly achieve common tasks in the context of Kubernetes YAML manifests.  
+
+All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the repository:
+
+```bash
+yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output path >
+```
+
 
 ### Adding Additional Labels and Selectors To All YAML Files In a Directory
 
@@ -132,3 +143,6 @@ yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: /tmp/k8s
 ```
+
+[Back to Table of Contents](../documentation.md)  
+[Next Up: Interactive Tutorials and Learning Paths](tutorials.md)
