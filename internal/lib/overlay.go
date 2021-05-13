@@ -21,12 +21,12 @@ var (
 	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
 )
 
-func (o *Overlay) process(f *YamlFile, docIndex int) error {
+func (o *Overlay) process(src *Source, docIndex int) error {
 	if ok := o.checkDocumentIndex(docIndex); !ok {
 		return nil
 	}
 
-	node := f.Nodes[docIndex]
+	node := src.Nodes[docIndex]
 
 	ok, err := o.checkDocumentQuery(node)
 	if err != nil {
@@ -37,7 +37,7 @@ func (o *Overlay) process(f *YamlFile, docIndex int) error {
 		return nil
 	}
 
-	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, f.Path, docIndex)
+	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, src.Path, docIndex)
 
 	results, err := searchYAMLPaths(o.Query, node)
 	if err != nil {
@@ -45,7 +45,7 @@ func (o *Overlay) process(f *YamlFile, docIndex int) error {
 	}
 
 	if results == nil {
-		if err := o.onMissing(f, docIndex); err != nil {
+		if err := o.onMissing(src, docIndex); err != nil {
 			return err
 		}
 	}
@@ -55,7 +55,7 @@ func (o *Overlay) process(f *YamlFile, docIndex int) error {
 			return fmt.Errorf("%w in instructions file", err)
 		}
 
-		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
+		return fmt.Errorf("%w in file %s on Document %d", err, src.Path, docIndex)
 	}
 
 	return nil
@@ -100,38 +100,13 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 		return true, nil
 	}
 
-	conditionsMet := false
-
-	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
-
 	for i := range o.DocumentQuery {
-		for ci := range o.DocumentQuery[i].Conditions {
-			yp, err := yamlpath.NewPath(o.DocumentQuery[i].Conditions[ci].Key)
-			if err != nil {
-				return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", o.DocumentQuery[i].Conditions[ci].Key, err)
-			}
-
-			results, err := yp.Find(node)
-			if err != nil {
-				return false, fmt.Errorf("failed to find results for %s, %w", o.DocumentQuery[i].Conditions[ci].Key, err)
-			}
-
-			for _, result := range results {
-				conditionsMet = cmp.Equal(*result, o.DocumentQuery[i].Conditions[ci].Value, compareOptions)
-				if !conditionsMet {
-					break
-				}
-			}
-
-			if !conditionsMet {
-				break
-			}
-		}
-
-		if conditionsMet {
+		if ok, err := o.DocumentQuery[i].check(node); ok {
 			log.Debugf("Document Query conditions were met, continuing")
 
 			return true, nil
+		} else if err != nil {
+			return false, err
 		}
 	}
 
@@ -140,7 +115,7 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 	return false, nil
 }
 
-func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
+func (o *Overlay) onMissing(src *Source, docIndex int) error {
 	// check if the query has a match
 	// if no match then we require an inject path
 	// we need to then check if each inject path is valid (does it exist)
@@ -148,44 +123,23 @@ func (o *Overlay) onMissing(f *YamlFile, docIndex int) error {
 	// if we didn't have an inject path we have an implicit onMissing: ignore and we put out a warning if not stdout option to terminal
 	switch o.OnMissing.Action {
 	case "ignore", "":
-		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectAction)
+		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, src.Path, docIndex, ErrOnMissingNoInjectAction)
 
 		return nil
 	case "inject":
 		_, err := path.BuildMulti(o.Query)
-		switch {
-		case err == nil:
-			return o.doInjectPath(o.Query, f.Nodes[docIndex])
-		case errors.Is(err, path.ErrInvalidPathSyntax):
-			return o.handleInjectPath(f, docIndex)
-		default:
+		if err != nil {
+			if errors.Is(err, path.ErrInvalidPathSyntax) {
+				return o.handleInjectPath(src, docIndex)
+			}
+
 			return fmt.Errorf("%w, for onMissing", err)
 		}
+
+		return o.doInjectPath(o.Query, src.Nodes[docIndex])
 	default:
 		return fmt.Errorf("%w for onMissing of type '%s'", ErrInvalidAction, o.Action)
 	}
-}
-
-func searchYAMLPaths(paths []string, node *yaml.Node) ([]*yaml.Node, error) {
-	var results []*yaml.Node
-
-	for _, p := range paths {
-		log.Debugf("searching path %s\n", p)
-
-		yp, err := yamlpath.NewPath(p)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse the query path %s due to %w", p, err)
-		}
-
-		result, err := yp.Find(node)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find results for %s, %w", p, err)
-		}
-
-		results = append(results, result...)
-	}
-
-	return results, nil
 }
 
 func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
@@ -240,21 +194,45 @@ func (o *Overlay) doAction(root, node *yaml.Node) error {
 	return nil
 }
 
-func (o *Overlay) handleInjectPath(f *YamlFile, docIndex int) error {
+func (o *Overlay) handleInjectPath(src *Source, docIndex int) error {
 	_, err := path.BuildMulti(o.Query)
 	if !errors.Is(err, path.ErrInvalidPathSyntax) {
-		return o.doInjectPath(o.Query, f.Nodes[docIndex])
+		return o.doInjectPath(o.Query, src.Nodes[docIndex])
 	}
 
 	if o.OnMissing.InjectPath == nil {
-		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, f.Path, docIndex, ErrOnMissingNoInjectPath)
+		log.Debugf("ignoring %s at %s in file %s on Document %d due to %s\n", o.Action, o.Query, src.Path, docIndex, ErrOnMissingNoInjectPath)
 
 		return nil
 	}
 
-	if err := o.doInjectPath(o.OnMissing.InjectPath, f.Nodes[docIndex]); err != nil {
-		return fmt.Errorf("%w in file %s on Document %d", err, f.Path, docIndex)
+	if err := o.doInjectPath(o.OnMissing.InjectPath, src.Nodes[docIndex]); err != nil {
+		return fmt.Errorf("%w in file %s on Document %d", err, src.Path, docIndex)
 	}
 
 	return nil
+}
+
+func (dq *DocumentQuery) check(node *yaml.Node) (bool, error) {
+	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
+
+	for ci := range dq.Conditions {
+		yp, err := yamlpath.NewPath(dq.Conditions[ci].Key)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", dq.Conditions[ci].Key, err)
+		}
+
+		results, err := yp.Find(node)
+		if err != nil {
+			return false, fmt.Errorf("failed to find results for %s, %w", dq.Conditions[ci].Key, err)
+		}
+
+		for _, result := range results {
+			if ok := cmp.Equal(*result, dq.Conditions[ci].Value, compareOptions); !ok {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
 }

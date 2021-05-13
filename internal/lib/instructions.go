@@ -4,9 +4,7 @@
 package lib
 
 import (
-	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -28,74 +26,74 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 		return nil, fmt.Errorf("unable to read instructions file %s: %w", *fileName, err)
 	}
 
-	instructions.setOutputPath()
-
-	if err := instructions.readYamlFiles(); err != nil {
+	if err := instructions.ReadYamlFiles(); err != nil {
 		return nil, err
 	}
+
+	instructions.setOutputPath()
 
 	return &instructions, nil
 }
 
 func (i *Instructions) applyOverlays(options *Options) error {
 	for _, file := range i.YamlFiles {
-		for nodeIndex := range file.Nodes {
-			log.Infof("Processing Common Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
+		for _, src := range file.Source {
+			for nodeIndex := range src.Nodes {
+				log.Infof("Processing Common Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
 
-			if err := file.processOverlays(i.CommonOverlays, nodeIndex); err != nil {
-				return fmt.Errorf("failed to apply common overlays, %w", err)
-			}
-
-			log.Infof("Processing File Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
-
-			if err := file.processOverlays(file.Overlays, nodeIndex); err != nil {
-				return fmt.Errorf("failed to apply file overlays, %w", err)
-			}
-
-			log.Infof("Processing Document Overlays in File %s on Document %d\n\n", file.Path, nodeIndex)
-
-			for docIndex, docOverlay := range file.Documents {
-				if docOverlay.Path != fmt.Sprint(nodeIndex) {
-					continue
+				if err := src.processOverlays(i.CommonOverlays, nodeIndex); err != nil {
+					return fmt.Errorf("failed to apply common overlays, %w", err)
 				}
 
-				if err := file.processOverlays(file.Documents[docIndex].Overlays, nodeIndex); err != nil {
-					return fmt.Errorf("failed to apply document overlays, %w", err)
+				log.Infof("Processing File Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
+
+				if err := src.processOverlays(file.Overlays, nodeIndex); err != nil {
+					return fmt.Errorf("failed to apply file overlays, %w", err)
+				}
+
+				log.Infof("Processing Document Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
+
+				for docIndex, docOverlay := range file.Documents {
+					if docOverlay.Path != fmt.Sprint(nodeIndex) {
+						continue
+					}
+
+					if err := src.processOverlays(file.Documents[docIndex].Overlays, nodeIndex); err != nil {
+						return fmt.Errorf("failed to apply document overlays, %w", err)
+					}
 				}
 			}
-		}
 
-		if err := file.doPostProcessing(options); err != nil {
-			return fmt.Errorf("failed to perform post processing on %s: %w", file.Path, err)
+			if err := src.doPostProcessing(options); err != nil {
+				return fmt.Errorf("failed to perform post processing on %s: %w", src.Path, err)
+			}
 		}
 	}
 
 	return nil
 }
 
-func (i *Instructions) readYamlFiles() error {
-	for index, file := range i.YamlFiles {
-		reader, err := ReadStream(file.Path)
-		if err != nil {
-			return err
-		}
+func (i *Instructions) ReadYamlFiles() error {
+	for yIndex, yFile := range i.YamlFiles {
+		var files []string
 
-		dc := yaml.NewDecoder(reader)
-
-		for {
-			var y yaml.Node
-
-			if err := dc.Decode(&y); errors.Is(err, io.EOF) {
-				if reader, ok := reader.(*os.File); ok {
-					CloseFile(reader)
-
-					break
-				}
-			} else if err != nil {
-				return fmt.Errorf("failed to read file %s: %w", file.Path, err)
+		if ok, err := isDirectory(yFile.Path); ok {
+			files, err = getFileNames(yFile.Path)
+			if err != nil {
+				return err
+			}
+		} else {
+			if err != nil {
+				return err
 			}
 
-			i.YamlFiles[index].Nodes = append(i.YamlFiles[index].Nodes, &y)
+			files = []string{yFile.Path}
+		}
+
+		for _, file := range files {
+			if err := i.YamlFiles[yIndex].readYamlFile(file); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -104,13 +102,18 @@ func (i *Instructions) readYamlFiles() error {
 
 func (i *Instructions) setOutputPath() {
 	p := make([]string, 0, len(i.YamlFiles))
+
 	for _, yf := range i.YamlFiles {
-		p = append(p, yf.Path)
+		for _, src := range yf.Source {
+			p = append(p, src.Path)
+		}
 	}
 
 	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
 
 	for yi := range i.YamlFiles {
-		i.YamlFiles[yi].outputPath = strings.TrimPrefix(i.YamlFiles[yi].Path, pathPrefix)
+		for si, src := range i.YamlFiles[yi].Source {
+			i.YamlFiles[yi].Source[si].outputPath = strings.TrimPrefix(src.Path, pathPrefix)
+		}
 	}
 }

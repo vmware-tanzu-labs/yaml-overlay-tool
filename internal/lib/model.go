@@ -15,7 +15,6 @@ type Options struct {
 	OutputDir        string
 	StdOut           bool
 	Indent           int
-	ValuesPath       []string
 }
 
 type Instructions struct {
@@ -43,17 +42,23 @@ type Condition struct {
 }
 
 type YamlFile struct {
-	Name       string     `yaml:"name,omitempty"`
-	Path       string     `yaml:"path,omitempty"`
-	Overlays   []Overlay  `yaml:"overlays,omitempty"`
-	Documents  []YamlFile `yaml:"documents,omitempty"`
-	Nodes      []*yaml.Node
-	outputPath string
+	Name      string     `yaml:"name,omitempty"`
+	Path      string     `yaml:"path,omitempty"`
+	Overlays  []Overlay  `yaml:"overlays,omitempty"`
+	Documents []YamlFile `yaml:"documents,omitempty"`
+	Source    []Source
 }
 
 type OnMissing struct {
 	Action     string      `yaml:"action,omitempty"`
 	InjectPath multiString `yaml:"injectPath,omitempty"`
+}
+
+type Source struct {
+	Nodes      []*yaml.Node
+	Origin     string
+	Path       string
+	outputPath string
 }
 
 type multiString []string
