@@ -48,9 +48,9 @@ Now apply the changes by generating a new set of YAML files:
 `yot -i instructions.yaml -o /tmp/new`
 
 
-### Change the Name of a Label's Key
+### Modify the Name of a Label's Key
 
-In this example we will replace the `name` label with `app.kubernetes.io/name` by using the `format` action.  The `~` character in JSONPath+ always returns the value of the key, rather than the value.
+In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
 
 ```yaml
 # instructions.yaml
@@ -59,6 +59,26 @@ commonOverlays:
     query: metadata.labels.name~
     value: app.kubernetes.io/%s
     action: format
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: /tmp/k8s
+```
+
+Now apply the changes by generating a new set of YAML files:
+`yot -i instructions.yaml -o /tmp/new`
+
+### Replace the Name of a Label's Key
+
+In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
+
+```yaml
+# instructions.yaml
+commonOverlays:
+  - name: Replace name label's key to my-new-label
+    query: metadata.labels.name~
+    value: my-new-label
+    action: replace
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
