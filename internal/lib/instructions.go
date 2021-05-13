@@ -35,7 +35,7 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	return &instructions, nil
 }
 
-func (i *Instructions) applyOverlays(options *Options) error {
+func (i *Instructions) processYamlFiles(options *Options) error {
 	for _, file := range i.YamlFiles {
 		for _, src := range file.Source {
 			for nodeIndex := range src.Nodes {
@@ -53,13 +53,13 @@ func (i *Instructions) applyOverlays(options *Options) error {
 
 				log.Infof("Processing Document Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
 
-				for docIndex, docOverlay := range file.Documents {
-					if docOverlay.Path != fmt.Sprint(nodeIndex) {
+				for di := range file.Documents {
+					if !checkDocumentPath(&file.Documents[di], nodeIndex) {
 						continue
 					}
 
-					if err := src.processOverlays(file.Documents[docIndex].Overlays, nodeIndex); err != nil {
-						return fmt.Errorf("failed to apply document overlays, %w", err)
+					if err := src.processOverlays(file.Documents[di].Overlays, nodeIndex); err != nil {
+						return err
 					}
 				}
 			}
@@ -116,4 +116,8 @@ func (i *Instructions) setOutputPath() {
 			i.YamlFiles[yi].Source[si].outputPath = strings.TrimPrefix(src.Path, pathPrefix)
 		}
 	}
+}
+
+func checkDocumentPath(doc *YamlFile, docIndex int) bool {
+	return doc.Path == fmt.Sprint(docIndex)
 }

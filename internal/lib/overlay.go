@@ -7,9 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/path"
 	"gopkg.in/yaml.v3"
@@ -21,20 +18,15 @@ var (
 	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
 )
 
-func (o *Overlay) process(src *Source, docIndex int) error {
+func (o *Overlay) applyOverlay(src *Source, docIndex int) error {
 	if ok := o.checkDocumentIndex(docIndex); !ok {
 		return nil
 	}
 
 	node := src.Nodes[docIndex]
 
-	ok, err := o.checkDocumentQuery(node)
-	if err != nil {
+	if ok, err := o.checkDocumentQuery(node); !ok {
 		return err
-	}
-
-	if !ok {
-		return nil
 	}
 
 	log.Debugf("%s at %s in file %s on Document %d\n", o.Action, o.Query, src.Path, docIndex)
@@ -50,28 +42,12 @@ func (o *Overlay) process(src *Source, docIndex int) error {
 		}
 	}
 
-	if err := o.processActions(node, results); err != nil {
+	if err := o.doAction(node, results); err != nil {
 		if errors.Is(err, ErrInvalidAction) {
 			return fmt.Errorf("%w in instructions file", err)
 		}
 
 		return fmt.Errorf("%w in file %s on Document %d", err, src.Path, docIndex)
-	}
-
-	return nil
-}
-
-func (o *Overlay) processActions(node *yaml.Node, results []*yaml.Node) error {
-	for ri := range results {
-		b, _ := yaml.Marshal(&results[ri])
-		p, _ := yaml.Marshal(o.Value)
-
-		log.Debugf("Current: >>>\n%s\n", b)
-		log.Debugf("Proposed: >>>\n%s\n", p)
-
-		if err := o.doAction(node, results[ri]); err != nil {
-			return fmt.Errorf("%w for %s query result %d", err, o.Query, ri)
-		}
 	}
 
 	return nil
@@ -101,7 +77,7 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 	}
 
 	for i := range o.DocumentQuery {
-		if ok, err := o.DocumentQuery[i].check(node); ok {
+		if ok, err := o.DocumentQuery[i].checkQuery(node); ok {
 			log.Debugf("Document Query conditions were met, continuing")
 
 			return true, nil
@@ -171,24 +147,32 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 	return nil
 }
 
-func (o *Overlay) doAction(root, node *yaml.Node) error {
-	switch o.Action {
-	case "delete":
-		actions.Delete(root, node)
-	case "replace":
-		if err := actions.Replace(node, &o.Value); err != nil {
-			return fmt.Errorf("%w, skipping replace", err)
+func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
+	for i := range nodes {
+		b, _ := yaml.Marshal(nodes[i])
+		p, _ := yaml.Marshal(o.Value)
+
+		log.Debugf("Current: >>>\n%s\n", b)
+		log.Debugf("Proposed: >>>\n%s\n", p)
+
+		switch o.Action {
+		case "delete":
+			actions.Delete(root, nodes[i])
+		case "replace":
+			if err := actions.Replace(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping replace", err)
+			}
+		case "format":
+			if err := actions.Format(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping format", err)
+			}
+		case "merge":
+			if err := actions.Merge(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping merge", err)
+			}
+		default:
+			return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
 		}
-	case "format":
-		if err := actions.Format(node, &o.Value); err != nil {
-			return fmt.Errorf("%w, skipping format", err)
-		}
-	case "merge":
-		if err := actions.Merge(node, &o.Value); err != nil {
-			return fmt.Errorf("%w, skipping merge", err)
-		}
-	default:
-		return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
 	}
 
 	return nil
@@ -211,28 +195,4 @@ func (o *Overlay) handleInjectPath(src *Source, docIndex int) error {
 	}
 
 	return nil
-}
-
-func (dq *DocumentQuery) check(node *yaml.Node) (bool, error) {
-	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
-
-	for ci := range dq.Conditions {
-		yp, err := yamlpath.NewPath(dq.Conditions[ci].Key)
-		if err != nil {
-			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", dq.Conditions[ci].Key, err)
-		}
-
-		results, err := yp.Find(node)
-		if err != nil {
-			return false, fmt.Errorf("failed to find results for %s, %w", dq.Conditions[ci].Key, err)
-		}
-
-		for _, result := range results {
-			if ok := cmp.Equal(*result, dq.Conditions[ci].Value, compareOptions); !ok {
-				return false, nil
-			}
-		}
-	}
-
-	return true, nil
 }
