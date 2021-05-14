@@ -19,7 +19,7 @@ func ReadStream(fileName string) (io.Reader, error) {
 
 	file, err := os.Open(fileName)
 	if err != nil {
-		return nil, fmt.Errorf("unable to open file %s: %w", fileName, err)
+		return nil, fmt.Errorf("unable to %w", err)
 	}
 
 	return file, nil
