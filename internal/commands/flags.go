@@ -21,7 +21,7 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		"verbose",
 		"V",
 		false,
-		"verbose mode",
+		HelpVerbose,
 	)
 
 	rootCmd.Flags().StringVarP(

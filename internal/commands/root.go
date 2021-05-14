@@ -22,7 +22,7 @@ func New() *cobra.Command {
 		SuggestFor:                 []string{},
 		Short:                      YotShort,
 		Long:                       YotLong,
-		Example:                    "",
+		Example:                    HelpUsageExample,
 		ValidArgs:                  []string{},
 		ValidArgsFunction:          nil,
 		Args:                       nil,
