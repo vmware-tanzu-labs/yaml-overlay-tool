@@ -13,22 +13,25 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var ErrInvalidPathSyntax = errors.New("invalid path syntax")
+var (
+	ErrInvalidPathSyntax  = errors.New("invalid path syntax")
+	ErrWildCardNotAllowed = errors.New("wildcard notation not allowed for build")
+)
 
 func BuildMulti(paths []string) (*yaml.Node, error) {
-	var yamlNodes []*yaml.Node
+	yamlNodes := make([]*yaml.Node, len(paths))
 
-	for _, path := range paths {
+	for i, path := range paths {
 		yamlNode, err := Build(path)
 		if err != nil {
 			return nil, err
 		}
 
-		yamlNodes = append(yamlNodes, yamlNode)
+		yamlNodes[i] = yamlNode
 	}
 
 	if err := actions.Merge(yamlNodes...); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w", err)
 	}
 
 	return yamlNodes[0], nil
@@ -117,7 +120,7 @@ func identity() (*yaml.Node, error) {
 
 func childThen(l *lexer, childName string, y *yaml.Node) (*yaml.Node, error) {
 	if childName == "*" {
-		return nil, fmt.Errorf("wildcard notation not allowed for build")
+		return nil, ErrWildCardNotAllowed
 	}
 
 	childName = unescape(childName)
