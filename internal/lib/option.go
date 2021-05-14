@@ -5,6 +5,7 @@ package lib
 
 type Options struct {
 	Verbose          bool
+	LogLevel         string
 	InstructionsFile string
 	OutputDir        string
 	StdOut           bool
