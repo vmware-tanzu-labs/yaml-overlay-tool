@@ -10,10 +10,10 @@ metadata:
   namespace: my-web-page
 spec:
   ports:
-  - name: 8443-443
-    port: 8443
-    protocol: TCP
-    targetPort: 443
+    - name: 8443-443
+      port: 8443
+      protocol: TCP
+      targetPort: 443
   selector:
     app: my-service
   type: LoadBalancer
