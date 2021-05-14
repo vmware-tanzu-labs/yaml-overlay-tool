@@ -1,3 +1,4 @@
+---
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~

@@ -1,3 +1,4 @@
+---
 commonOverlays:
   - name: Remove all annotations with conditions
     query: metadata.annotations

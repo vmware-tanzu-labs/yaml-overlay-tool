@@ -6,12 +6,11 @@ package commands
 const (
 	Version = "v0.1.0"
 
-	YotShort = "yot (YAML overlay tool) is a yaml overlay tool which allows for the templating of overlay instruction data with jinja2"
+	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
 
-	YotLong = `yot (YAML overlay tool) is a yaml overlay tool which allows for the templating 
-of overlay instruction data with jinja2, and the application of rendered 
-overlays "over the top" of a yaml file. yot only produces valid yaml 
-documents on output.`
+	YotLong = `yot (YAML Overlay Tool) is a YAML overlay tool which uses a YAML schema to 
+	define overlay operations on a set of YAML documents. yot only produces valid YAML 
+	documents on output, and can preserve and inject comments.`
 
 	/*helpDefaultValueFile = `Path to your default values file. If not set, you must
 	pass a values file of defaults.yaml or
@@ -48,15 +47,21 @@ documents on output.`
 	and will render your instructions differently based on its
 	values`
 	*/
-	HelpInstructionsFile = "Instruction file path. Defaults to ./instructions.yaml (required)"
 
-	HelpOutputDirectory = `Path to directory to write the overlayed yaml files to.
-If value files were supplied in addition to a 
-defaults.yaml/.yml then the rendered templates will land
-in <output dir>/<addl value file name>.`
+	HelpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	HelpRenderStdOut = `Render output to stdout. Templated instructions files 
-will still be output to the --output-directory.`
+	HelpVerbose = "Verbose output"
+
+	HelpInstructionsFile = "Path to instructions file (required)"
+
+	HelpOutputDirectory = `Path to directory for writing the YAML files which were operated on`
+	/*	`If value files were supplied in addition to a
+		defaults.yaml/.yml then the rendered templates will land
+		in <output dir>/<addl value file name>.`
+	*/
+
+	HelpRenderStdOut = `Output YAML files which were operated on to stdout`
+	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
 		the rendered instructions to stdout to allow for
@@ -64,7 +69,8 @@ will still be output to the --output-directory.`
 		of yot. Equivalent to a dry-run. Exits with return
 		code 0 prior to processing instructions`
 	*/
-	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (default: 2) (min: 2, max: 9)`
+
+	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
 	CompletionUse   = "completion [bash|zsh|fish|powershell]"
 	CompletionShort = "Generate completion script"
@@ -73,13 +79,13 @@ will still be output to the --output-directory.`
 
 Bash:
 
-  $ source <(yourprogram completion bash)
+  $ source <(yot completion bash)
 
   # To load completions for each session, execute once:
   # Linux:
-  $ yourprogram completion bash > /etc/bash_completion.d/yourprogram
+  $ yot completion bash > /etc/bash_completion.d/yot
   # macOS:
-  $ yourprogram completion bash > /usr/local/etc/bash_completion.d/yourprogram
+  $ yot completion bash > /usr/local/etc/bash_completion.d/yot
 
 Zsh:
 
@@ -89,23 +95,23 @@ Zsh:
   $ echo "autoload -U compinit; compinit" >> ~/.zshrc
 
   # To load completions for each session, execute once:
-  $ yourprogram completion zsh > "${fpath[1]}/_yourprogram"
+  $ yot completion zsh > "${fpath[1]}/_yot"
 
   # You will need to start a new shell for this setup to take effect.
 
 fish:
 
-  $ yourprogram completion fish | source
+  $ yot completion fish | source
 
   # To load completions for each session, execute once:
-  $ yourprogram completion fish > ~/.config/fish/completions/yourprogram.fish
+  $ yot completion fish > ~/.config/fish/completions/yot.fish
 
 PowerShell:
 
-  PS> yourprogram completion powershell | Out-String | Invoke-Expression
+  PS> yot completion powershell | Out-String | Invoke-Expression
 
   # To load completions for every new session, run:
-  PS> yourprogram completion powershell > yourprogram.ps1
+  PS> yot completion powershell > yot.ps1
   # and source this file from your PowerShell profile.
 `
 )

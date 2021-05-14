@@ -1,4 +1,7 @@
-## Details on How Types are Handled with Merge Actions
+[Back to Actions](actions.md#3-merge)  
+[Back to Table of Contents](../documentation.md)
+
+## Details on How Data Types are Handled with Merge Actions
 
 The `action` of `merge` can affect how the `value` data gets applied to a YAML document, depending on the type of data it is.  This is fairly intuitive by design, but there are a few things to be aware of so you can harness the full feature set of `yot`.  If you do not wish to use these features, simply use the `replace` action.
 
@@ -133,3 +136,5 @@ metadata:
 
 This will render three versions of the file test.yaml for DEV, QA, and PROD, where the metadata.name field will have been extended as such `my-cool-app-DEV`, `my-cool-app-QA`, and `my-cool-app-PROD`.
 
+[Back to Actions](actions.md#3-merge)  
+[Back to Table of Contents](../documentation.md)

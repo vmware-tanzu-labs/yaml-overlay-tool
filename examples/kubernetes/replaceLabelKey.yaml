@@ -1,3 +1,4 @@
+---
 commonOverlays:
   - name: Replace name label's key to my-new-label
     query: metadata.labels.name~
