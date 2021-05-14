@@ -12,11 +12,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Document struct {
+	Name     string    `yaml:"name,omitempty"`
+	Path     string    `yaml:"path,omitempty"`
+	Overlays []Overlay `yaml:"overlays,omitempty"`
+}
+
 type YamlFile struct {
-	Name      string     `yaml:"name,omitempty"`
-	Path      string     `yaml:"path,omitempty"`
-	Overlays  []Overlay  `yaml:"overlays,omitempty"`
-	Documents []YamlFile `yaml:"documents,omitempty"`
+	Document  `yaml:",inline"`
+	Documents []Document `yaml:"documents,omitempty"`
 	Source    []Source
 }
 
@@ -52,4 +56,38 @@ func (yf *YamlFile) readYamlFile(path string) error {
 	yf.Source = append(yf.Source, *source)
 
 	return nil
+}
+
+func (yf *YamlFile) processYamlFiles(opt *Options) error {
+	for _, src := range yf.Source {
+		for nodeIndex := range src.Nodes {
+			log.Infof("Processing Common & File Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
+
+			if err := src.processOverlays(yf.Overlays, nodeIndex); err != nil {
+				return fmt.Errorf("failed to apply file overlays, %w", err)
+			}
+
+			log.Infof("Processing Document Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
+
+			for di := range yf.Documents {
+				if ok := yf.Documents[di].checkDocumentPath(nodeIndex); !ok {
+					continue
+				}
+
+				if err := src.processOverlays(yf.Documents[di].Overlays, nodeIndex); err != nil {
+					return err
+				}
+			}
+		}
+
+		if err := src.doPostProcessing(opt); err != nil {
+			return fmt.Errorf("failed to perform post processing on %s: %w", src.Path, err)
+		}
+	}
+
+	return nil
+}
+
+func (d *Document) checkDocumentPath(docIndex int) bool {
+	return d.Path == fmt.Sprint(docIndex)
 }

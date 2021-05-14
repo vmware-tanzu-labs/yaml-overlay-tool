@@ -40,42 +40,10 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	return &instructions, nil
 }
 
-func (i *Instructions) processYamlFiles(options *Options) error {
+func (i *Instructions) addCommonOverlays() {
 	for _, file := range i.YamlFiles {
-		for _, src := range file.Source {
-			for nodeIndex := range src.Nodes {
-				log.Infof("Processing Common Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
-
-				if err := src.processOverlays(i.CommonOverlays, nodeIndex); err != nil {
-					return fmt.Errorf("failed to apply common overlays, %w", err)
-				}
-
-				log.Infof("Processing File Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
-
-				if err := src.processOverlays(file.Overlays, nodeIndex); err != nil {
-					return fmt.Errorf("failed to apply file overlays, %w", err)
-				}
-
-				log.Infof("Processing Document Overlays in File %s on Document %d\n\n", src.Path, nodeIndex)
-
-				for di := range file.Documents {
-					if !checkDocumentPath(&file.Documents[di], nodeIndex) {
-						continue
-					}
-
-					if err := src.processOverlays(file.Documents[di].Overlays, nodeIndex); err != nil {
-						return err
-					}
-				}
-			}
-
-			if err := src.doPostProcessing(options); err != nil {
-				return fmt.Errorf("failed to perform post processing on %s: %w", src.Path, err)
-			}
-		}
+		file.Overlays = append(i.CommonOverlays, file.Overlays...)
 	}
-
-	return nil
 }
 
 func (i *Instructions) ReadYamlFiles() error {
@@ -121,8 +89,4 @@ func (i *Instructions) setOutputPath() {
 			i.YamlFiles[yi].Source[si].outputPath = strings.TrimPrefix(src.Path, pathPrefix)
 		}
 	}
-}
-
-func checkDocumentPath(doc *YamlFile, docIndex int) bool {
-	return doc.Path == fmt.Sprint(docIndex)
 }

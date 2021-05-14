@@ -9,11 +9,19 @@ import (
 
 var log = logging.MustGetLogger("lib") //nolint:gochecknoglobals
 
-func Execute(options *Options) error {
-	instructions, err := ReadInstructionFile(&options.InstructionsFile)
+func Execute(opt *Options) error {
+	instructions, err := ReadInstructionFile(&opt.InstructionsFile)
 	if err != nil {
 		return err
 	}
 
-	return instructions.processYamlFiles(options)
+	instructions.addCommonOverlays()
+
+	for yfIndex := range instructions.YamlFiles {
+		if err := instructions.YamlFiles[yfIndex].processYamlFiles(opt); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
