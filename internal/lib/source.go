@@ -30,7 +30,7 @@ func (src *Source) processOverlays(o []Overlay, nodeIndex int) error {
 	return nil
 }
 
-func (src *Source) Save(o *Options, buf *bytes.Buffer) error {
+func (src *Source) Save(o *Options, output string) error {
 	fileName := path.Join(o.OutputDir, "yamlFiles", src.outputPath)
 	dirName := path.Dir(fileName)
 
@@ -41,7 +41,7 @@ func (src *Source) Save(o *Options, buf *bytes.Buffer) error {
 	}
 
 	//nolint:gosec //output files with read and write permissions so that end-users can continue to leverage these files
-	if err := ioutil.WriteFile(fileName, buf.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(fileName, []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to save file %s: %w", fileName, err)
 	}
 
@@ -60,15 +60,17 @@ func (src *Source) doPostProcessing(o *Options) error {
 		}
 	}
 
+	final := fmt.Sprintf("---\n%s\n", output)
+
 	log.Noticef("Final: >>>\n%s\n", output)
 	// added so we can quickly see the results of the run
 	if o.StdOut {
-		fmt.Printf("---\n%s", output) //nolint:forbidigo
+		fmt.Print(final) //nolint:forbidigo
 
 		return nil
 	}
 
-	if err := src.Save(o, output); err != nil {
+	if err := src.Save(o, final); err != nil {
 		return fmt.Errorf("failed to save, %w", err)
 	}
 
