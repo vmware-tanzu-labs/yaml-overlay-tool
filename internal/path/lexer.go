@@ -24,6 +24,10 @@ const (
 	lexemeEOF // lexing complete
 )
 
+const (
+	chanLen = 2
+)
+
 // a lexeme is a token returned from the lexer.
 type lexeme struct {
 	typ lexemeType
@@ -55,7 +59,7 @@ func lex(name, input string) *lexer {
 		input:                 input,
 		state:                 lexPath,
 		stack:                 make([]stateFn, 0),
-		items:                 make(chan lexeme, 2),
+		items:                 make(chan lexeme, chanLen),
 		lastEmittedLexemeType: lexemeEOF,
 	}
 
@@ -363,7 +367,9 @@ func lexSubPath(l *lexer) stateFn {
 
 		for {
 			le := l.next()
-			if le == '.' || le == '[' || le == ')' || le == ' ' || le == '&' || le == '|' || le == '=' || le == '!' || le == '>' || le == '<' || le == '~' || le == '*' || le == eof {
+			if le == '.' || le == '[' || le == ')' || le == ' ' || le == '&' ||
+				le == '|' || le == '=' || le == '!' || le == '>' || le == '<' ||
+				le == '~' || le == '*' || le == eof {
 				l.backup()
 
 				break
@@ -411,7 +417,9 @@ func lexSubPath(l *lexer) stateFn {
 
 		for {
 			le := l.next()
-			if le == '.' || le == '[' || le == ']' || le == ')' || le == ' ' || le == '&' || le == '|' || le == '=' || le == '!' || le == '>' || le == '<' || le == '~' || le == '*' || le == eof {
+			if le == '.' || le == '[' || le == ')' || le == ' ' || le == '&' ||
+				le == '|' || le == '=' || le == '!' || le == '>' || le == '<' ||
+				le == '~' || le == '*' || le == eof {
 				l.backup()
 
 				break
