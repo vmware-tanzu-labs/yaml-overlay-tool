@@ -1,7 +1,7 @@
 ---
 commonOverlays:
   - name: Add additional labels
-    query: 
+    query:
       - metadata.labels
       - spec.template.metadata.labels
       - spec.selector.matchLabels

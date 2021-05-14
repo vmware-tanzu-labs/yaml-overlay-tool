@@ -10,10 +10,10 @@ metadata:
   namespace: my-web-page
 spec:
   containers:
-  - image: nginx:latest
-    name: my-web-page
-    ports:
-    - containerPort: 443
-    resources: {}
+    - image: nginx:latest
+      name: my-web-page
+      ports:
+        - containerPort: 443
+      resources: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always

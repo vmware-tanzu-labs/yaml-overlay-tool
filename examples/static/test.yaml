@@ -1,9 +1,10 @@
 ---
-# the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are processed first on each file
+# the commonOverlays apply to all yamlFiles listed out in 'yamlFiles' and are
+## processed first on each file
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
     query: spec.selector['app.kubernetes.io/name']
-    value: app.kubernetes.io/newName #+workload:certManagerResourceName:default="cert-manager":type=string
+    value: app.kubernetes.io/Name  # +workload:Name:default="c-m":type=string
     action: replace
     # qualifier to further refine when this overlay is applied
     documentQuery:
@@ -21,13 +22,13 @@ commonOverlays:
             value: pvc-var-cache-bind
   - name: "add a common label to everything"
     query: metadata.labels
-    value: 
+    value:
       app.kubernetes.io/name: "test"
     action: replace
-yamlFiles: # what to overlay onto
-  - name: "some arbitrary descriptor" # Name is Optional
+yamlFiles:  # what to overlay onto
+  - name: "some arbitrary descriptor"  # Name is Optional
     path: "examples/manifests/test.yaml"
-    overlays: # if multi-doc yaml file, applies to all docs, gets applied first
+    overlays:  # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
         query: metadata.annotations
         action: "delete"
@@ -39,7 +40,7 @@ yamlFiles: # what to overlay onto
         value: v2alpha1
         action: replace
       # on the following 2 items, notice that the onMissing is not set
-      ## these will only affect the yaml docs that have matches, otherwise ignore
+      ## these will only affect the yaml docs that have matches, else ignore
       - name: "test Deleting a Seq Node"
         query: spec.accessModes[1]
         action: delete
@@ -47,13 +48,13 @@ yamlFiles: # what to overlay onto
       - name: "now replace the merged list with just the new port"
         query: spec.ports
         value:
-          #Test Head Comment
-          - name: dns-tcp # Test Line Comment
+          # Test Head Comment
+          - name: dns-tcp  # Test Line Comment
             port: 53
-            #Test Head Comment
+            # Test Head Comment
             protocol: TCP
             targetPort: dns-tcp
-            #Test Tail Comment
+            # Test Tail Comment
         action: replace
       # next one shouldn't do anything because no onMissing = implicit ignore
       - query: status
@@ -61,7 +62,7 @@ yamlFiles: # what to overlay onto
         action: "merge"
       - name: "Demo the need for an inject path"
         query: fake.key1.*
-        value: 
+        value:
           fake: content1
         action: "merge"
         onMissing:
@@ -69,13 +70,13 @@ yamlFiles: # what to overlay onto
       # same as previous, but with an injectPath (actually does this one)
       - name: "Show same example but with an injectPath"
         query: fake.key2.*
-        value: 
+        value:
           fake: "content2"
         action: "merge"
         onMissing:
           action: "inject"
           injectPath: fake2.key2
-      # qualifier to only apply to the first doc in the yaml file
+        # qualifier to only apply to the first doc in the yaml file
         documentIndex:
           - 0
       # test out some merges
@@ -90,7 +91,7 @@ yamlFiles: # what to overlay onto
         action: merge
       - name: "add 1 to service port number (integer concatenation test)"
         query: spec.ports[0].port
-        value: 1 # expect port 54 to come out (yes this is weird)
+        value: 1  # expect port 54 to come out (yes this is weird)
         action: merge
       - name: "add some new labels to a manifest"
         query: metadata.labels
@@ -110,14 +111,14 @@ yamlFiles: # what to overlay onto
         onMissing:
           action: inject
           injectPath: metadata.annotations
-    documents: # optional and only used for multi-doc yaml files
+    documents:  # optional and only used for multi-doc yaml files
       # need to refer to them by their index
       - name: the manifest that does something
         path: 0
         overlays:
           # demos multiple inject paths on missing
           - query: x.*
-            value: 
+            value:
               x: x
             action: merge
             onMissing:
@@ -126,14 +127,14 @@ yamlFiles: # what to overlay onto
                 - x
                 - y
                 - z
-  # demoing application of 'commonOverlays' without a 'overlays' or 'documents' key
+  # demoing application of 'commonOverlays' without a 'overlays' or 'documents'
   - name: "another file"
     path: "examples/manifests/another.yaml"
     overlays:
       - name: "Replace image name"
-        query: "..image" 
-        value: 
-          #Test Comment
+        query: "..image"
+        value:
+          # Test Comment
           "registry-harbor.vmware.com/docker-hub-cache/%s"
-          #Test Foot Comment
+          # Test Foot Comment
         action: format
