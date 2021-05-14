@@ -4,7 +4,6 @@
 package commands
 
 import (
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"

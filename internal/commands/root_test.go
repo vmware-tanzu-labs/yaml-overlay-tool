@@ -27,7 +27,7 @@ func TestNew(t *testing.T) {
 				Long:             commands.YotLong,
 				Version:          commands.Version,
 				PersistentPreRun: commands.SetupLogging,
-				RunE:             commands.Execute,
+				Run:              commands.Execute,
 			},
 		},
 	}
@@ -104,7 +104,7 @@ func TestExecute(t *testing.T) {
 				cmd:  commands.New(),
 				args: nil,
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 
@@ -113,7 +113,7 @@ func TestExecute(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			if err := commands.Execute(test.args.cmd, test.args.args); (err != nil) != test.wantErr {
+			if err := test.args.cmd.Execute(); (err != nil) != test.wantErr {
 				t.Errorf("Execute() error = %v, wantErr %v", err, test.wantErr)
 			}
 		})

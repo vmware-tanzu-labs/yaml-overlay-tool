@@ -50,7 +50,9 @@ const (
 
 	HelpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	HelpVerbose = "Verbose output"
+	HelpVerbose = "Verbose output, short cut to -log-level Debug"
+
+	HelpLogLevel = "level of logs to display (critical, error, warning, notice, info, debug)"
 
 	HelpInstructionsFile = "Path to instructions file (required)"
 

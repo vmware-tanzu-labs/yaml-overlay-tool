@@ -4,8 +4,6 @@
 package commands
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/lib"
 )
@@ -24,20 +22,24 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 		HelpVerbose,
 	)
 
+	rootCmd.PersistentFlags().StringVarP(
+		&options.LogLevel,
+		"log-level",
+		"l",
+		"",
+		HelpLogLevel,
+	)
+
 	rootCmd.Flags().StringVarP(
 		&options.InstructionsFile,
 		"instructions",
 		"i",
-		"",
+		"instructions.yaml",
 		HelpInstructionsFile,
 	)
 
 	if err := rootCmd.MarkFlagFilename("instructions"); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := rootCmd.MarkFlagRequired("instructions"); err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 
 	rootCmd.PersistentFlags().StringVarP(

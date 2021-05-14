@@ -14,6 +14,8 @@ import (
 
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
+var log = logging.MustGetLogger("cmd") //nolint:gochecknoglobals
+
 func New() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
@@ -24,26 +26,23 @@ func New() *cobra.Command {
 		Long:                       YotLong,
 		Example:                    HelpUsageExample,
 		ValidArgs:                  []string{},
-		ValidArgsFunction:          nil,
 		Args:                       nil,
 		ArgAliases:                 []string{},
 		BashCompletionFunction:     "",
 		Deprecated:                 "",
+		Hidden:                     false,
 		Annotations:                map[string]string{},
 		Version:                    Version,
 		PersistentPreRun:           SetupLogging,
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		Run:                        nil,
-		RunE:                       Execute,
+		Run:                        Execute,
+		RunE:                       nil,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
 		PersistentPostRunE:         nil,
-		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
-		TraverseChildren:           false,
-		Hidden:                     false,
 		SilenceErrors:              false,
 		SilenceUsage:               false,
 		DisableFlagParsing:         false,
@@ -51,6 +50,8 @@ func New() *cobra.Command {
 		DisableFlagsInUseLine:      false,
 		DisableSuggestions:         false,
 		SuggestionsMinimumDistance: 0,
+		TraverseChildren:           false,
+		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
 	}
 
 	initializeGlobalFlags(rootCmd)
@@ -69,7 +70,14 @@ func SetupLogging(cmd *cobra.Command, args []string) {
 	backend := logging.AddModuleLevel(
 		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
 
-	if options.Verbose {
+	if options.LogLevel != "" {
+		level, err := logging.LogLevel(options.LogLevel)
+		if err != nil {
+			log.Error(err)
+		}
+
+		backend.SetLevel(level, "")
+	} else if options.Verbose {
 		backend.SetLevel(logging.DEBUG, "")
 	} else {
 		backend.SetLevel(logging.ERROR, "")
@@ -78,12 +86,11 @@ func SetupLogging(cmd *cobra.Command, args []string) {
 	logging.SetBackend(backend)
 }
 
-func Execute(cmd *cobra.Command, args []string) error {
+func Execute(cmd *cobra.Command, args []string) {
 	if err := lib.Execute(&options); err != nil {
 		cmd.SilenceUsage = true
 
-		return fmt.Errorf("%w", err)
+		log.Error(fmt.Errorf("%w", err))
+		os.Exit(1)
 	}
-
-	return nil
 }
