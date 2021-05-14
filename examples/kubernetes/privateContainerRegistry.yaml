@@ -1,3 +1,4 @@
+---
 commonOverlays:
   - name: Set our private container registry in manifests
     query: ..image

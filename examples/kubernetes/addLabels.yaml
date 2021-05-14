@@ -1,3 +1,4 @@
+---
 commonOverlays:
   - name: Add additional labels
     query: 
