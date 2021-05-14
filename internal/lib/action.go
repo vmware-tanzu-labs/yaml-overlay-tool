@@ -92,10 +92,6 @@ func (a *OnMissingAction) UnmarshalYAML(unmarshal func(interface{}) error) error
 		"inject": Inject,
 	}
 
-	if toID[y] == Invalid {
-		return ErrInvalidAction
-	}
-
 	*a = toID[y]
 
 	return nil
