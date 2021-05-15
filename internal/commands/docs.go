@@ -75,7 +75,7 @@ const (
 	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
 	CompletionUse   = "completion [bash|zsh|fish|powershell]"
-	CompletionShort = "Generate completion script"
+	CompletionShort = "Generate shell auto-completion scripts"
 
 	CompletionLong = `To load completions:
 
