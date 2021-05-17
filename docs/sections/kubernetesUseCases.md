@@ -10,11 +10,63 @@ All of these examples are available for your convenience in [examples/kubernetes
 yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output path >
 ```
 
-
----
-[Here](../../examples/kubernetes/manifests) you will find the original state of the YAML files being modified in each of these example use-cases called out by the line (`path: ./examples/kubernetes/manifests`).  
-  
 <br/>
+
+
+### Example Kubernetes YAML Manifests
+
+Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
+
+```yaml
+# my-app.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    my.custom.annotation/fake: idk
+  labels:
+    name: my-web-page
+  name: my-web-page
+  namespace: my-web-page
+spec:
+  containers:
+    - image: nginx:latest
+      name: my-web-page
+      ports:
+        - containerPort: 443
+      resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+
+```
+
+```yaml
+# my-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  labels:
+    name: my-web-page
+  name: my-service
+  namespace: my-web-page
+spec:
+  ports:
+    - name: 8443-443
+      port: 8443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app: my-service
+  type: LoadBalancer
+
+```
+
+<br/>
+
 
 ## Adding Additional Labels and Selectors To All YAML Files In a Directory
 
