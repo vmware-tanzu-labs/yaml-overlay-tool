@@ -31,7 +31,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
@@ -52,7 +52,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
@@ -73,7 +73,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
@@ -93,7 +93,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
@@ -113,7 +113,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
@@ -142,7 +142,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
