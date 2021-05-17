@@ -17,7 +17,7 @@ In this example we use the `merge` action to add in 2 new labels to a set of YAM
 
 ```yaml
 ---
-# instructions.yaml
+# addLabels.yaml
 commonOverlays:
   - name: Add additional labels
     query: 
@@ -35,7 +35,7 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
 
 
 ### Prepend a Private Registry URL to All Container Images
@@ -43,7 +43,7 @@ Now apply the changes by generating a new set of YAML files:
 In this example we use the `format` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.
 
 ```yaml
-# instructions.yaml
+# privateContainerRegistry.yaml
 commonOverlays:
   - name: Set our private container registry in manifests
     query: ..image
@@ -56,7 +56,7 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
 
 
 ### Modify the Name of a Label's Key
@@ -64,7 +64,7 @@ Now apply the changes by generating a new set of YAML files:
 In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
 
 ```yaml
-# instructions.yaml
+# formatLabelKey.yaml
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~
@@ -77,14 +77,14 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
 
 ### Replace the Name of a Label's Key
 
 In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
 
 ```yaml
-# instructions.yaml
+# replaceLabelKey.yaml
 commonOverlays:
   - name: Replace name label's key to my-new-label
     query: metadata.labels.name~
@@ -97,7 +97,7 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
 
 
 ### Remove All Annotations
@@ -105,7 +105,7 @@ Now apply the changes by generating a new set of YAML files:
 Often times annotations are set for certain environments that may not apply to your environment.  To remove all annotations we will use the `delete` action.
 
 ```yaml
-# instructions.yaml
+# removeAnnotations.yaml
 commonOverlays:
   - name: Remove all annotations
     query: metadata.annotations
@@ -117,7 +117,7 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
 
 
 ### Remove Annotations from Specific Kubernetes Object Types
@@ -125,6 +125,7 @@ Now apply the changes by generating a new set of YAML files:
 To build on the previous example, there are often times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove these annotations, we will use the `delete` action and a `documentQuery`.
 
 ```yaml
+# removeAnnotationsWithConditions.yaml
 commonOverlays:
   - name: Remove all annotations with conditions
     query: metadata.annotations
@@ -143,6 +144,10 @@ yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: /tmp/k8s
 ```
+
+Now apply the changes by generating a new set of YAML files:
+`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
+
 
 [Back to Table of Contents](../documentation.md)  
 [Next Up: Interactive Tutorials and Learning Paths](tutorials.md)
