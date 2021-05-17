@@ -77,13 +77,14 @@ In this example we use the `merge` action to add in 2 new labels to a set of YAM
 # addLabels.yaml
 commonOverlays:
   - name: Add additional labels
-    query: 
+    query:
       - metadata.labels
       - spec.template.metadata.labels
       - spec.selector.matchLabels
+      - spec.selector
     value:
-      newlabel1: newValue1
-      newlabel2: newValue2
+      app.kubernetes.io/owner: Jeff Smith
+      app.kubernetes.io/purpose: static-webpage
     action: merge
 
 yamlFiles:
