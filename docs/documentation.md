@@ -11,7 +11,7 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 1. [Installation and Setup](sections/setup.md)
 1. [Command Line Usage and Overview](sections/usage.md)
 1. [Instructions File YAML Schema](sections/instructionsFile.md)
-1. [Instructions File Actions](sections/actions.md)
+1. [Overlay Actions](sections/actions.md)
 1. [Overlay Qualifiers](sections/qualifiers.md)
 1. [Order of Operations/Processing](sections/orderOfOperations.md)
 1. [Kubernetes Common Use-Cases and Patterns](sections/kubernetesUseCases.md)
