@@ -50,19 +50,19 @@ const (
 
 	HelpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	HelpVerbose = "Verbose output, short cut to -log-level Debug"
+	HelpVerbose = "Verbose log-level stdout, equivalent to '--log-level debug'"
 
-	HelpLogLevel = "level of logs to display (critical, error, warning, notice, info, debug)"
+	HelpLogLevel = "Log-level to display to stdout, one of: critical, error, warning, notice, info, or debug"
 
-	HelpInstructionsFile = "Path to instructions file (required)"
+	HelpInstructionsFile = "Path to the instructions file (required)"
 
-	HelpOutputDirectory = `Path to directory for writing the YAML files which were operated on`
+	HelpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by yot`
 	/*	`If value files were supplied in addition to a
 		defaults.yaml/.yml then the rendered templates will land
 		in <output dir>/<addl value file name>.`
 	*/
 
-	HelpRenderStdOut = `Output YAML files which were operated on to stdout`
+	HelpRenderStdOut = `Output YAML files which were operated on by yot to stdout`
 	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -75,7 +75,7 @@ const (
 	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
 	CompletionUse   = "completion [bash|zsh|fish|powershell]"
-	CompletionShort = "Generate completion script"
+	CompletionShort = "Generate shell auto-completion scripts"
 
 	CompletionLong = `To load completions:
 

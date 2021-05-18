@@ -1,49 +1,107 @@
 [Back to Table of Contents](../documentation.md)
 
-## Kubernetes Common Use-Cases and Patterns
+# Kubernetes Common Use-Cases and Patterns
 
 The following set of examples will help you quickly achieve common tasks in the context of Kubernetes YAML manifests.  
 
-All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the repository:
+All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
 
 ```bash
 yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output path >
 ```
 
+<br/>
 
-### Adding Additional Labels and Selectors To All YAML Files In a Directory
+
+### Example Kubernetes YAML Manifests
+
+Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
+
+```yaml
+# my-app.yaml
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    my.custom.annotation/fake: idk
+  labels:
+    name: my-web-page
+  name: my-web-page
+  namespace: my-web-page
+spec:
+  containers:
+    - image: nginx:latest
+      name: my-web-page
+      ports:
+        - containerPort: 443
+      resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+
+```
+
+```yaml
+# my-service.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  labels:
+    name: my-web-page
+  name: my-service
+  namespace: my-web-page
+spec:
+  ports:
+    - name: 8443-443
+      port: 8443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    app: my-service
+  type: LoadBalancer
+
+```
+
+<br/>
+
+
+## Adding Additional Labels and Selectors To All YAML Files In a Directory
 
 In this example we use the `merge` action to add in 2 new labels to a set of YAML files contained in a directory.
 
 ```yaml
 ---
-# instructions.yaml
+# addLabels.yaml
 commonOverlays:
   - name: Add additional labels
-    query: 
+    query:
       - metadata.labels
       - spec.template.metadata.labels
       - spec.selector.matchLabels
+      - spec.selector
     value:
-      newlabel1: newValue1
-      newlabel2: newValue2
+      app.kubernetes.io/owner: Jeff Smith
+      app.kubernetes.io/purpose: static-webpage
     action: merge
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
 
 
-### Prepend a Private Registry URL to All Container Images
+## Prepend a Private Registry URL to All Container Images
 
 In this example we use the `format` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.
 
 ```yaml
-# instructions.yaml
+# privateContainerRegistry.yaml
 commonOverlays:
   - name: Set our private container registry in manifests
     query: ..image
@@ -52,19 +110,19 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
 
 
-### Modify the Name of a Label's Key
+## Modify the Name of a Label's Key
 
 In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
 
 ```yaml
-# instructions.yaml
+# formatLabelKey.yaml
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~
@@ -73,18 +131,18 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
 
-### Replace the Name of a Label's Key
+## Replace the Name of a Label's Key
 
 In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
 
 ```yaml
-# instructions.yaml
+# replaceLabelKey.yaml
 commonOverlays:
   - name: Replace name label's key to my-new-label
     query: metadata.labels.name~
@@ -93,19 +151,19 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
 
 
-### Remove All Annotations
+## Remove All Annotations
 
 Often times annotations are set for certain environments that may not apply to your environment.  To remove all annotations we will use the `delete` action.
 
 ```yaml
-# instructions.yaml
+# removeAnnotations.yaml
 commonOverlays:
   - name: Remove all annotations
     query: metadata.annotations
@@ -113,18 +171,19 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:
-`yot -i instructions.yaml -o /tmp/new`
+`yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
 
 
-### Remove Annotations from Specific Kubernetes Object Types
+## Remove Annotations from Specific Kubernetes Object Types
 
 To build on the previous example, there are often times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove these annotations, we will use the `delete` action and a `documentQuery`.
 
 ```yaml
+# removeAnnotationsWithConditions.yaml
 commonOverlays:
   - name: Remove all annotations with conditions
     query: metadata.annotations
@@ -141,8 +200,12 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: /tmp/k8s
+    path: ./examples/kubernetes/manifests
 ```
+
+Now apply the changes by generating a new set of YAML files:
+`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
+
 
 [Back to Table of Contents](../documentation.md)  
 [Next Up: Interactive Tutorials and Learning Paths](tutorials.md)

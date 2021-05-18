@@ -1,6 +1,6 @@
 [Back to Table of Contents](../documentation.md)
 
-# YAML Overlay Tool - Actions
+# Overlay Actions
 
 Within `yot` there are four types of actions you can take to apply a change to a YAML document.  These actions help you achieve a desired outcome when it comes to manipulating existing YAML files.
 
@@ -107,4 +107,4 @@ yamlFiles:
 ```
 
 [Back to Table of Contents](../documentation.md)  
-[Next Up: Order of Operations/Processing](orderOfOperations.md)
+[Next Up: Overlay Qualifiers](qualifiers.md)
