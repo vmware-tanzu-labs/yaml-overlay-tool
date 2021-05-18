@@ -3,7 +3,7 @@
 
 package lib
 
-type Options struct {
+type Config struct {
 	Verbose          bool
 	LogLevel         string
 	InstructionsFile string

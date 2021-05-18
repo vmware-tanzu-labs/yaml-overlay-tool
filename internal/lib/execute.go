@@ -9,8 +9,8 @@ import (
 
 var log = logging.MustGetLogger("lib") //nolint:gochecknoglobals
 
-func Execute(opt *Options) error {
-	instructions, err := ReadInstructionFile(&opt.InstructionsFile)
+func Execute(cfg *Config) error {
+	instructions, err := ReadInstructionFile(&cfg.InstructionsFile)
 	if err != nil {
 		return err
 	}
@@ -18,7 +18,7 @@ func Execute(opt *Options) error {
 	instructions.addCommonOverlays()
 
 	for yfIndex := range instructions.YamlFiles {
-		if err := instructions.YamlFiles[yfIndex].processYamlFiles(opt); err != nil {
+		if err := instructions.YamlFiles[yfIndex].processYamlFiles(cfg); err != nil {
 			return err
 		}
 	}

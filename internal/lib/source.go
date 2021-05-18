@@ -4,9 +4,11 @@
 package lib
 
 import (
+	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path"
 
@@ -20,17 +22,60 @@ type Source struct {
 	outputPath string
 }
 
-func (src *Source) processOverlays(o []Overlay, nodeIndex int) error {
-	for i := range o {
-		if err := o[i].applyOverlay(src, nodeIndex); err != nil {
+type Sources []*Source
+
+func (src *Sources) readYamlFile(p string) error {
+	var files []string
+
+	if ok, err := isDirectory(p); ok {
+		files, err = getFileNames(p)
+		if err != nil {
 			return err
 		}
+	} else {
+		if err != nil {
+			return err
+		}
+
+		files = []string{p}
+	}
+
+	for _, file := range files {
+		source := &Source{
+			Origin: "file",
+			Path:   file,
+		}
+
+		reader, err := ReadStream(file)
+		if err != nil {
+			return err
+		}
+
+		dc := yaml.NewDecoder(reader)
+
+		for {
+			var y yaml.Node
+
+			if err := dc.Decode(&y); errors.Is(err, io.EOF) {
+				if reader, ok := reader.(*os.File); ok {
+					CloseFile(reader)
+
+					break
+				}
+			} else if err != nil {
+				return fmt.Errorf("failed to read file %s: %w", file, err)
+			}
+
+			source.Nodes = append(source.Nodes, &y)
+		}
+
+		*src = append(*src, source)
 	}
 
 	return nil
 }
 
-func (src *Source) Save(o *Options, output string) error {
+func (src *Source) Save(o *Config, output string) error {
 	fileName := path.Join(o.OutputDir, "yamlFiles", src.outputPath)
 	dirName := path.Dir(fileName)
 
@@ -41,17 +86,17 @@ func (src *Source) Save(o *Options, output string) error {
 	}
 
 	//nolint:gosec //output files with read and write permissions so that end-users can continue to leverage these files
-	if err := ioutil.WriteFile(fileName, []byte(output), 0644); err != nil {
+	if err := os.WriteFile(fileName, []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to save file %s: %w", fileName, err)
 	}
 
 	return nil
 }
 
-func (src *Source) doPostProcessing(o *Options) error {
+func (src *Source) doPostProcessing(cfg *Config) error {
 	output := new(bytes.Buffer)
 	ye := yaml.NewEncoder(output)
-	ye.SetIndent(o.Indent)
+	ye.SetIndent(cfg.Indent)
 
 	for _, node := range src.Nodes {
 		err := ye.Encode(node)
@@ -64,14 +109,37 @@ func (src *Source) doPostProcessing(o *Options) error {
 
 	log.Noticef("Final: >>>\n%s\n", output)
 	// added so we can quickly see the results of the run
-	if o.StdOut {
-		fmt.Print(final) //nolint:forbidigo
+	if cfg.StdOut {
+		writer := bufio.NewWriter(os.Stdout)
+		if _, err := writer.WriteString(final); err != nil {
+			return fmt.Errorf("failed to write to string, %w", err)
+		}
 
-		return nil
+		writer.Flush()
 	}
 
-	if err := src.Save(o, final); err != nil {
+	if err := src.Save(cfg, final); err != nil {
 		return fmt.Errorf("failed to save, %w", err)
+	}
+
+	return nil
+}
+
+func (src *Sources) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var p string
+
+	if err := unmarshal(&p); err != nil {
+		return err
+	}
+
+	return src.readYamlFile(p)
+}
+
+func (src *Source) processOverlays(o []*Overlay, nodeIndex int) error {
+	for _, o := range o {
+		if err := o.applyOverlay(src, nodeIndex); err != nil {
+			return err
+		}
 	}
 
 	return nil
