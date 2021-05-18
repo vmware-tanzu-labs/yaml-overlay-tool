@@ -41,8 +41,8 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 }
 
 func (i *Instructions) addCommonOverlays() {
-	for _, file := range i.YamlFiles {
-		file.Overlays = append(i.CommonOverlays, file.Overlays...)
+	for idx := range i.YamlFiles {
+		i.YamlFiles[idx].Overlays = append(i.CommonOverlays, i.YamlFiles[idx].Overlays...)
 	}
 }
 
