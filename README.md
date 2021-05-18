@@ -1,19 +1,21 @@
-# YAML Overlay Tool (yot)
+# YAML Overlay Tool (Yot)
 
-YAML Overlay Tool, or `yot` for short, and often pronounced *yaucht*, is a tool to assist with patching YAML files.  Yot uses JSONPath to query YAML documents within YAML files, and to perform a change.  YAML Overlay Tool operates on YAML nodes, and therefore is able to preserve and inject head, foot, and line comments into the newly output versions of the files you manipulate.
+YAML Overlay Tool, or Yot for short (often pronounced */yaucht/*), is a tool to assist with patching YAML files.  Yot uses JSONPath to query YAML documents within YAML files, and to perform a change.  YAML Overlay Tool operates on YAML nodes. It is able to preserve and inject head, foot, and line comments into the new output versions of the files that you manipulate.
 
 
 ## Why Create Another YAML Tool?
 
-`yot` was designed to be flexible, simple, and familiar with a focus on end-user and developer experience.  Whether you want the ability to use a templating language to transform YAML data, or just change a couple values in a YAML document, `yot` will make it possible.  However, as we port the protype Python version of `yot` to be written in Go, we have temporarily stripped out the templating language functionality, and plan to have a robust set of options available in version 0.2.0.  
+Yot is designed to be flexible, simple, and familiar; with a focus on end-user and developer experience.  Whether you want to use a templating language to transform YAML data, or just change a couple values in a YAML document, Yot can make it possible.  
 
-Our philosophy is to treat YAML manifests as source code.  We don't want to manage templated YAML files, we want to manage patches (overlays) for YAML files, and furthermore we want to keep any potential templating outside of the source YAML files altogether.  
+**NOTE** In order to port the protype Python version of Yot to be written in Go, we temporarily stripped out the templating language functionality. A robust set of options is planned for version 0.2.0.  
 
-Templated files become hard to manage over time and can be difficult to read.  `yot` allows us to take YAML documents from multiple sources and transform them through overlays to fit our environment's requirements.  This allows us to take any generic YAML file and manipulate it to suit our purpose, without contaminating the original file.
+Our philosophy is to treat YAML manifests as source code. We don't want to manage templated YAML files. We want to manage patches (overlays) and keep all potential templating outside of the source YAML files.  
 
-This practice gets you out of the cycle of updating and managing complex YAML templates.  At the same time `yot`'s instructions file specification serves as documentation-as-code, where you have now essentially documented all the required changes to source YAML files in one place, and what is required to get an application running in your environment.
+Templated files are hard to manage over time, making them difficult to read.  Yot allows us to take YAML documents from multiple sources and transform them to fit our environment requirements through overlays. This practice allows us to manipulate a generic YAML file, without contaminating the original file. This practice also stops the cycle of having to update and manage complex YAML templates. 
 
-The use of JSONPath queries and templating give the tool familiar interfaces, making adoption easier, and a more pleasant end-user experience.  The specification, also known as the *instructions file*, is assembled in a declarative way, where we only operate on what has been clearly defined.  We take *actions* based on JSONPath query results.  We provide flexibility by allowing your instructions to be templated if needed (functionality will return in v0.2.0).  Please see the [full documentation](docs/documentation.md), which will help get you moving along with `yot`!
+At the same time, Yot's instructions file specification provides you with documentation-as-code. This is because you have documented all the required changes to source YAML files in one place, including what is required to get an application running in your environment.
+
+The use of JSONPath queries and templating give the tool familiar interfaces, making adoption easier, and providing for a more pleasant end-user experience.  The specification, also known as the *instructions file*, is assembled in a declarative way, where we only operate on what is clearly defined.  We take *actions* based on JSONPath query results.  We provide flexibility by allowing your instructions to be templated if needed (functionality will return in v0.2.0). See the [full documentation](docs/documentation.md), which will help get you moving along with Yot!
 
 
 ## Author
