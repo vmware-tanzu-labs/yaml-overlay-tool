@@ -303,3 +303,44 @@ func TestOnMissingAction_UnmarshalYAML(t *testing.T) {
 		})
 	}
 }
+
+func TestOnMissingAction_MarshalYAML(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name    string
+		a       lib.OnMissingAction
+		want    interface{}
+		wantErr bool
+	}{
+		{
+			name:    "Marshal Ignore",
+			a:       lib.Ignore,
+			want:    "ignore",
+			wantErr: false,
+		},
+		{
+			name:    "Unmarshal Inject",
+			a:       lib.Inject,
+			want:    "inject",
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		test := tt
+
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := test.a.MarshalYAML()
+			if (err != nil) != test.wantErr {
+				t.Errorf("Action.MarshalYAML() error = %v, wantErr %v", err, test.wantErr)
+
+				return
+			}
+			if !reflect.DeepEqual(got, test.want) {
+				t.Errorf("Action.MarshalYAML() = %v, want %v", got, test.want)
+			}
+		})
+	}
+}

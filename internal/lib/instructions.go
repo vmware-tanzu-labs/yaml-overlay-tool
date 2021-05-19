@@ -46,7 +46,7 @@ func (i *Instructions) setOutputPath() {
 	p := make([]string, 0, len(i.YamlFiles))
 
 	for _, yf := range i.YamlFiles {
-		for _, src := range yf.Sources {
+		for _, src := range yf.Files {
 			p = append(p, src.Path)
 		}
 	}
@@ -54,8 +54,16 @@ func (i *Instructions) setOutputPath() {
 	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
 
 	for _, yf := range i.YamlFiles {
-		for _, src := range yf.Sources {
+		for _, src := range yf.Files {
 			src.outputPath = strings.TrimPrefix(src.Path, pathPrefix)
 		}
 	}
+}
+
+func (i *Instructions) queueYamlFiles(c chan *YamlFile) {
+	for _, yf := range i.YamlFiles {
+		c <- yf
+	}
+
+	close(c)
 }

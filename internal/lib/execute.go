@@ -23,7 +23,7 @@ func Execute(cfg *Config) error {
 
 	go instructions.queueYamlFiles(yfChan)
 
-	func() {
+	go func() {
 		for yf := range yfChan {
 			oChan := make(chan *workStream)
 
@@ -31,10 +31,8 @@ func Execute(cfg *Config) error {
 
 			OverlayHandler(cfg, oChan, errs)
 
-			for _, src := range yf.Sources {
-				if err := src.doPostProcessing(cfg); err != nil {
-					errs <- err
-				}
+			if err := yf.doPostProcessing(cfg); err != nil {
+				errs <- err
 			}
 		}
 

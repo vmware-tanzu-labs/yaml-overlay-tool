@@ -13,7 +13,7 @@ import (
 )
 
 type DocumentQuery struct {
-	Conditions []Condition `yaml:"conditions,omitempty"`
+	Conditions []*Condition `yaml:"conditions,omitempty"`
 }
 
 type Condition struct {
@@ -21,22 +21,46 @@ type Condition struct {
 	Value yaml.Node `yaml:"value,omitempty"`
 }
 
+type DocumentQueries []*DocumentQuery
+
+func (dq DocumentQueries) checkQueries(node *yaml.Node) (bool, error) {
+	if dq == nil {
+		log.Debugf("No Document Queries found, continuing")
+
+		return true, nil
+	}
+
+	for _, q := range dq {
+		if ok, err := q.checkQuery(node); ok {
+			log.Debugf("Document Query conditions were met, continuing")
+
+			return true, nil
+		} else if err != nil {
+			return false, err
+		}
+	}
+
+	log.Debugf("Document Query Conditions were not met, skipping")
+
+	return false, nil
+}
+
 func (dq *DocumentQuery) checkQuery(node *yaml.Node) (bool, error) {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
-	for ci := range dq.Conditions {
-		yp, err := yamlpath.NewPath(dq.Conditions[ci].Key)
+	for _, c := range dq.Conditions {
+		yp, err := yamlpath.NewPath(c.Key)
 		if err != nil {
-			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", dq.Conditions[ci].Key, err)
+			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", c.Key, err)
 		}
 
 		results, err := yp.Find(node)
 		if err != nil {
-			return false, fmt.Errorf("failed to find results for %s, %w", dq.Conditions[ci].Key, err)
+			return false, fmt.Errorf("failed to find results for %s, %w", c.Key, err)
 		}
 
 		for _, result := range results {
-			if ok := cmp.Equal(*result, dq.Conditions[ci].Value, compareOptions); !ok {
+			if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {
 				return false, nil
 			}
 		}

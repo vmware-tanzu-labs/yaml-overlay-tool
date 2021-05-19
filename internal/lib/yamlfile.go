@@ -3,32 +3,31 @@
 
 package lib
 
-type Document struct {
-	Name     string     `yaml:"name,omitempty"`
-	Path     int        `yaml:"index,omitempty"`
-	Overlays []*Overlay `yaml:"overlays,omitempty"`
-}
+import (
+	"bytes"
+	"fmt"
+	"os"
+
+	"gopkg.in/yaml.v3"
+)
 
 type YamlFile struct {
 	Name      string      `yaml:"name,omitempty"`
 	Overlays  []*Overlay  `yaml:"overlays,omitempty"`
 	Documents []*Document `yaml:"documents,omitempty"`
-	Sources   Sources     `yaml:"path,omitempty"`
-}
-
-func (d *Document) checkDocumentIndex(docIndex int) bool {
-	return d.Path == docIndex
+	Files     Files       `yaml:"path,omitempty"`
 }
 
 func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
-	for _, src := range yf.Sources {
-		for nodeIndex := range src.Nodes {
+	for _, f := range yf.Files {
+		for nodeIndex, n := range f.Nodes {
 			for _, o := range yf.Overlays {
 				if ok := o.checkDocumentIndex(nodeIndex); ok {
 					oChan <- &workStream{
 						Overlay:   *o,
+						Node:      n,
 						NodeIndex: nodeIndex,
-						File:      src,
+						File:      f,
 					}
 				}
 			}
@@ -38,8 +37,9 @@ func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
 					for _, o := range d.Overlays {
 						oChan <- &workStream{
 							Overlay:   *o,
+							Node:      n,
 							NodeIndex: nodeIndex,
-							File:      src,
+							File:      f,
 						}
 					}
 				}
@@ -50,18 +50,49 @@ func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
 	close(oChan)
 }
 
-func (i *Instructions) queueYamlFiles(c chan *YamlFile) {
-	for _, yf := range i.YamlFiles {
-		c <- yf
-	}
+func (yf *YamlFile) doPostProcessing(cfg *Config) error {
+	var o *os.File
 
-	close(c)
-}
+	var err error
 
-func OverlayHandler(cfg *Config, oChan chan *workStream, errs chan error) {
-	for o := range oChan {
-		if err := o.Overlay.applyOverlay(o.File, o.NodeIndex); err != nil {
-			errs <- err
+	output := new(bytes.Buffer)
+
+	ye := yaml.NewEncoder(output)
+	defer func() {
+		if err = ye.Close(); err != nil {
+			log.Critical(err)
 		}
+	}()
+
+	ye.SetIndent(cfg.Indent)
+
+	output.WriteString("---\n")
+
+	for _, f := range yf.Files {
+		for _, node := range f.Nodes {
+			err = ye.Encode(node)
+			if err != nil {
+				return fmt.Errorf("unable to marshal final document %s, error: %w", f.Path, err)
+			}
+		}
+
+		log.Debugf("Final: >>>\n%s\n", output)
+		// added so we can quickly see the results of the run
+		if cfg.StdOut {
+			o = os.Stdout
+		} else {
+			o, err = f.OpenFile(cfg)
+			if err != nil {
+				return err
+			}
+		}
+
+		if _, err = output.WriteTo(o); err != nil {
+			return fmt.Errorf("failed to %w", err)
+		}
+
+		output.Reset()
 	}
+
+	return nil
 }
