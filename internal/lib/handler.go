@@ -13,15 +13,15 @@ type workStream struct {
 	Overlay   Overlay
 	Node      *yaml.Node
 	NodeIndex int
-	File      *File
+	Path      string
 }
 
 func OverlayHandler(cfg *Config, oChan chan *workStream, errs chan error) {
 	for o := range oChan {
-		log.Noticef("Processing overlay [%q] on document %d of file %s", o.Overlay.Name, o.NodeIndex, o.File.Path)
+		log.Noticef("Processing overlay [%q] in file %s on document %d", o.Overlay.Name, o.Path, o.NodeIndex)
 
 		if err := o.Overlay.apply(o.Node); err != nil {
-			errs <- fmt.Errorf("%w in file %s on Document %d", err, o.File.Path, o.NodeIndex)
+			errs <- fmt.Errorf("%w in file %s on Document %d", err, o.Path, o.NodeIndex)
 		}
 	}
 }

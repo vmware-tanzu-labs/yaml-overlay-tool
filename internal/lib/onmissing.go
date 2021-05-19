@@ -12,6 +12,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var (
+	ErrOnMissingNoInjectAction = errors.New("no matches and no onMissing.action of 'inject'")
+	ErrOnMissingNoInjectPath   = errors.New("no matches and no onMissing.injectPath")
+	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
+)
+
 type OnMissing struct {
 	Action     OnMissingAction `yaml:"action,omitempty"`
 	InjectPath multiString     `yaml:"injectPath,omitempty"`
@@ -24,23 +30,12 @@ func (o *Overlay) onMissing(n *yaml.Node) error {
 	// if we had an inject path(s) then we inject the value to those locations
 	// if we didn't have an inject path we have an implicit onMissing: ignore and we put out a warning if not stdout option to terminal
 	switch o.OnMissing.Action {
-	case Ignore:
+	case Inject:
+		return o.handleInjectPath(n)
+	default:
 		log.Debugf("ignoring %s at %s due to %s\n", o.Action, o.Query, ErrOnMissingNoInjectAction)
 
 		return nil
-	case Inject:
-		_, err := path.BuildMulti(o.Query)
-		if err != nil {
-			if errors.Is(err, path.ErrInvalidPathSyntax) {
-				return o.handleInjectPath(n)
-			}
-
-			return fmt.Errorf("%w, for onMissing", err)
-		}
-
-		return o.doInjectPath(o.Query, n)
-	default:
-		return fmt.Errorf("%w for onMissing of type '%s'", ErrInvalidAction, o.Action)
 	}
 }
 
@@ -62,10 +57,6 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 
 	for _, r := range results {
 		if err := actions.Replace(r, &o.Value); err != nil {
-			if errors.Is(err, ErrInvalidAction) {
-				return fmt.Errorf("%w in instructions file", err)
-			}
-
 			return fmt.Errorf("%w for onMissing.InjectPath", err)
 		}
 	}
@@ -75,15 +66,19 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 
 func (o *Overlay) handleInjectPath(n *yaml.Node) error {
 	_, err := path.BuildMulti(o.Query)
-	if !errors.Is(err, path.ErrInvalidPathSyntax) {
-		return o.doInjectPath(o.Query, n)
+	if err != nil {
+		if errors.Is(err, path.ErrInvalidPathSyntax) {
+			if o.OnMissing.InjectPath == nil {
+				log.Debugf("ignoring %s at %s due to %s\n", o.Action, o.Query, ErrOnMissingNoInjectPath)
+
+				return nil
+			}
+
+			return o.doInjectPath(o.OnMissing.InjectPath, n)
+		}
+
+		return fmt.Errorf("%w, for onMissing", err)
 	}
 
-	if o.OnMissing.InjectPath == nil {
-		log.Debugf("ignoring %s at %s due to %s\n", o.Action, o.Query, ErrOnMissingNoInjectPath)
-
-		return nil
-	}
-
-	return o.doInjectPath(o.OnMissing.InjectPath, n)
+	return o.doInjectPath(o.Query, n)
 }

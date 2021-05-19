@@ -19,7 +19,7 @@ func Execute(cfg *Config) error {
 
 	instructions.addCommonOverlays()
 
-	yfChan := make(chan *YamlFile)
+	yfChan := make(chan *YamlFile, len(instructions.YamlFiles))
 
 	go instructions.queueYamlFiles(yfChan)
 
@@ -27,7 +27,7 @@ func Execute(cfg *Config) error {
 		for yf := range yfChan {
 			oChan := make(chan *workStream)
 
-			go yf.queueSourceFiles(oChan)
+			go yf.queueOverlays(oChan)
 
 			OverlayHandler(cfg, oChan, errs)
 

@@ -18,7 +18,7 @@ type YamlFile struct {
 	Files     Files       `yaml:"path,omitempty"`
 }
 
-func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
+func (yf *YamlFile) queueOverlays(oChan chan *workStream) {
 	for _, f := range yf.Files {
 		for nodeIndex, n := range f.Nodes {
 			for _, o := range yf.Overlays {
@@ -27,7 +27,7 @@ func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
 						Overlay:   *o,
 						Node:      n,
 						NodeIndex: nodeIndex,
-						File:      f,
+						Path:      f.Path,
 					}
 				}
 			}
@@ -39,7 +39,7 @@ func (yf *YamlFile) queueSourceFiles(oChan chan *workStream) {
 							Overlay:   *o,
 							Node:      n,
 							NodeIndex: nodeIndex,
-							File:      f,
+							Path:      f.Path,
 						}
 					}
 				}
@@ -60,7 +60,7 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 	ye := yaml.NewEncoder(output)
 	defer func() {
 		if err = ye.Close(); err != nil {
-			log.Critical(err)
+			log.Fatalf("error closing encoder, %w", err)
 		}
 	}()
 
@@ -81,7 +81,7 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 		if cfg.StdOut {
 			o = os.Stdout
 		} else {
-			o, err = f.OpenFile(cfg)
+			o, err = f.OpenOutputFile(cfg)
 			if err != nil {
 				return err
 			}

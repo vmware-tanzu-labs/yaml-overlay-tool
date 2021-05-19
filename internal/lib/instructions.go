@@ -19,7 +19,7 @@ type Instructions struct {
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
-	log.Debugf("Instructions File: %s\n\n", *fileName)
+	log.Debugf("Instructions File: %s\n", *fileName)
 
 	reader, err := ReadStream(*fileName)
 	if err != nil {

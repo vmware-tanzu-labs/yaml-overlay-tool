@@ -23,10 +23,10 @@ type File struct {
 type Files []*File
 
 func (f *Files) readYamlFile(p string) error {
-	var files []string
+	var paths []string
 
 	if ok, err := isDirectory(p); ok {
-		files, err = getFileNames(p)
+		paths, err = getFileNames(p)
 		if err != nil {
 			return err
 		}
@@ -35,16 +35,16 @@ func (f *Files) readYamlFile(p string) error {
 			return err
 		}
 
-		files = []string{p}
+		paths = []string{p}
 	}
 
-	for _, file := range files {
-		source := &File{
+	for _, p := range paths {
+		file := &File{
 			Origin: "file",
-			Path:   file,
+			Path:   p,
 		}
 
-		reader, err := ReadStream(file)
+		reader, err := ReadStream(p)
 		if err != nil {
 			return err
 		}
@@ -61,13 +61,13 @@ func (f *Files) readYamlFile(p string) error {
 					break
 				}
 			} else if err != nil {
-				return fmt.Errorf("failed to read file %s: %w", file, err)
+				return fmt.Errorf("failed to read file %s: %w", p, err)
 			}
 
-			source.Nodes = append(source.Nodes, &y)
+			file.Nodes = append(file.Nodes, &y)
 		}
 
-		*f = append(*f, source)
+		*f = append(*f, file)
 	}
 
 	return nil
@@ -83,7 +83,7 @@ func (f *Files) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return f.readYamlFile(p)
 }
 
-func (f *File) OpenFile(o *Config) (*os.File, error) {
+func (f *File) OpenOutputFile(o *Config) (*os.File, error) {
 	fileName := path.Join(o.OutputDir, "yamlFiles", f.outputPath)
 	dirName := path.Dir(fileName)
 
@@ -97,6 +97,8 @@ func (f *File) OpenFile(o *Config) (*os.File, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
 	}
+
+	os.Stdout.WriteString(fileName + "\n")
 
 	return file, nil
 }

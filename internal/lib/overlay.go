@@ -4,17 +4,10 @@
 package lib
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
-)
-
-var (
-	ErrOnMissingNoInjectAction = errors.New("no matches and no onMissing.action of 'inject'")
-	ErrOnMissingNoInjectPath   = errors.New("no matches and no onMissing.injectPath")
-	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
 )
 
 type Overlay struct {
@@ -28,13 +21,11 @@ type Overlay struct {
 }
 
 func (o *Overlay) apply(n *yaml.Node) error {
-	log.Debugf("Checking Document Queries for %s", o.Query)
+	log.Debugf("Checking Document Queries for [%q]", o.Name)
 
 	if ok, err := o.DocumentQuery.checkQueries(n); !ok {
 		return err
 	}
-
-	log.Debugf("applying overlay [%q], %s at %s\n", o.Name, o.Action, o.Query)
 
 	results, err := searchYAMLPaths(o.Query, n)
 	if err != nil {
@@ -44,9 +35,7 @@ func (o *Overlay) apply(n *yaml.Node) error {
 	if results == nil {
 		log.Debugf("No results found checking onMissing")
 
-		if err := o.onMissing(n); err != nil {
-			return err
-		}
+		return o.onMissing(n)
 	}
 
 	return o.doAction(n, results)
@@ -55,7 +44,7 @@ func (o *Overlay) apply(n *yaml.Node) error {
 func (o *Overlay) checkDocumentIndex(current int) bool {
 	if o.DocumentIndex != nil {
 		for _, i := range o.DocumentIndex {
-			if current != i {
+			if current == i {
 				return true
 			}
 		}
@@ -68,11 +57,7 @@ func (o *Overlay) checkDocumentIndex(current int) bool {
 
 func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 	for _, n := range nodes {
-		b, _ := yaml.Marshal(n)
-		p, _ := yaml.Marshal(o.Value)
-
-		log.Debugf("Current: >>>\n%s\n", b)
-		log.Debugf("Proposed: >>>\n%s\n", p)
+		log.Debugf("applying overlay [%q], %s at line %d column %d\n", o.Name, o.Action, n.Line, n.Column)
 
 		switch o.Action {
 		case Delete:
@@ -89,8 +74,6 @@ func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 			if err := actions.Merge(n, &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping merge on line %d, column %d", err, n.Line, n.Column)
 			}
-		default:
-			return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
 		}
 	}
 
