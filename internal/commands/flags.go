@@ -5,25 +5,22 @@ package commands
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/lib"
 )
 
-var options lib.Options //nolint:gochecknoglobals
-
-func initializeGlobalFlags(rootCmd *cobra.Command) {
+func (rc *RootCommand) initializeGlobalFlags(rootCmd *cobra.Command) {
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
-	rootCmd.PersistentFlags().BoolVarP(
-		&options.Verbose,
+	rootCmd.Flags().BoolVarP(
+		&rc.Options.Verbose,
 		"verbose",
 		"V",
 		false,
 		HelpVerbose,
 	)
 
-	rootCmd.PersistentFlags().StringVarP(
-		&options.LogLevel,
+	rootCmd.Flags().StringVarP(
+		&rc.Options.LogLevel,
 		"log-level",
 		"l",
 		"",
@@ -31,7 +28,7 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 	)
 
 	rootCmd.Flags().StringVarP(
-		&options.InstructionsFile,
+		&rc.Options.InstructionsFile,
 		"instructions",
 		"i",
 		"instructions.yaml",
@@ -39,31 +36,31 @@ func initializeGlobalFlags(rootCmd *cobra.Command) {
 	)
 
 	if err := rootCmd.MarkFlagFilename("instructions"); err != nil {
-		log.Error(err)
+		rc.Log.Error(err)
 	}
 
-	rootCmd.PersistentFlags().StringVarP(
-		&options.OutputDir,
+	rootCmd.Flags().StringVarP(
+		&rc.Options.OutputDir,
 		"output-directory",
 		"o",
 		"./output",
 		HelpOutputDirectory,
 	)
 
-	if err := rootCmd.MarkPersistentFlagDirname("output-directory"); err != nil {
-		log.Fatal(err)
+	if err := rootCmd.MarkFlagDirname("output-directory"); err != nil {
+		rc.Log.Fatal(err)
 	}
 
-	rootCmd.PersistentFlags().BoolVarP(
-		&options.StdOut,
+	rootCmd.Flags().BoolVarP(
+		&rc.Options.StdOut,
 		"stdout",
 		"s",
 		false,
 		HelpRenderStdOut,
 	)
 
-	rootCmd.PersistentFlags().IntVarP(
-		&options.Indent,
+	rootCmd.Flags().IntVarP(
+		&rc.Options.Indent,
 		"indent-level",
 		"I",
 		2,

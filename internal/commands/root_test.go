@@ -4,6 +4,7 @@
 package commands_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -26,8 +27,8 @@ func TestNew(t *testing.T) {
 				Short:            commands.YotShort,
 				Long:             commands.YotLong,
 				Version:          commands.Version,
-				PersistentPreRun: commands.SetupLogging,
-				Run:              commands.Execute,
+				PersistentPreRun: commands.New().SetupLogging,
+				Run:              commands.New().Execute,
 			},
 		},
 	}
@@ -36,7 +37,7 @@ func TestNew(t *testing.T) {
 		test := tt
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			got := commands.New()
+			got := commands.New().Command()
 			if got.Use != test.want.Use {
 				t.Errorf("New() = %v, want %v", got.Use, test.want.Use)
 			}
@@ -49,72 +50,8 @@ func TestNew(t *testing.T) {
 			if got.Version != test.want.Version {
 				t.Errorf("New() = %v, want %v", got.Version, test.want.Version)
 			}
-		})
-	}
-}
-
-func TestSetupLogging(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		cmd  *cobra.Command
-		args []string
-	}
-
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "Test Initialization",
-			args: args{
-				cmd:  &cobra.Command{},
-				args: nil,
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		test := tt
-
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-
-			commands.SetupLogging(test.args.cmd, test.args.args)
-		})
-	}
-}
-
-func TestExecute(t *testing.T) {
-	t.Parallel()
-
-	type args struct {
-		cmd  *cobra.Command
-		args []string
-	}
-
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "No args",
-			args: args{
-				cmd:  commands.New(),
-				args: nil,
-			},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		test := tt
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-
-			if err := test.args.cmd.Execute(); (err != nil) != test.wantErr {
-				t.Errorf("Execute() error = %v, wantErr %v", err, test.wantErr)
+			if reflect.DeepEqual(got.Execute, test.want.Execute) {
+				t.Errorf("New() = %v, want %v", got.Version, test.want.Version)
 			}
 		})
 	}

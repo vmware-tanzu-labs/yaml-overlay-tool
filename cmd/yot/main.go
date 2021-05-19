@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	yot := command.New()
+	yot := command.New().Command()
 
 	yot.Execute() //nolint:errcheck // not needed as command will handle errors
 }

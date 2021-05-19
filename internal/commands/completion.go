@@ -9,7 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func addCompletionCommand() *cobra.Command {
+type CompletionCommand Command
+
+func (c CompletionCommand) Command() *cobra.Command {
 	return &cobra.Command{
 		Use:                   CompletionUse,
 		Short:                 CompletionShort,
@@ -17,11 +19,11 @@ func addCompletionCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 		Args:                  cobra.ExactValidArgs(1),
-		Run:                   Completions,
+		Run:                   c.Completions,
 	}
 }
 
-func Completions(cmd *cobra.Command, args []string) {
+func (c CompletionCommand) Completions(cmd *cobra.Command, args []string) {
 	if len(args) > 1 {
 		panic("Too Many Args")
 	}
@@ -29,19 +31,19 @@ func Completions(cmd *cobra.Command, args []string) {
 	switch args[0] {
 	case "bash":
 		if err := cmd.Root().GenBashCompletion(os.Stdout); err != nil {
-			log.Fatal(err)
+			c.Log.Fatal(err)
 		}
 	case "zsh":
 		if err := cmd.Root().GenZshCompletion(os.Stdout); err != nil {
-			log.Fatal(err)
+			c.Log.Fatal(err)
 		}
 	case "fish":
 		if err := cmd.Root().GenFishCompletion(os.Stdout, true); err != nil {
-			log.Fatal(err)
+			c.Log.Fatal(err)
 		}
 	case "powershell":
 		if err := cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout); err != nil {
-			log.Fatal(err)
+			c.Log.Fatal(err)
 		}
 	}
 }
