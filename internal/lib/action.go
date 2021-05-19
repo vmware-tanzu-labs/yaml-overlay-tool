@@ -5,6 +5,7 @@ package lib
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -50,7 +51,7 @@ func (a *Action) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 
 	if toID[y] == Invalid {
-		return ErrInvalidAction
+		return fmt.Errorf("%w, %s", ErrInvalidAction, y)
 	}
 
 	*a = toID[y]
