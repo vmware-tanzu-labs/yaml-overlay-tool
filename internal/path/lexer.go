@@ -125,9 +125,8 @@ func (l *lexer) consume(s string) {
 	}
 }
 
-// consumed checks the input to see if it starts with the given token and does
-// not start with any of the given exceptions. If so, it consumes the given
-// token and returns true. Otherwise, it returns false.
+// consumed checks the input to see if it starts with the given token. If so,
+// it consumes the given token and returns true. Otherwise, it returns false.
 func (l *lexer) consumed(token string) bool {
 	if l.hasPrefix(token) {
 		l.consume(token)
@@ -189,6 +188,27 @@ func (l *lexer) consumeWhitespace() {
 	}
 
 	l.pos = pos
+}
+
+// consumeUntil consumes tokens until it hits one of the exceptions provided,
+// if no exception is provided it will consume tokens until end of input.
+func (l *lexer) consumeUntil(except ...rune) bool {
+	consumed := false
+
+	except = append(except, eof)
+
+	for {
+		le := l.next()
+		for _, s := range except {
+			if le == s {
+				l.backup()
+
+				return consumed
+			}
+		}
+
+		consumed = true
+	}
 }
 
 // peeked checks the input to see if it starts with the given token and does
@@ -353,89 +373,16 @@ func lexSubPath(l *lexer) stateFn {
 		return l.pop()
 
 	case l.empty():
-		if !l.emptyStack() {
-			return l.pop()
-		}
-
-		l.emit(lexemeIdentity)
-		l.emit(lexemeEOF)
-
-		return nil
+		return l.handleEmpty()
 
 	case l.consumed(dot):
-		childName := false
-
-		for {
-			le := l.next()
-			if le == '.' || le == '[' || le == ')' || le == ' ' || le == '&' ||
-				le == '|' || le == '=' || le == '!' || le == '>' || le == '<' ||
-				le == '~' || le == '*' || le == eof {
-				l.backup()
-
-				break
-			}
-
-			childName = true
-		}
-
-		if !childName {
-			return l.errorf("child name missing")
-		}
-
-		l.emit(lexemeDotChild)
-
-		return lexSubPath
+		return l.handleChild(lexemeDotChild)
 
 	case l.peekedWhitespaced("[", "'") || l.peekedWhitespaced("[", `"`): // bracketQuote or bracketDoubleQuote
-		l.consumedWhitespaced("[")
-
-		l.consumeWhitespace()
-		quote := string(l.next())
-
-		if !consumedEscapedString(l, quote) {
-			return nil
-		}
-
-		if !l.consumed(quote) {
-			return l.errorf(`missing %s`, enquote(quote))
-		}
-
-		if l.consumedWhitespaced(",") {
-			return l.errorf(`comma not allowed, dot notation can only contain a single child per level`)
-		}
-
-		if !l.consumedWhitespaced("]") {
-			return l.errorf(`missing "]" or ","`)
-		}
-
-		l.emit(lexemeBracketChild)
-
-		return lexSubPath
+		return l.handleBracket()
 
 	case l.lastEmittedLexemeType == lexemeEOF:
-		childName := false
-
-		for {
-			le := l.next()
-			if le == '.' || le == '[' || le == ')' || le == ' ' || le == '&' ||
-				le == '|' || le == '=' || le == '!' || le == '>' || le == '<' ||
-				le == '~' || le == '*' || le == eof {
-				l.backup()
-
-				break
-			}
-
-			childName = true
-		}
-
-		if !childName {
-			return l.errorf("child name missing")
-		}
-
-		l.emit(lexemeUndottedChild)
-
-		return lexSubPath
-
+		return l.handleChild(lexemeUndottedChild)
 	default:
 		return l.errorf("invalid path syntax")
 	}
@@ -452,4 +399,58 @@ func enquote(quote string) string {
 	default:
 		panic(fmt.Sprintf(`enquote called with incorrect argument %q`, quote))
 	}
+}
+
+func (l *lexer) handleEmpty() stateFn {
+	if !l.emptyStack() {
+		return l.pop()
+	}
+
+	l.emit(lexemeIdentity)
+	l.emit(lexemeEOF)
+
+	return nil
+}
+
+func (l *lexer) handleChild(t lexemeType) stateFn {
+	exceptions := []rune{
+		'.', '[', ')', ' ', '&',
+		'|', '=', '!', '>', '<',
+		'~', '*', eof,
+	}
+
+	if childName := l.consumeUntil(exceptions...); !childName {
+		return l.errorf("child name missing")
+	}
+
+	l.emit(t)
+
+	return lexSubPath
+}
+
+func (l *lexer) handleBracket() stateFn {
+	l.consumedWhitespaced("[")
+
+	l.consumeWhitespace()
+	quote := string(l.next())
+
+	if !consumedEscapedString(l, quote) {
+		return nil
+	}
+
+	if !l.consumed(quote) {
+		return l.errorf(`missing %s`, enquote(quote))
+	}
+
+	if l.consumedWhitespaced(",") {
+		return l.errorf(`comma not allowed, dot notation can only contain a single child per level`)
+	}
+
+	if !l.consumedWhitespaced("]") {
+		return l.errorf(`missing "]" or ","`)
+	}
+
+	l.emit(lexemeBracketChild)
+
+	return lexSubPath
 }

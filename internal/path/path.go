@@ -18,11 +18,11 @@ var (
 	ErrWildCardNotAllowed = errors.New("wildcard notation not allowed for build")
 )
 
-func BuildMulti(paths []string) (*yaml.Node, error) {
+func BuildPaths(paths []string) (*yaml.Node, error) {
 	yamlNodes := make([]*yaml.Node, len(paths))
 
 	for i, path := range paths {
-		yamlNode, err := Build(path)
+		yamlNode, err := BuildPath(path)
 		if err != nil {
 			return nil, err
 		}
@@ -37,8 +37,8 @@ func BuildMulti(paths []string) (*yaml.Node, error) {
 	return yamlNodes[0], nil
 }
 
-// Build constructs a Path from a string expression.
-func Build(path string) (*yaml.Node, error) {
+// BuildPath constructs a Path from a string expression.
+func BuildPath(path string) (*yaml.Node, error) {
 	return build(lex("Path lexer", path), nil)
 }
 
@@ -166,29 +166,28 @@ func bracketChildNames(childNames string) []string {
 	s := strings.Split(childNames, ",")
 	// reconstitute child names with embedded commas
 	children := []string{}
-	accum := ""
+	name := ""
 
 	for _, c := range s {
-		if balanced(c, '\'') && balanced(c, '"') {
-			if accum != "" {
-				accum += "," + c
+		switch {
+		case balanced(c, '\'') && balanced(c, '"'):
+			if name != "" {
+				name += "," + c
 			} else {
 				children = append(children, c)
-				accum = ""
+				name = ""
 			}
-		} else {
-			if accum == "" {
-				accum = c
-			} else {
-				accum += "," + c
-				children = append(children, accum)
-				accum = ""
-			}
+		case name == "":
+			name = c
+		default:
+			name += "," + c
+			children = append(children, name)
+			name = ""
 		}
 	}
 
-	if accum != "" {
-		children = append(children, accum)
+	if name != "" {
+		children = append(children, name)
 	}
 
 	unquotedChildren := []string{}

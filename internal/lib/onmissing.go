@@ -40,7 +40,7 @@ func (o *Overlay) onMissing(n *yaml.Node) error {
 }
 
 func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
-	y, err := path.BuildMulti(ip)
+	y, err := path.BuildPaths(ip)
 	if err != nil {
 		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
 	}
@@ -65,7 +65,7 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 }
 
 func (o *Overlay) handleInjectPath(n *yaml.Node) error {
-	_, err := path.BuildMulti(o.Query)
+	_, err := path.BuildPaths(o.Query)
 	if err != nil {
 		if errors.Is(err, path.ErrInvalidPathSyntax) {
 			if o.OnMissing.InjectPath == nil {
