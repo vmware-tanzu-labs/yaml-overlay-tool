@@ -29,6 +29,12 @@ type Overlay struct {
 	DocumentIndex []int           `yaml:"documentIndex,omitempty"`
 }
 
+type workStream struct {
+	Overlay   Overlay
+	NodeIndex int
+	File      *Source
+}
+
 type OnMissing struct {
 	Action     OnMissingAction `yaml:"action,omitempty"`
 	InjectPath multiString     `yaml:"injectPath,omitempty"`
@@ -91,7 +97,7 @@ func (o *Overlay) applyOverlay(src *Source, docIndex int) error {
 func (o *Overlay) checkDocumentIndex(current int) bool {
 	if o.DocumentIndex != nil {
 		for f := range o.DocumentIndex {
-			if current == o.DocumentIndex[f] {
+			if current != o.DocumentIndex[f] {
 				return true
 			}
 		}
@@ -124,6 +130,37 @@ func (o *Overlay) checkDocumentQuery(node *yaml.Node) (bool, error) {
 	log.Debugf("Document Query Conditions were not met, skipping")
 
 	return false, nil
+}
+
+func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
+	for i := range nodes {
+		b, _ := yaml.Marshal(nodes[i])
+		p, _ := yaml.Marshal(o.Value)
+
+		log.Debugf("Current: >>>\n%s\n", b)
+		log.Debugf("Proposed: >>>\n%s\n", p)
+
+		switch o.Action {
+		case Delete:
+			actions.Delete(root, nodes[i])
+		case Replace:
+			if err := actions.Replace(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping replace", err)
+			}
+		case Format:
+			if err := actions.Format(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping format", err)
+			}
+		case Merge:
+			if err := actions.Merge(nodes[i], &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping merge", err)
+			}
+		default:
+			return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
+		}
+	}
+
+	return nil
 }
 
 func (o *Overlay) onMissing(src *Source, docIndex int) error {
@@ -176,37 +213,6 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 			}
 
 			return fmt.Errorf("%w for onMissing.InjectPath", err)
-		}
-	}
-
-	return nil
-}
-
-func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
-	for i := range nodes {
-		b, _ := yaml.Marshal(nodes[i])
-		p, _ := yaml.Marshal(o.Value)
-
-		log.Debugf("Current: >>>\n%s\n", b)
-		log.Debugf("Proposed: >>>\n%s\n", p)
-
-		switch o.Action {
-		case Delete:
-			actions.Delete(root, nodes[i])
-		case Replace:
-			if err := actions.Replace(nodes[i], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping replace", err)
-			}
-		case Format:
-			if err := actions.Format(nodes[i], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping format", err)
-			}
-		case Merge:
-			if err := actions.Merge(nodes[i], &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping merge", err)
-			}
-		default:
-			return fmt.Errorf("%w of type '%s'", ErrInvalidAction, o.Action)
 		}
 	}
 

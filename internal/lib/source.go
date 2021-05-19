@@ -75,6 +75,16 @@ func (src *Sources) readYamlFile(p string) error {
 	return nil
 }
 
+func (src *Sources) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var p string
+
+	if err := unmarshal(&p); err != nil {
+		return err
+	}
+
+	return src.readYamlFile(p)
+}
+
 func (src *Source) Save(o *Config, output string) error {
 	fileName := path.Join(o.OutputDir, "yamlFiles", src.outputPath)
 	dirName := path.Dir(fileName)
@@ -120,26 +130,6 @@ func (src *Source) doPostProcessing(cfg *Config) error {
 
 	if err := src.Save(cfg, final); err != nil {
 		return fmt.Errorf("failed to save, %w", err)
-	}
-
-	return nil
-}
-
-func (src *Sources) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var p string
-
-	if err := unmarshal(&p); err != nil {
-		return err
-	}
-
-	return src.readYamlFile(p)
-}
-
-func (src *Source) processOverlays(o []*Overlay, nodeIndex int) error {
-	for _, o := range o {
-		if err := o.applyOverlay(src, nodeIndex); err != nil {
-			return err
-		}
 	}
 
 	return nil
