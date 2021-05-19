@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package path
+package builder
 
 import (
 	"fmt"
@@ -431,19 +431,25 @@ func (l *lexer) handleChild(t lexemeType) stateFn {
 func (l *lexer) handleBracket() stateFn {
 	l.consumedWhitespaced("[")
 
-	l.consumeWhitespace()
-	quote := string(l.next())
+	for {
+		l.consumeWhitespace()
+		quote := string(l.next())
 
-	if !consumedEscapedString(l, quote) {
-		return nil
-	}
+		if !consumedEscapedString(l, quote) {
+			return nil
+		}
 
-	if !l.consumed(quote) {
-		return l.errorf(`missing %s`, enquote(quote))
-	}
+		if !l.consumed(quote) {
+			return l.errorf(`missing %s`, enquote(quote))
+		}
 
-	if l.consumedWhitespaced(",") {
-		return l.errorf(`comma not allowed, dot notation can only contain a single child per level`)
+		if l.consumedWhitespaced(",") {
+			if !l.peekedWhitespaced("'") && !l.peekedWhitespaced(`"`) {
+				return l.errorf(`missing %s or %s`, enquote("'"), enquote(`"`))
+			}
+		} else {
+			break
+		}
 	}
 
 	if !l.consumedWhitespaced("]") {

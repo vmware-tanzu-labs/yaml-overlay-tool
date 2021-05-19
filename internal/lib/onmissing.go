@@ -8,7 +8,7 @@ import (
 	"fmt"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/path"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/builder"
 	"gopkg.in/yaml.v3"
 )
 
@@ -40,7 +40,12 @@ func (o *Overlay) onMissing(n *yaml.Node) error {
 }
 
 func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
-	y, err := path.BuildPaths(ip)
+	bps, err := builder.NewPaths(ip)
+	if err != nil {
+		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
+	}
+
+	y, err := bps.BuildPaths()
 	if err != nil {
 		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
 	}
@@ -65,9 +70,9 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 }
 
 func (o *Overlay) handleInjectPath(n *yaml.Node) error {
-	_, err := path.BuildPaths(o.Query)
+	_, err := builder.NewPaths(o.Query)
 	if err != nil {
-		if errors.Is(err, path.ErrInvalidPathSyntax) {
+		if errors.Is(err, builder.ErrInvalidPathSyntax) {
 			if o.OnMissing.InjectPath == nil {
 				log.Debugf("ignoring %s at %s due to %s\n", o.Action, o.Query, ErrOnMissingNoInjectPath)
 

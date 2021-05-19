@@ -51,6 +51,7 @@ func CloseFile(file *os.File) {
 	}
 }
 
+// FIXME: too efficient doesn't work on single files.
 func GetCommonPrefix(sep byte, paths ...string) string {
 	switch len(paths) {
 	case 0:
