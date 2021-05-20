@@ -1,10 +1,12 @@
 [Back to Table of Contents](../documentation.md)
 
-# Kubernetes Common Use-Cases and Patterns
+# Kubernetes common use-cases and patterns
 
 The following set of examples will help you quickly achieve common tasks in the context of Kubernetes YAML manifests.  
 
-All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
+All these examples are available in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository.
+
+Example:
 
 ```bash
 yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output path >
@@ -13,9 +15,9 @@ yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output p
 <br/>
 
 
-### Example Kubernetes YAML Manifests
+### Example Kubernetes YAML manifests
 
-Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
+Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you'll find the two example Kubernetes YAML Manifests that are manipulated in the following set of example use-cases:
 
 ```yaml
 # my-app.yaml
@@ -68,9 +70,9 @@ spec:
 <br/>
 
 
-## Adding Additional Labels and Selectors To All YAML Files In a Directory
+## Add additional labels and selectors to all YAML files in a directory
 
-In this example we use the `merge` action to add in 2 new labels to a set of YAML files contained in a directory.
+In this example, the `merge` action lets you add two new labels to a set of YAML files contained in a directory.
 
 ```yaml
 ---
@@ -92,13 +94,14 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
 
 
-## Prepend a Private Registry URL to All Container Images
+## Prepend a private registry URL to all container images
 
-In this example we use the `format` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.
+In this example the `format` action lets you take images that are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.
 
 ```yaml
 # privateContainerRegistry.yaml
@@ -113,13 +116,14 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
 
 
-## Modify the Name of a Label's Key
+## Modify the label key name
 
-In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
+In this example, the `name` label key of `app.kubernetes.io/name` is manipulated by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the key/value pair.
 
 ```yaml
 # formatLabelKey.yaml
@@ -134,12 +138,13 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
 
-## Replace the Name of a Label's Key
+## Replace the label key name
 
-In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
+In this example, the `name` label is replaced with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always returns the value of the key, rather than the key/value pair.
 
 ```yaml
 # replaceLabelKey.yaml
@@ -154,13 +159,14 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
 
 
-## Remove All Annotations
+## Remove all annotations
 
-Often times annotations are set for certain environments that may not apply to your environment.  To remove all annotations we will use the `delete` action.
+There are times when annotations that are set for specific environments may not apply to your environment. To remove annotations, use the `delete` action.
 
 ```yaml
 # removeAnnotations.yaml
@@ -174,13 +180,14 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
 
 
-## Remove Annotations from Specific Kubernetes Object Types
+## Remove annotations from specific Kubernetes object types
 
-To build on the previous example, there are often times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove these annotations, we will use the `delete` action and a `documentQuery`.
+To build on the previous example, there are times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove these annotations, use the `delete` action and a `documentQuery`.
 
 ```yaml
 # removeAnnotationsWithConditions.yaml
@@ -203,7 +210,8 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
+Now, you can apply the changes by generating a new set of YAML files.
+
 `yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
 
 
