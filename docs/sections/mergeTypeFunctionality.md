@@ -1,14 +1,16 @@
 [Back to Actions](actions.md#3-merge)  
 [Back to Table of Contents](../documentation.md)
 
-## Details on How Data Types are Handled with Merge Actions
+## How data types are handled with merge actions
 
-The `action` of `merge` can affect how the `value` data gets applied to a YAML document, depending on the type of data it is.  This is fairly intuitive by design, but there are a few things to be aware of so you can harness the full feature set of `yot`.  If you do not wish to use these features, simply use the `replace` action.
+The type of data you are merging affects how the `merge` `action` applies `value` data is applied to a YAML document. This concept is intuitive by design, but there are a few things to be aware of to harness the full feature set of `Yot`.  You can also use the `replace` action if you do not want to merge data.
 
 
 ### Dictionary/Map Merge Functionality
 
-A dictionary in YAML is a set of key value pairs, represented as such:
+A dictionary in YAML is a set of key value pairs. 
+
+For example,
 
 ```yaml
 # short-form
@@ -19,12 +21,16 @@ dictionaryExample2:
   key2: value2 
 ```
 
-When merging dictionary data, `yot` performs a deep merge on the original dictionary data with the new dictionary data.  This means any new keys are added into the existing values, and any identical keys with new values are simply updated. If this approach does not work for your situation, consider using the `replace` action.
+During a dictionary data merge, `Yot` performs a deep merge on the original dictionary data with the new dictionary data. Any new keys added into the existing values, or any identical keys with new values are automatically updated. 
+
+If you don't want to merge data, but would rather replace it, use the `replace` action instead.
 
 
-### Array/Sequence Merge Functionality
+### Array/sequence merge functionality
 
-An array/sequence in YAML appears as a key with a list of items prefaced by a `- ` pattern or a comma-separated list contained in square brackets as such:
+An array/sequence in YAML appears as a key with a list of items prefaced by a `- ` pattern or a comma-separated list contained in square brackets.
+
+For example,
 
 ```yaml
 # short-form
@@ -36,12 +42,14 @@ arrayExample2:
   - item3
 ```
 
-When merging list data, `yot` takes the original list data, and extends it with the new list data.  This is fairly intuitive, but worth calling out for clarity.
+When merging list data, `Yot` takes the original list data and extends it with the new list data.  
 
 
-### Integer/Float Merge Functionality
+### Integer/float merge functionality
 
-An integer in YAML appears as an unquoted set of digits, without a decimal.  A float (floating point numbers) appears as an unquoted set of digits with a decimal as such:
+In YAML, an integer appears as an unquoted set of digits without a decimal and a float (floating point numbers) appears as an unquoted set of digits with a decimal.
+
+For example,
 
 ```yaml
 # source: https://www.tutorialspoint.com/yaml/yaml_scalars_and_tags.htm
@@ -61,11 +69,13 @@ fixed: 1,234.56
 negativeInfinity: -.inf
 ```
 
-When merging an integer/float with an existing integer/float, `yot` performs a math behavior by adding the two values together.
+When merging an integer/float with an existing integer/float, `Yot` adds the two values together.
 
 
-### Boolean Merge Functionality
-A boolean in YAML is represented as `true`/`false`, `yes`/`no`, `y`/`n`, or `on`/`off` as such:
+### Boolean merge functionality
+A boolean in YAML is represented as `true`/`false`, `yes`/`no`, `y`/`n`, or `on`/`off`.
+
+For example,
 
 ```yaml
 booleanExample1: true
@@ -78,12 +88,18 @@ booleanExample7: on
 booleanExample8: off
 ```
 
-When merging boolean type data, `yot` performs a boolean math behavior.  **In this scenario, `false`/`no`/`n`/`off` always wins.**
+When merging boolean type data, `yot` performs in boolean.  
+
+For example, 
+
+**In this scenario, `false`/`no`/`n`/`off` always wins.**
 
 
-### String Merge Functionality
+### String merge functionality
 
-In YAML a string is typically represented as an unquoted set of alphanumeric characters.  If you wish to represent a number as a string you would enclose the number in double-quotation marks (`"`) as such:
+In YAML, a string is typically represented as an unquoted set of alphanumeric characters.  To represent a number as a string, enclose the number in double-quotation marks (`"`). 
+
+For example,
 
 ```yaml
 stringExample1: dog
@@ -94,12 +110,16 @@ stringExample5: "1234"
 stringExample6: "1234.56"
 ```
 
-When merging string data, `yot` takes the original string data and concatenates it with the new string data.  This is not initially intuitive, but can provide some interesting use-cases.  
+When merging string data, `yot` takes the original string data and concatenates it with the new string data. This is not initially intuitive, but can provide some interesting use-cases.  
 
 
-#### String Merge Examples
+#### String merge examples
 
-A few use-cases that come to mind is adding on to a Kubernetes `apiVersion` (i.e. v1 + alpha2 => outputs a change of v1alpha2).  In a templated instructions file (templating is not implemented in v0.1.0) with multiple values files for differing Kubernetes clusters, a user could have the value of `site` set differently in each values file, such as:
+In a templated instructions file with multiple values files for differing Kubernetes clusters, you could have the value of `site` set differently in each values file. 
+
+**Note:** Templating is not implemented in v0.1.0.
+
+The following example use-cases show adding on to a Kubernetes `apiVersion`. For example, v1 + alpha2 => outputs a change of v1alpha2. 
 
 ```yaml
 # dev.yaml
