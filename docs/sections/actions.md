@@ -1,6 +1,6 @@
 [Back to Table of Contents](../documentation.md)
 
-# Overlay actions
+# Actions
 
 There are four types of actions that you can use to apply changes to a YAML document within Yot.
 
@@ -8,6 +8,13 @@ There are four types of actions that you can use to apply changes to a YAML docu
 * **Format**
 * **Merge**
 * **Replace**
+
+
+There are two types of actions that you can use to apply changes to a YAML document when a `query` returns no results (`onMissing`) within Yot.
+
+* **Ignore**
+* **Inject**
+
 
 ## Overlay actions
 
