@@ -59,7 +59,53 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 		dq      DocumentQueries
 		want    bool
 		wantErr bool
-	}{}
+	}{
+		{
+			name: "query should return true if it exists",
+			dq: DocumentQueries{
+				{
+					Conditions: []*Condition{
+						{
+							Key: "kind",
+							Value: yaml.Node{
+								Kind:  yaml.ScalarNode,
+								Tag:   "!!str",
+								Value: `Service`,
+							},
+						},
+					},
+				},
+			},
+			want:    true,
+			wantErr: false,
+		},
+		{
+			name:    "query should return true if there are no conditions",
+			dq:      DocumentQueries{},
+			want:    false,
+			wantErr: false,
+		},
+		{
+			name: "query should return false it it does not exist",
+			dq: DocumentQueries{
+				{
+					Conditions: []*Condition{
+						{
+							Key: "kind",
+							Value: yaml.Node{
+								Kind:  yaml.ScalarNode,
+								Tag:   "!!str",
+								Value: `Potato`,
+							},
+						},
+					},
+				},
+			},
+			want:    false,
+			wantErr: false,
+		},
+	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
