@@ -3,7 +3,7 @@
 
 ## Introduction to YAML Overlay Tool
 
-YAML Overlay Tool (YOT) is not a traditional text-based templating tool. It is more like an overlay tool that takes fragments of YAML configuration to apply or inject over the top of an existing YAML configuration.     
+YAML Overlay Tool (Yot) is not a traditional text-based templating tool. It is an overlay tool that takes fragments of YAML configuration to apply or inject over the top of an existing YAML configuration.     
 
 Each overlay operation is performed with a JSONPath `query`, a desired `value`, and an `action`.  If a JSONPath `query` returns no results, a desired value is either ignored (default behavior), or injected, (`onMissing`). It can also provide a specific path or set of paths (`injectPath`) to inject the value, if the initial JSONPath query was not a fully-qualified JSONPath.  
 

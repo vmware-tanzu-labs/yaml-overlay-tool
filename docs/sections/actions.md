@@ -18,7 +18,7 @@ The `delete` action lets a Yot user remove unwanted pieces of a YAML document.
 
 ### 2. Format
 
-The `format` action lets a Yot user do something with data looked up by a JSONPath query, and represented by `%s`.  You can use `format` to put text before an existing value, after an existing value, or both before and after the existing vaue.  
+The `format` action lets a Yot user do something with data looked up by a JSONPath query, where the returned value is represented by `%s`.  You can use `format` to put text before an existing value, after an existing value, or both before and after the existing value.  
 
 >**NOTE:** To use `%s` at the start of the `value` field, wrap the value in double-quotation marks. For example,`"%sSomeNewText"`.
 
@@ -61,7 +61,7 @@ The `replace` action lets a Yot user replace existing data with new data.
 
 ### 1. Ignore
 
-The `ignore` action is the default if there are no results found for your `query`.  Use of the `onMissing` key is optional. Add it if you want your instructions file to contain information about the no results found `query`. If you do not want the query to be included in your instructions file, do not add the `onMissing` key.
+The `ignore` action is the default `onMissing` action if there are no results found from your `query`.  Use of the `onMissing` key is optional. Use of `ignore` can be added for the sake of being explicit to anyone reading your instructions file.  
 
 ```yaml
 yamlFiles:
@@ -83,9 +83,9 @@ Use `inject` if your `query` returned no results, but you still want to insert d
 
 #### Inject Path
 
-Use an `injectPath` if your initial query does not return any results, even after using JSONpath operations known to be more powerful than a dot-notation style path such as 'a.b.c.d'.  An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
+If your initial `query` used some of JSONPath's advanced features (`../`, `*`, etc) rather than a dot-notation style path (e.g: `a.b.c.d`), and no results were obtained, an `injectPath` is also required to allow for properly building the YAML paths.  An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
 
-The following example illustrates a simple use-case for missing labels that you would like to inject.
+The following example illustrates a simple use-case for missing labels that you would like to inject if `metadata.labels` was missing in the YAML file.
 
 ```yaml
 yamlFiles:
