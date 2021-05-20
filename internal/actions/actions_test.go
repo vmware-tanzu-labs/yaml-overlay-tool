@@ -117,19 +117,19 @@ func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testVa
 
 	switch action {
 	case "merge":
-		if err := actions.Merge(result, testValue[0]); err != nil {
+		if err := actions.MergeNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on merge action: %w", err)
 		}
 	case "replace":
-		if err := actions.Replace(result, testValue[0]); err != nil {
+		if err := actions.ReplaceNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on replace action: %w", err)
 		}
 	case "format":
-		if err := actions.Format(result, testValue[0]); err != nil {
+		if err := actions.FormatNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on format action: %w", err)
 		}
 	case "delete":
-		actions.Delete(testYaml, result)
+		actions.DeleteNode(testYaml, result)
 	}
 
 	return nil

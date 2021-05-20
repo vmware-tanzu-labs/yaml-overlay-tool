@@ -16,7 +16,7 @@ var (
 	ErrMergeUnsupportedType  = errors.New("not a supported yaml type for merging")
 )
 
-func Merge(nodes ...*yaml.Node) error {
+func MergeNode(nodes ...*yaml.Node) error {
 	if len(nodes) <= 1 {
 		return nil
 	}

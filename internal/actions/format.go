@@ -13,7 +13,7 @@ import (
 
 var ErrFormatOnlyForScalars = errors.New("format action can only be used on scalar values")
 
-func Format(originalValue, newValue *yaml.Node) error {
+func FormatNode(originalValue, newValue *yaml.Node) error {
 	if originalValue.Kind == yaml.ScalarNode && newValue.Kind == yaml.ScalarNode {
 		ov := originalValue.Value
 

@@ -7,13 +7,13 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Delete(pn, child *yaml.Node) {
+func DeleteNode(pn, child *yaml.Node) {
 	for i, c := range pn.Content {
 		// we are comparing against the memory address of the pointer not the value
 		// so this will only find one result in the yaml tree
 		if c != child {
 			if c.Content != nil {
-				Delete(c, child)
+				DeleteNode(c, child)
 			}
 
 			continue

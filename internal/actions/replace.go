@@ -10,7 +10,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func Replace(original, replaceValue *yaml.Node) error {
+func ReplaceNode(original, replaceValue *yaml.Node) error {
 	options := copier.Option{
 		IgnoreEmpty: false,
 		DeepCopy:    true,
