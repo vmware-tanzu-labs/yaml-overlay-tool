@@ -1,26 +1,31 @@
 [Back to Table of Contents](../documentation.md)
 
-# Overlay Actions
+# Overlay actions
 
-Within `yot` there are four types of actions you can take to apply a change to a YAML document.  These actions help you achieve a desired outcome when it comes to manipulating existing YAML files.
+There are four types of actions that you can use to apply changes to a YAML document within Yot.
 
-There are also actions you can take when a JSONPath `query` returns no results, by making use of `onMissing`.
+* **Delete**
+* **Format**
+* **Merge**
+* **Replace**
 
-## Overlay Actions
+## Overlay actions
 
 ### 1. Delete
 
-The `delete` action provides a user of `yot` a mechanism to remove unwanted pieces of a YAML document.  
+The `delete` action lets a Yot user remove unwanted pieces of a YAML document.   
 
 
 ### 2. Format
 
-The `format` action provides a user of `yot` a mechanism to take existing data looked up by a JSONPath query, and represented by `%s`, to do something with it.  Typically `format` is used for either putting text before the existing value, after it, or a combination thereof.  
+The `format` action lets a Yot user do something with data looked up by a JSONPath query, and represented by `%s`.  You can use `format` to put text before an existing value, after an existing value, or both before and after the existing vaue.  
 
->**NOTE:** *If you would like to use `%s` at the start of the `value` field, you will need to wrap the value in double-quotation marks like `"%sSomeNewText"`.*
+>**NOTE:** To use `%s` at the start of the `value` field, wrap the value in double-quotation marks. For example,`"%sSomeNewText"`.
 
 
-#### Format Usage Example
+#### Format usage example
+
+In the following example, the `name` label is now called `app.kubernetes.io/name`.
 
 ```yaml
 commonOverlays:
@@ -34,30 +39,29 @@ yamlFiles:
     path: /tmp/yamls
 ```
 
-In the example above, the `name` label will now be called `app.kubernetes.io/name`.
 
 
 ### 3. Merge
 
-The `merge` action provides a user of `yot` a mechanism to merge new data with existing data.  Depending on the type of data being merged, merge behaves differently.  `merge` is best used with lists/arrays and dictionaries/maps.
+The `merge` action lets a Yot user merge new data with existing data. You'll find this action works best with lists/arrays and dictionaries/maps, and that the `merge` behavior differs according to the type of data being merged.
 
-Please see [Details on How Data Types are Handled with Merge Actions](mergeTypeFunctionality.md)
+See [Details on How Data Types are Handled with Merge Actions](mergeTypeFunctionality.md).
 
 
 ### 4. Replace
 
-The `replace` action provides a user of `yot` a mechanism to completely replace existing data with new data.
+The `replace` action lets a Yot user replace existing data with new data.
 
 
 
 ## On Missing Actions
 
-`onMissing` actions are used to instruct `yot` on what to do if there are no results from your JSONPath `query`.
+`onMissing` actions instruct Yot on what to do if there are no results from your JSONPath `query`.
 
 
 ### 1. Ignore
 
-`ignore` is always the default action when no results are obtained from your `query`.  It is not required to add the `onMissing` key if you do not care that something is missing, unless you want to be explicit to anyone reading your instructions file.  `yot` will not act on data that does not exist.
+The `ignore` action is the default if there are no results found for your `query`.  Use of the `onMissing` key is optional. Add it if you want your instructions file to contain information about the no results found `query`. If you do not want the query to be included in your instructions file, do not add the `onMissing` key.
 
 ```yaml
 yamlFiles:
@@ -75,10 +79,13 @@ yamlFiles:
 
 ### 2. Inject
 
-`inject` is required if your `query` returned no results, and you wish to insert the data anyways.
+Use `inject` if your `query` returned no results, but you still want to insert data.
 
 #### Inject Path
-If your initial `query` used some of the more powerful JSONPath operations, rather than a dot-notation style path (e.g: `a.b.c.d`), and obtained no results, an `injectPath` is also required.  An `injectPath` can be either a `string` or a `list/array` for cases where you may want to inject the same data to multiple-locations within the file.
+
+Use an `injectPath` if your initial query does not return any results, even after using JSONpath operations known to be more powerful than a dot-notation style path such as 'a.b.c.d'.  An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
+
+The following example illustrates a simple use-case for missing labels that you would like to inject.
 
 ```yaml
 yamlFiles:
@@ -92,7 +99,6 @@ yamlFiles:
       action: inject
 ```
 
-The example above illustrates a simple use-case for missing labels that you would like to inject.
 
 ```yaml
 yamlFiles:
