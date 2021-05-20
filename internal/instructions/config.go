@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package lib
+package instructions
 
 type Config struct {
 	Verbose          bool

@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package lib
+package instructions
 
 import (
 	"bufio"
@@ -10,27 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
-
-type multiString []string
-
-func (ms *multiString) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
-	if err := unmarshal(&s); err == nil {
-		*ms = []string{s}
-
-		return nil
-	}
-
-	type ss []string
-
-	return unmarshal((*ss)(ms))
-}
-
-func (ms multiString) String() string {
-	return strings.Join(ms, ",")
-}
 
 func ReadStream(fileName string) (io.Reader, error) {
 	if fileName == "-" {
@@ -51,13 +31,12 @@ func CloseFile(file *os.File) {
 	}
 }
 
-// FIXME: too efficient doesn't work on single files.
 func GetCommonPrefix(sep byte, paths ...string) string {
 	switch len(paths) {
 	case 0:
 		return ""
 	case 1:
-		return path.Clean(paths[0])
+		return path.Dir(path.Clean(paths[0]))
 	}
 
 	c := path.Clean(paths[0]) + string(sep)

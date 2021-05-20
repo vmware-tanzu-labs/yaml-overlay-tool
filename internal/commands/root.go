@@ -9,14 +9,14 @@ import (
 
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/lib"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
 type Command struct {
 	Log     *logging.Logger
-	Options *lib.Config
+	Options *instructions.Config
 }
 
 type RootCommand Command
@@ -24,7 +24,7 @@ type RootCommand Command
 func New() *RootCommand {
 	return &RootCommand{
 		Log:     logging.MustGetLogger("cmd"),
-		Options: &lib.Config{},
+		Options: &instructions.Config{},
 	}
 }
 
@@ -99,7 +99,7 @@ func (rc *RootCommand) SetupLogging(cmd *cobra.Command, args []string) {
 }
 
 func (rc *RootCommand) Execute(cmd *cobra.Command, args []string) {
-	if err := lib.Execute(rc.Options); err != nil {
+	if err := instructions.Execute(rc.Options); err != nil {
 		cmd.SilenceUsage = true
 
 		rc.Log.Error(fmt.Errorf("%w", err))

@@ -1,19 +1,20 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package lib
+package instructions
 
 import (
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 
 type Instructions struct {
-	CommonOverlays []*Overlay  `yaml:"commonOverlays,omitempty"`
-	YamlFiles      []*YamlFile `yaml:"yamlFiles,omitempty"`
+	CommonOverlays []*overlays.Overlay `yaml:"commonOverlays,omitempty"`
+	YamlFiles      []*YamlFile         `yaml:"yamlFiles,omitempty"`
 }
 
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
@@ -58,12 +59,4 @@ func (i *Instructions) setOutputPath() {
 			src.outputPath = strings.TrimPrefix(src.Path, pathPrefix)
 		}
 	}
-}
-
-func (i *Instructions) queueYamlFiles(c chan *YamlFile) {
-	for _, yf := range i.YamlFiles {
-		c <- yf
-	}
-
-	close(c)
 }

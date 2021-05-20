@@ -1,53 +1,44 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package lib
+package instructions
 
 import (
 	"bytes"
 	"fmt"
 	"os"
 
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 
 type YamlFile struct {
-	Name      string      `yaml:"name,omitempty"`
-	Overlays  []*Overlay  `yaml:"overlays,omitempty"`
-	Documents []*Document `yaml:"documents,omitempty"`
-	Files     Files       `yaml:"path,omitempty"`
+	Name      string              `yaml:"name,omitempty"`
+	Overlays  []*overlays.Overlay `yaml:"overlays,omitempty"`
+	Documents []*Document         `yaml:"documents,omitempty"`
+	Files     Files               `yaml:"path,omitempty"`
 }
 
-func (yf *YamlFile) queueOverlays(oChan chan *workStream) {
+func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
 	for _, f := range yf.Files {
 		for nodeIndex, n := range f.Nodes {
 			for _, o := range yf.Overlays {
-				if ok := o.checkDocumentIndex(nodeIndex); ok {
-					oChan <- &workStream{
-						Overlay:   *o,
-						Node:      n,
-						NodeIndex: nodeIndex,
-						Path:      f.Path,
-					}
+				if ok := o.CheckDocumentIndex(nodeIndex); ok {
+					stream.AddWorkload(o, n, nodeIndex, f.Path)
 				}
 			}
 
 			for _, d := range yf.Documents {
 				if ok := d.checkDocumentIndex(nodeIndex); ok {
 					for _, o := range d.Overlays {
-						oChan <- &workStream{
-							Overlay:   *o,
-							Node:      n,
-							NodeIndex: nodeIndex,
-							Path:      f.Path,
-						}
+						stream.AddWorkload(o, n, nodeIndex, f.Path)
 					}
 				}
 			}
 		}
 	}
 
-	close(oChan)
+	stream.CloseStream()
 }
 
 func (yf *YamlFile) doPostProcessing(cfg *Config) error {
@@ -76,11 +67,11 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 			}
 		}
 
-		log.Debugf("Final: >>>\n%s\n", output)
 		// added so we can quickly see the results of the run
 		if cfg.StdOut {
 			o = os.Stdout
 		} else {
+			log.Debugf("Final: >>>\n%s\n", output)
 			o, err = f.OpenOutputFile(cfg)
 			if err != nil {
 				return err

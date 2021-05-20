@@ -127,7 +127,7 @@ func (paths *Paths) BuildPaths() (*yaml.Node, error) {
 		yamlNodes[i] = yamlNode
 	}
 
-	if err := actions.Merge(yamlNodes...); err != nil {
+	if err := actions.MergeNode(yamlNodes...); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 

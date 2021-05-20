@@ -1,9 +1,13 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package lib
+package instructions
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
+)
 
 func TestDocument_checkDocumentIndex(t *testing.T) {
 	t.Parallel()
@@ -11,7 +15,7 @@ func TestDocument_checkDocumentIndex(t *testing.T) {
 	type fields struct {
 		Name     string
 		Path     int
-		Overlays []*Overlay
+		Overlays []*overlays.Overlay
 	}
 
 	type args struct {
