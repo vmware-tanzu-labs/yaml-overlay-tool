@@ -45,10 +45,7 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
 	}
 
-	y, err := bps.BuildPaths()
-	if err != nil {
-		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
-	}
+	y, _ := bps.BuildPaths()
 
 	err = actions.MergeNode(node, y)
 	if err != nil {

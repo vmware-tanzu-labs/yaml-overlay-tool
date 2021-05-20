@@ -24,7 +24,7 @@ type Condition struct {
 type DocumentQueries []*DocumentQuery
 
 func (dq DocumentQueries) checkQueries(node *yaml.Node) (bool, error) {
-	if dq == nil {
+	if len(dq) == 0 {
 		log.Debugf("No Document Queries found, continuing")
 
 		return true, nil
@@ -40,7 +40,7 @@ func (dq DocumentQueries) checkQueries(node *yaml.Node) (bool, error) {
 		}
 	}
 
-	log.Debugf("Document Query Conditions were not met, skipping")
+	log.Debugf("Document Query conditions were not met, skipping")
 
 	return false, nil
 }
@@ -54,10 +54,7 @@ func (dq *DocumentQuery) checkQuery(node *yaml.Node) (bool, error) {
 			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", c.Key, err)
 		}
 
-		results, err := yp.Find(node)
-		if err != nil {
-			return false, fmt.Errorf("failed to find results for %s, %w", c.Key, err)
-		}
+		results, _ := yp.Find(node)
 
 		for _, result := range results {
 			if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {

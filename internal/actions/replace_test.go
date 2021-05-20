@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestReplace(t *testing.T) {
+func TestReplaceNode(t *testing.T) {
 	t.Parallel()
 
 	tests := testCases{

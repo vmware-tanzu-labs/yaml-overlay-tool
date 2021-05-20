@@ -6,7 +6,7 @@ package actions
 import (
 	"errors"
 	"fmt"
-	"strconv"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -56,11 +56,11 @@ func merge(o, n *yaml.Node) error {
 
 func mergeDocument(o, n *yaml.Node) error {
 	if o.Content != nil && n.Content != nil {
+		mergeComments(o, n)
+
 		if err := merge(o.Content[0], n.Content[0]); err != nil {
 			return err
 		}
-
-		mergeComments(o, n)
 	}
 
 	return nil
@@ -75,11 +75,11 @@ func mergeMap(o, n *yaml.Node) error {
 				if o.Content[oi].Value == n.Content[ni].Value {
 					resultFound = true
 
+					mergeComments(o.Content[oi], n.Content[ni])
+
 					if err := merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
 						return err
 					}
-
-					mergeComments(o.Content[oi], n.Content[ni])
 
 					break
 				}
@@ -96,58 +96,35 @@ func mergeMap(o, n *yaml.Node) error {
 
 func mergeArray(o, n *yaml.Node) {
 	if o.Content != nil && n.Content != nil {
+		mergeComments(o, n)
+
 		o.Content = append(o.Content, n.Content...)
 	}
 }
 
 func mergeScalar(ov, nv *yaml.Node) error {
-	switch ov.Tag {
-	case "!!int":
-		o, err := strconv.Atoi(ov.Value)
-		if err != nil {
-			return fmt.Errorf("failed to %s to int for merging: %w", ov.Value, err)
-		}
-
-		n, err := strconv.Atoi(nv.Value)
-		if err != nil {
-			return fmt.Errorf("failed to %s to int for merging: %w", nv.Value, err)
-		}
-
-		ov.Value = strconv.Itoa(o + n)
-
-	case "!!bool":
-		o, err := strconv.ParseBool(ov.Value)
-		if err != nil {
-			return fmt.Errorf("failed to %s to bool for merging: %w", ov.Value, err)
-		}
-
-		n, err := strconv.ParseBool(nv.Value)
-		if err != nil {
-			return fmt.Errorf("failed to %s to bool for merging: %w", nv.Value, err)
-		}
-
-		ov.Value = strconv.FormatBool(o && n)
-
-	default:
-		ov.Value += nv.Value
-	}
-
 	mergeComments(ov, nv)
+
+	ov.Value = CondSprintf(nv.Value, ov.Value, strings.TrimPrefix(ov.LineComment, "#"))
 
 	return nil
 }
 
 func mergeComments(o, n *yaml.Node) {
+	hc := strings.TrimPrefix(o.HeadComment, "#")
+	lc := strings.TrimPrefix(o.LineComment, "#")
+	fc := strings.TrimPrefix(o.FootComment, "#")
+
 	switch {
 	case n.HeadComment != "":
-		o.HeadComment += n.HeadComment
+		o.HeadComment = CondSprintf(n.HeadComment, o.Value, lc, hc, fc)
 
 		fallthrough
 	case n.LineComment != "":
-		o.LineComment += n.LineComment
+		o.LineComment = CondSprintf(n.LineComment, o.Value, lc, hc, fc)
 
 		fallthrough
 	case n.FootComment != "":
-		o.FootComment += n.FootComment
+		o.FootComment = CondSprintf(n.FootComment, o.Value, lc, hc, fc)
 	}
 }

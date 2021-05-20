@@ -21,10 +21,7 @@ func searchYAMLPaths(paths []string, node *yaml.Node) ([]*yaml.Node, error) {
 			return nil, fmt.Errorf("failed to parse the query path %s due to %w", p, err)
 		}
 
-		result, err := yp.Find(node)
-		if err != nil {
-			return nil, fmt.Errorf("failed to find results for %s, %w", p, err)
-		}
+		result, _ := yp.Find(node)
 
 		results = append(results, result...)
 	}

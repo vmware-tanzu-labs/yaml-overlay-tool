@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestDelete(t *testing.T) {
+func TestDeleteNode(t *testing.T) {
 	t.Parallel()
 
 	tests := testCases{

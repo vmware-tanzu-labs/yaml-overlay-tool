@@ -69,11 +69,11 @@ func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 			if err := actions.ReplaceNode(n, &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping replace on line %d column %d", err, n.Line, n.Column)
 			}
-		case actions.Format:
-			if err := actions.FormatNode(n, &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping format on line %d column %d", err, n.Line, n.Column)
+		case actions.Math:
+			if err := actions.MathNode(n, &o.Value); err != nil {
+				return fmt.Errorf("%w, skipping math on line %d, column %d", err, n.Line, n.Column)
 			}
-		case actions.Merge:
+		default:
 			if err := actions.MergeNode(n, &o.Value); err != nil {
 				return fmt.Errorf("%w, skipping merge on line %d, column %d", err, n.Line, n.Column)
 			}

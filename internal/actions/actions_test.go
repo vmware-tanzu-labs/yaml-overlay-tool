@@ -124,8 +124,8 @@ func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testVa
 		if err := actions.ReplaceNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on replace action: %w", err)
 		}
-	case "format":
-		if err := actions.FormatNode(result, testValue[0]); err != nil {
+	case "math":
+		if err := actions.MathNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on format action: %w", err)
 		}
 	case "delete":

@@ -82,7 +82,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 		{
 			name:    "query should return true if there are no conditions",
 			dq:      DocumentQueries{},
-			want:    false,
+			want:    true,
 			wantErr: false,
 		},
 		{
@@ -103,6 +103,25 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 			},
 			want:    false,
 			wantErr: false,
+		},
+		{
+			name: "an error should raise if path is malformed",
+			dq: DocumentQueries{
+				{
+					Conditions: []*Condition{
+						{
+							Key: "@&^#badd/example",
+							Value: yaml.Node{
+								Kind:  yaml.ScalarNode,
+								Tag:   "!!str",
+								Value: `Potato`,
+							},
+						},
+					},
+				},
+			},
+			want:    false,
+			wantErr: true,
 		},
 	}
 

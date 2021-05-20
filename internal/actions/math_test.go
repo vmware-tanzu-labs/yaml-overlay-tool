@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-// contains tests for the yaml-overlay-tool 'merge' action
+// contains tests for the yaml-overlay-tool 'math' action
 
 package actions_test
 
@@ -9,15 +9,15 @@ import (
 	"testing"
 )
 
-func TestMergeNode(t *testing.T) {
+func TestMathNode(t *testing.T) {
 	t.Parallel()
 
 	tests := testCases{
 		{
-			name: "Merge Sequence Node (array)",
+			name: "Math Scalar Node - string",
 			args: args{
-				query: "spec.ports",
-				value: "- name: sequenceTest\n  port: 22\n  protocol: TCP\n  targetPort: sshd",
+				query: "metadata.labels['app.kubernetes.io/name']",
+				value: "es",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -25,50 +25,7 @@ metadata:
   name: bind-udp
   namespace: tanzu-dns
   labels:
-    app.kubernetes.io/name: external-dns
-  annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
-    ## This annotation will be ignored on other cloud providers
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-spec:
-  selector:
-    app.kubernetes.io/name: external-dns
-  type: LoadBalancer
-  ports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: dns-udp
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: dns-tcp
-    - name: sequenceTest
-      port: 22
-      protocol: TCP
-      targetPort: sshd
-  # add some fake boolean values for testing
-  boolTest:
-    case0: false
-    case1: true
-`,
-		},
-		{
-			name: "Merge map",
-			args: args{
-				query: "metadata.labels",
-				value: "foo: bar\nbar: foo\npotato: badayda",
-			},
-			expectedValue: `apiVersion: v1
-kind: Service
-metadata:
-  name: bind-udp
-  namespace: tanzu-dns
-  labels:
-    app.kubernetes.io/name: external-dns
-    foo: bar
-    bar: foo
-    potato: badayda
+    app.kubernetes.io/name: external-dnses
   annotations:
     # NOTE: this only works on 1.19.1+vmware.1+, but not prior
     ## This annotation will be ignored on other cloud providers
@@ -93,10 +50,10 @@ spec:
 `,
 		},
 		{
-			name: "Merge map (inject line comment)",
+			name: "Math Scalar Node - integer",
 			args: args{
-				query: "metadata.labels",
-				value: "foo: bar\nbar: foo\npotato: badayda # sometimes encountered in the northeast",
+				query: "spec.ports[1].port",
+				value: "53",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -105,9 +62,6 @@ metadata:
   namespace: tanzu-dns
   labels:
     app.kubernetes.io/name: external-dns
-    foo: bar
-    bar: foo
-    potato: badayda # sometimes encountered in the northeast
   annotations:
     # NOTE: this only works on 1.19.1+vmware.1+, but not prior
     ## This annotation will be ignored on other cloud providers
@@ -122,7 +76,7 @@ spec:
       protocol: UDP
       targetPort: dns-udp
     - name: dns-tcp
-      port: 53
+      port: 106
       protocol: TCP
       targetPort: dns-tcp
   # add some fake boolean values for testing
@@ -132,49 +86,13 @@ spec:
 `,
 		},
 		{
-			name: "Merge map (with line comment)",
+			name: "Math Scalar Node - true boolean with false boolean",
 			args: args{
-				query: "metadata.labels",
-				value: `app.kubernetes.io/name: "%s" # test`,
+				query: "spec.boolTest.case0",
+				value: "true",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
-metadata:
-  name: bind-udp
-  namespace: tanzu-dns
-  labels:
-    app.kubernetes.io/name: external-dns # test
-  annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
-    ## This annotation will be ignored on other cloud providers
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-spec:
-  selector:
-    app.kubernetes.io/name: external-dns
-  type: LoadBalancer
-  ports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: dns-udp
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: dns-tcp
-  # add some fake boolean values for testing
-  boolTest:
-    case0: false
-    case1: true
-`,
-		},
-		{
-			name: "Format Scalar Node (only type accepted for format action)",
-			args: args{
-				query: "kind",
-				value: "My%s",
-			},
-			expectedValue: `apiVersion: v1
-kind: MyService
 metadata:
   name: bind-udp
   namespace: tanzu-dns
@@ -204,48 +122,10 @@ spec:
 `,
 		},
 		{
-			name: "Format Scalar Node Key",
+			name: "Math Scalar Node - false boolean with false boolean",
 			args: args{
-				query: "spec.ports~",
-				value: "s%s",
-			},
-			expectedValue: `apiVersion: v1
-kind: Service
-metadata:
-  name: bind-udp
-  namespace: tanzu-dns
-  labels:
-    app.kubernetes.io/name: external-dns
-  annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
-    ## This annotation will be ignored on other cloud providers
-    service.beta.kubernetes.io/aws-load-balancer-type: nlb
-spec:
-  selector:
-    app.kubernetes.io/name: external-dns
-  type: LoadBalancer
-  sports:
-    - name: dns-udp
-      port: 53
-      protocol: UDP
-      targetPort: dns-udp
-    - name: dns-tcp
-      port: 53
-      protocol: TCP
-      targetPort: dns-tcp
-  # add some fake boolean values for testing
-  boolTest:
-    case0: false
-    case1: true
-`,
-		},
-		{
-			// Found that the '%s' cannot be unquoted at line start, or yaml cannot unmarshal
-			// The quotation happens below in value via escaped double-quotes
-			name: "Format Scalar Node in Array with head, line, foot comments",
-			args: args{
-				query: "spec.ports[0].name",
-				value: "# head\n\"%s-port\" # line\n# foot",
+				query: "spec.boolTest.case0",
+				value: "false",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -263,10 +143,118 @@ spec:
     app.kubernetes.io/name: external-dns
   type: LoadBalancer
   ports:
-    - name: dns-udp-port # line
-      # foot
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Math Scalar Node - true boolean with true boolean",
+			args: args{
+				query: "spec.boolTest.case1",
+				value: "true",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: true
+`,
+		},
+		{
+			name: "Math Scalar Node - false boolean with true boolean",
+			args: args{
+				query: "spec.boolTest.case1",
+				value: "false",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
+      port: 53
+      protocol: UDP
+      targetPort: dns-udp
+    - name: dns-tcp
+      port: 53
+      protocol: TCP
+      targetPort: dns-tcp
+  # add some fake boolean values for testing
+  boolTest:
+    case0: false
+    case1: false
+`,
+		},
+		{
+			name: "Math Scalar Node - string (with comments)",
+			args: args{
+				query: "metadata.annotations['service.beta.kubernetes.io/aws-load-balancer-type']",
+				value: "# head\ns #line\n# foot",
+			},
+			expectedValue: `apiVersion: v1
+kind: Service
+metadata:
+  name: bind-udp
+  namespace: tanzu-dns
+  labels:
+    app.kubernetes.io/name: external-dns
+  annotations:
+    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    ## This annotation will be ignored on other cloud providers
+    service.beta.kubernetes.io/aws-load-balancer-type: nlbs #line
+    # foot
 
-      # head
+    # head
+spec:
+  selector:
+    app.kubernetes.io/name: external-dns
+  type: LoadBalancer
+  ports:
+    - name: dns-udp
       port: 53
       protocol: UDP
       targetPort: dns-udp
@@ -281,5 +269,6 @@ spec:
 `,
 		},
 	}
-	tests.runTests(t, "merge")
+
+	tests.runTests(t, "math")
 }
