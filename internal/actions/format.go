@@ -11,11 +11,12 @@ import (
 )
 
 func format(formatStr string, v ...interface{}) string {
-	for i := range v {
-		for _, t := range []string{"%v", "%h", "%l", "%f"} {
-			v[i] = strings.ReplaceAll(v[i].(string), t, "")
-			formatStr = strings.ReplaceAll(formatStr, t, fmt.Sprintf("%%[%d]v", i+1))
+	for i, t := range []string{"%v", "%l", "%h", "%f"} {
+		for j := range v {
+			v[j] = strings.ReplaceAll(v[j].(string), t, "")
 		}
+
+		formatStr = strings.ReplaceAll(formatStr, t, fmt.Sprintf("%%[%d]v", i+1))
 	}
 
 	v = append(v, "")
