@@ -1,39 +1,47 @@
 [Back to Table of Contents](../documentation.md)
 
-## Overlay Qualifiers
+## Overlay qualifiers
 
-Overlay Qualifiers are a means to further refine/qualify when an overlay is applied to a YAML document within a YAML file path.  Currently `yot` has two kinds of qualifiers, `documentQuery` and `documentIndex`.  These can be used together or separately, or not at all.
+Overlay qualifiers refine/qualify when an overlay is applied to a YAML document within a YAML file path.  
+
+The Yaml Overlay Tool `Yot` has two kinds of qualifiers that can be used together, separately, or not at all.
+
+* `documentQuery`
+* `documentIndex` 
 
 
-### documentQuery Overlay Qualifier
+### documentQuery overlay qualifier
 
-The `documentQuery` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yamlFiles.path`, but cannot be used under the `documents` key.  The purpose of a `documentQuery` is to qualify an overlay operation by checking for a value or multiple values contained in a YAML document within a file.
+The `documentQuery` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yamlFiles.path`. It cannot be used under the `documents` key.  The purpose of a `documentQuery` is to qualify an overlay operation by checking for a value or multiple values contained in a YAML document within a file.
 
-Think of the `documentQuery` as groups of conditions that must be met before applying this overlay to the YAML document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
+The `documentQuery` results include groups of conditions that must be met before applying this overlay to the YAML document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
 
 The `documentQuery` key is a list/array which contains a list of the following top-level keys:
 
+* documentQuery Top-level
+* documentQuery conditions
 
-#### documentQuery Top-level keys
 
-| Key | Description | Type |
+#### documentQuery top-level keys
+
+| **Key** | **Description** | **Type** |
 | --- | --- | --- |
-| conditions | A grouping of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or many `conditions` groups.  Each list/array of `conditions` contains a list/array of key/value pairs that must all return valid matches with expected values prior to qualifying application of an overlay. Each group of `conditions` is treated as an implicit "or", while the key/value conditions in each grouping is treated as an implicit "and". | list/array |
+| Conditions | A group of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or more `conditions` groups.  Each list/array of `conditions` contain a list/array of key/value pairs that must all return valid matches with expected values prior to qualifying the application of an overlay. Each group of `conditions` is treated as an implicit "or", while the key/value conditions in each grouping is treated as an implicit "and". | List/array |
 
 
 ##### documentQuery conditions keys
 
-| Key | Description | Type |
+| **Key** | **Description** | **Type** |
 | --- | --- | --- |
-| key | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | string |
-| value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action will be applied to a document. | string |
+| Key | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | String |
+| Value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action is applied to a document. | String |
 
 
-#### documentQuery Examples
+#### documentQuery examples
 
-The following example demonstrates use of `commonOverlays` with a `documentQuery` to qualify when the overlay will be applied.  All key/value pairs within each `conditions` item would have to contain a valid matched result within the YAML document prior to the overlay's application.  
+The following example demonstrates use of `commonOverlays` with a `documentQuery` to qualify when the overlay will be applied. This allows you a great deal of flexibility on when to apply overlays. All key/value pairs within each `conditions` item has to contain a valid matched result within the YAML document prior to the overlay's application.  
 
-Think of each grouping of `conditions` as "match this" or "match this" (implicit "or").  Think of each condition within a group of `conditions` as "match this" and "match this" (implicit "and").  This allows you a great deal of flexibility on when to apply overlays. 
+Think of each group of `conditions` as "match this" or "match this" (implicit "or").  Think of each condition within a group of `conditions` as "match this" and "match this" (implicit "and").  
 
 ```yaml
 commonOverlays:
@@ -60,7 +68,7 @@ commonOverlays:
       value: cool-app
 ```
 
-The following example demonstrates use of multiple `documentQuery` groupings.  Any single one of these key/value conditions groups would need to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this".
+The following example demonstrates use of multiple `documentQuery` groups.  Any single one of these key/value conditions groups have to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this" (implicit "or").
 
 ```yaml
 commonOverlays:
@@ -77,9 +85,9 @@ commonOverlays:
       value: Service
 ```
 
-#### documentIndex Overlay Qualifier
+#### documentIndex overlay qualifier
 
-The `documentIndex` qualifier can be used on the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `documentIndex` is to qualify an overlay by specifying which specific YAML documents within a file should receive the overlay.  The `documentIndex` is a list, and should be expressed as:
+The `documentIndex` qualifier is used on the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `documentIndex` is to qualify an overlay by specifying which specific YAML documents within a file should receive the overlay.  The `documentIndex` is a list, and should be expressed as:
 
 ```yaml
 documentIndex: [0,1,3]
@@ -95,7 +103,7 @@ documentIndex:
 ```
 
 
-#### Instructions File Full-Specification Example
+#### Instructions File full-specification example
 
 ```yaml
 ---
