@@ -33,12 +33,7 @@ func MergeNode(nodes ...*yaml.Node) error {
 	return nil
 }
 
-func merge(o, n *yaml.Node) error {
-	if o.Kind != n.Kind && o.Kind != 0 {
-		// are both originalValue and newValue the same 'Kind'?
-		return ErrMergeMustBeOfSameKind
-	}
-
+func merge(o, n *yaml.Node, keyName ...string) error {
 	switch o.Kind {
 	case yaml.DocumentNode:
 		return mergeDocument(o, n)
@@ -47,7 +42,7 @@ func merge(o, n *yaml.Node) error {
 	case yaml.SequenceNode:
 		return mergeArray(o, n)
 	case yaml.ScalarNode:
-		mergeScalar(o, n)
+		mergeScalar(o, n, keyName...)
 	case yaml.AliasNode:
 		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
 	}
@@ -57,9 +52,9 @@ func merge(o, n *yaml.Node) error {
 
 func mergeDocument(o, n *yaml.Node) error {
 	if o.Content != nil && n.Content != nil {
-		mergeComments(o, n)
+		mergeComments(o, n, o.Value)
 
-		if err := merge(o.Content[0], n.Content[0]); err != nil {
+		if err := merge(o.Content[0], n.Content[0], o.Value); err != nil {
 			return err
 		}
 	}
@@ -68,25 +63,33 @@ func mergeDocument(o, n *yaml.Node) error {
 }
 
 func mergeMap(o, n *yaml.Node) error {
-	if n.Content == nil {
-		return nil
-	}
-
 	for ni := 0; ni < len(n.Content)-1; ni += 2 {
 		resultFound := false
 
 		for oi := 0; oi < len(o.Content)-1; oi += 2 {
-			if o.Content[oi].Value == n.Content[ni].Value {
-				resultFound = true
+			var formatKey bool
 
-				mergeComments(o.Content[oi], n.Content[ni])
-
-				if err := merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
-					return err
+			if formatKey = checkForMarkers(n.Content[ni].Value); !formatKey {
+				if o.Content[oi].Value != n.Content[ni].Value {
+					continue
 				}
+			}
 
+			resultFound = true
+
+			keyName := o.Content[oi].Value
+
+			mergeComments(o.Content[oi], n.Content[ni], keyName)
+
+			if err := merge(o.Content[oi+1], n.Content[ni+1], keyName); err != nil {
+				return err
+			}
+
+			if !formatKey {
 				break
 			}
+
+			mergeScalar(o.Content[oi+1], n.Content[ni], keyName)
 		}
 
 		if !resultFound {
@@ -101,7 +104,7 @@ func mergeMap(o, n *yaml.Node) error {
 
 func mergeArray(o, n *yaml.Node) error {
 	if o.Content != nil && n.Content != nil {
-		mergeComments(o, n)
+		mergeComments(o, n, o.Value)
 
 		if err := addNode(o, n.Content...); err != nil {
 			return err
@@ -111,32 +114,40 @@ func mergeArray(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeScalar(o, n *yaml.Node) {
+func mergeScalar(o, n *yaml.Node, keyName ...string) {
 	hc := strings.TrimPrefix(o.HeadComment, "#")
 	lc := strings.TrimPrefix(o.LineComment, "#")
 	fc := strings.TrimPrefix(o.FootComment, "#")
 
-	mergeComments(o, n)
+	mergeComments(o, n, keyName...)
 
-	o.Value = format(n.Value, o.Value, lc, hc, fc)
+	if keyName == nil {
+		keyName = []string{""}
+	}
+
+	o.Value = format(n.Value, o.Value, lc, hc, fc, keyName[0])
 }
 
-func mergeComments(o, n *yaml.Node) {
+func mergeComments(o, n *yaml.Node, keyName ...string) {
 	lc := strings.TrimPrefix(o.LineComment, "#")
 	hc := strings.TrimPrefix(o.HeadComment, "#")
 	fc := strings.TrimPrefix(o.FootComment, "#")
+
+	if keyName == nil {
+		keyName = []string{""}
+	}
 
 	switch {
 	case n.HeadComment != "":
-		o.HeadComment = format(n.HeadComment, o.Value, lc, hc, fc)
+		o.HeadComment = format(n.HeadComment, o.Value, lc, hc, fc, keyName[0])
 
 		fallthrough
 	case n.LineComment != "":
-		o.LineComment = format(n.LineComment, o.Value, lc, hc, fc)
+		o.LineComment = format(n.LineComment, o.Value, lc, hc, fc, keyName[0])
 
 		fallthrough
 	case n.FootComment != "":
-		o.FootComment = format(n.FootComment, o.Value, lc, hc, fc)
+		o.FootComment = format(n.FootComment, o.Value, lc, hc, fc, keyName[0])
 	}
 }
 
