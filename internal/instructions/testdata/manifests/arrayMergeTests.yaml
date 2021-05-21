@@ -1,0 +1,20 @@
+---
+apple:
+  sauce:
+    - mushy
+    - sweet
+    - tasty
+    - goodness
+  juice:
+    - brands:
+        - name: apple & apollo
+          price: high
+        - name: squelch's
+          price: medium
+        - name: store
+          price: low
+apples:
+  - cortland
+  - granny smith
+  - honey crisp
+
