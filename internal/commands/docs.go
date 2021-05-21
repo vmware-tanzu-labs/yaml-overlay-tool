@@ -52,7 +52,14 @@ const (
 
 	HelpVerbose = "Verbose log-level stdout, equivalent to '--log-level debug'"
 
-	HelpLogLevel = "Log-level to display to stdout, one of: critical, error, warning, notice, info, or debug"
+	HelpLogLevel = `Log-level to display to stdout, one of: 
+	CRITICAL: {"critical", "crit", "c"},
+	ERROR:    {"error", "err", "e"},
+	WARNING:  {"warning", "warn", "w"},
+	NOTICE:   {"notice", "note", "n"},
+	INFO:     {"info", "i"},
+	DEBUG:    {"debug", "d", "verbose", "v"} * used if no argument is provided
+`
 
 	HelpInstructionsFile = "Path to the instructions file (required)"
 
@@ -73,6 +80,17 @@ const (
 	*/
 
 	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
+
+	HelpOutputStyle = `style to be used for rendering final documents.
+multiple values can be provided to achieve the desired result, valid values are:
+	NORMAL:       {"normal", "n"},
+	TAGGED:       {"tagged", "tag", "t"},
+	DOUBLEQUOTED: {"doubleQuoted", "doubleQuote", "double", "dq"},
+	SINGLEQUOTED: {"singleQuoted", "singleQoute", "single", "sq"},
+	LITERAL:      {"literal", "l"},
+	FOLDED:       {"folded", "fold", "fo"},
+	FLOW:         {"flow", "fl"}
+`
 
 	CompletionUse   = "completion [bash|zsh|fish|powershell]"
 	CompletionShort = "Generate shell auto-completion scripts"

@@ -4,28 +4,29 @@
 package commands
 
 import (
+	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
+	"github.com/thediveo/enumflag"
 )
 
 func (rc *RootCommand) initializeGlobalFlags(rootCmd *cobra.Command) {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	rootCmd.Flags().BoolVarP(
-		&rc.Options.Verbose,
-		"verbose",
-		"V",
-		false,
-		HelpVerbose,
-	)
+	logMap := map[logging.Level][]string{
+		logging.CRITICAL: {"critical", "crit", "c"},
+		logging.ERROR:    {"error", "err", "e"},
+		logging.WARNING:  {"warning", "warn", "w"},
+		logging.NOTICE:   {"notice", "note", "n"},
+		logging.INFO:     {"info", "i"},
+		logging.DEBUG:    {"debug", "d", "verbose", "v"},
+	}
 
-	rootCmd.Flags().StringVarP(
-		&rc.Options.LogLevel,
+	rootCmd.Flags().VarP(
+		enumflag.New(&rc.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
 		"log-level",
-		"l",
-		"",
+		"v",
 		HelpLogLevel,
 	)
+
+	rootCmd.Flags().Lookup("log-level").NoOptDefVal = "debug"
 
 	rootCmd.Flags().StringVarP(
 		&rc.Options.InstructionsFile,
@@ -66,4 +67,13 @@ func (rc *RootCommand) initializeGlobalFlags(rootCmd *cobra.Command) {
 		2,
 		HelpIndentLevel,
 	)
+
+	rootCmd.Flags().VarP(
+		enumflag.NewSlice(&rc.Options.Styles, "style", rc.Options.Styles.FlagMap(), enumflag.EnumCaseInsensitive),
+		"output-style",
+		"S",
+		HelpOutputStyle,
+	)
+
+	rootCmd.Flags()
 }

@@ -3,11 +3,17 @@
 
 package instructions
 
+import (
+	"github.com/op/go-logging"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+)
+
 type Config struct {
 	Verbose          bool
-	LogLevel         string
+	LogLevel         logging.Level
 	InstructionsFile string
 	OutputDir        string
 	StdOut           bool
 	Indent           int
+	Styles           actions.Styles
 }

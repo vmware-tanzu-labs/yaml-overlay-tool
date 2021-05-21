@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
@@ -61,6 +62,8 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 
 	for _, f := range yf.Files {
 		for _, node := range f.Nodes {
+			actions.SetStyle(cfg.Styles, node)
+
 			err = ye.Encode(node)
 			if err != nil {
 				return fmt.Errorf("unable to marshal final document %s, error: %w", f.Path, err)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
@@ -23,8 +24,11 @@ type RootCommand Command
 
 func New() *RootCommand {
 	return &RootCommand{
-		Log:     logging.MustGetLogger("cmd"),
-		Options: &instructions.Config{},
+		Log: logging.MustGetLogger("cmd"),
+		Options: &instructions.Config{
+			LogLevel: logging.ERROR,
+			Styles:   actions.Styles{actions.NormalStyle},
+		},
 	}
 }
 
@@ -80,21 +84,10 @@ func (rc *RootCommand) SetupLogging(cmd *cobra.Command, args []string) {
 		`%{color}%{time:15:04:05} [%{level}]%{color:reset} %{message}`,
 	)
 	backend := logging.AddModuleLevel(
-		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format))
+		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format),
+	)
 
-	if rc.Options.LogLevel != "" {
-		level, err := logging.LogLevel(rc.Options.LogLevel)
-		if err != nil {
-			rc.Log.Error(err)
-		}
-
-		backend.SetLevel(level, "")
-	} else if rc.Options.Verbose {
-		backend.SetLevel(logging.DEBUG, "")
-	} else {
-		backend.SetLevel(logging.ERROR, "")
-	}
-
+	backend.SetLevel(rc.Options.LogLevel, "")
 	logging.SetBackend(backend)
 }
 
