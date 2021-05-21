@@ -3,7 +3,7 @@
 ## processed first on each file
 commonOverlays:
   - name: "add a label to certain yaml documents with refined criteria"
-    query: spec.selector['app.kubernetes.io/name']
+    query: spec.selector['app.kubernetes.io/name']~
     value: app.kubernetes.io/Name  # +workload:Name:default="c-m":type=string
     action: replace
     # qualifier to further refine when this overlay is applied
