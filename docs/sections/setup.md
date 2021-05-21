@@ -1,16 +1,14 @@
 [Back to Table of Contents](../documentation.md)
 
 
-## Installation and Setup
+## Installation and setup
 
-The compiled `yot` binary can be downloaded from the repository's releases page [here](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases).
+You can download the compiled YAML Overlay Tool `Yot` binary from the repository's releases page [here](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases).
 
-Be sure to download the appropriate release for your system's architecture and Operating System.
+* Be sure to download the appropriate release for your system's architecture and operating system.
+* It is recommended to move the binary into your path, such as `/usr/local/bin/yot` or `/usr/bin` for Linux and Unix-based systems.
 
-On Linux and Unix based systems it is recommended to move the binary into your path, such as `/usr/local/bin/yot` or `/usr/bin`.
-
-Once the `yot` binary is installed to a path in your system's `$PATH` you can then run the `yot` command.
-
+Run the `Yot` command once the `Yot` binary is installed to a path in your system's `$PATH`
 
 [Back to Table of Contents](../documentation.md)  
 [Next Up: Command Line Usage and Overview](usage.md)
