@@ -6,21 +6,16 @@ package actions
 import (
 	"fmt"
 
-	"github.com/jinzhu/copier"
+	"github.com/ulule/deepcopier"
 	"gopkg.in/yaml.v3"
 )
 
 func ReplaceNode(original, replaceValue *yaml.Node) error {
-	options := copier.Option{
-		IgnoreEmpty: false,
-		DeepCopy:    true,
-	}
-
 	ov := *original
 
 	mergeComments(&ov, replaceValue)
 
-	if err := copier.CopyWithOption(original, replaceValue, options); err != nil {
+	if err := deepcopier.Copy(replaceValue).To(original); err != nil {
 		return fmt.Errorf("failed to replace value: %w", err)
 	}
 

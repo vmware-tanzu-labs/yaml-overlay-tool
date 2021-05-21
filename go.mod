@@ -11,6 +11,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/thediveo/enumflag v0.10.1
+	github.com/ulule/deepcopier v0.0.0-20200430083143-45decc6639b6
 	github.com/vmware-labs/yaml-jsonpath v0.2.0
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c

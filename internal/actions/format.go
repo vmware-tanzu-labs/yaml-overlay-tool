@@ -25,8 +25,10 @@ func sanitizeNode(n ...*yaml.Node) {
 			continue
 		}
 
-		if nv.Kind == yaml.DocumentNode|yaml.MappingNode|yaml.SequenceNode|yaml.AliasNode {
+		switch nv.Kind {
+		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
 			sanitizeNode(nv.Content...)
+		case yaml.ScalarNode:
 		}
 
 		values := []*string{&nv.Value, &nv.HeadComment, &nv.LineComment, &nv.FootComment}
