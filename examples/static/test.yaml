@@ -92,7 +92,7 @@ yamlFiles:  # what to overlay onto
       - name: "add 1 to service port number (integer concatenation test)"
         query: spec.ports[0].port
         value: 1  # expect port 54 to come out (yes this is weird)
-        action: merge
+        action: combine
       - name: "add some new labels to a manifest"
         query: metadata.labels
         value:

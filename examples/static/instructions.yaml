@@ -26,7 +26,6 @@ yamlFiles:  # what to overlay onto
     overlays:  # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
         query: metadata.annotations
-        value: {}
         action: "delete"
       - name: "add in a new label"
         query: metadata.labels
