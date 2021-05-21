@@ -1,0 +1,23 @@
+---
+commonOverlays:
+  - name: insert line comments via merge
+    query:
+      - metadata.annotations['my.custom.annotation/fake']
+      - metadata.annotations['service.beta.kubernetes.io/aws-load-balancer-type']
+    value: "%v" # insert a line comment
+    action: merge
+  - name: insert a line comment via replace
+    query: spec.containers[0].image
+    value: new-image:latest # old value was: %v
+    action: replace
+  - name: insert head, foot, and line comments via merge
+    query: metadata.labels
+    value:
+      # insert a head comment
+      app.kubernetes.io/owner: Jeff Smith  # insert a line comment
+      app.kubernetes.io/purpose: static-webpage  # insert another line comment
+      # insert a foot comment
+    action: merge
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests
