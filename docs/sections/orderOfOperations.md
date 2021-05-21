@@ -62,4 +62,4 @@ If only a defaults.yaml value file was passed, then the output will be placed in
 
 
 [Back to Table of Contents](../documentation.md)  
-[Next Up: Kubernetes Common Use-Cases and Patterns](kubernetesUseCases.md)
+[Next Up: Output Directory Structure](outputDirStructure.md)

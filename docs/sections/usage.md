@@ -24,6 +24,11 @@ yot -i instructions.yaml -o /tmp/output
 ### Options
 
 ```
+Available Commands:
+  completion  Generate shell auto-completion scripts
+  help        Help about any command
+
+Flags:
   -h, --help                      help for yot
   -I, --indent-level int          Number of spaces to be used for indenting YAML output (min: 2, max: 9) (default 2)
   -i, --instructions string       Path to instructions file (required)

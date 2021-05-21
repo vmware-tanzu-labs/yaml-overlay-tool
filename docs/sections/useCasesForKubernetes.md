@@ -7,7 +7,7 @@ The following set of examples will help you quickly achieve common tasks in the 
 All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
 
 ```bash
-yot -i examples/kubernetes/< example you wish to run>.yaml -o < desired output path >
+yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output path >
 ```
 
 <br/>
@@ -92,61 +92,66 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
 
 
 ## Prepend a Private Registry URL to All Container Images
 
-In this example we use the `format` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.
+In this example we use the `merge` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.  
+
+We also demonstrate use of the `%v` format marker by injecting the original value into a new line comment.
 
 ```yaml
+---
 # privateContainerRegistry.yaml
 commonOverlays:
   - name: Set our private container registry in manifests
     query: ..image
-    value: my-private-reg/%s
-    action: format
+    value: my-private-reg/%v  # old value was: %v
+    action: merge
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
 
 
 ## Modify the Name of a Label's Key
 
-In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `format` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
+In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `merge` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
 
 ```yaml
+---
 # formatLabelKey.yaml
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~
-    value: app.kubernetes.io/%s
-    action: format
+    value: app.kubernetes.io/%v
+    action: merge
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
 
 ## Replace the Name of a Label's Key
 
 In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
 
 ```yaml
+---
 # replaceLabelKey.yaml
 commonOverlays:
   - name: Replace name label's key to my-new-label
     query: metadata.labels.name~
-    value: my-new-label
+    value: my-new-label  # old label key was: %v
     action: replace
 
 yamlFiles:
@@ -154,8 +159,8 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
 
 
 ## Remove All Annotations
@@ -174,8 +179,8 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
 
 
 ## Remove Annotations from Specific Kubernetes Object Types
@@ -203,11 +208,18 @@ yamlFiles:
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
 
 
 ## Inject Comments
+
+Sometimes you would like to add some additional comments to denote why you did something.  Additionally, to document what something used to be set to in case you want to restore it to a previous state later.
+
+There are other times where you want to add comments as annotations for another application's consumption.
+
+Yot **can** inject comments!
+
 ```yaml
 ---
 # injectComments.yaml
@@ -216,27 +228,27 @@ commonOverlays:
     query:
       - metadata.annotations['my.custom.annotation/fake']
       - metadata.annoations['service.beta.kubernetes.io/aws-load-balancer-type']
-    value: "" # inject a line comment
+    value: "%v" # inject a line comment
     action: merge
-  - name: Inject a line comment via format
+  - name: Inject a line comment via replace
     query: spec.containers[0].image
-    value: "%s" # inject a line comment
-    action: format
-  - name: Inject header, footer, and line comments via merge
+    value: new-image:latest # old value was: %v
+    action: replace
+  - name: Inject head, foot, and line comments via merge
     query: metadata.labels
     value:
-      # inject a header comment
+      # inject a head comment
       app.kubernetes.io/owner: Jeff Smith  # inject a line comment
       app.kubernetes.io/purpose: static-webpage  # inject another line comment
-      # inject a footer comment
+      # inject a foot comment
     action: merge
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: ./examples/kubernetes/manifests
 ```
 
-Now apply the changes by generating a new set of YAML files:
-`yot -i ./examples/kubernetes/injectComments.yaml -o /tmp/new`
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/injectComments.yaml -o /tmp/new`
 
 
 [Back to Table of Contents](../documentation.md)  

@@ -2,8 +2,8 @@
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~
-    value: app.kubernetes.io/%s
-    action: format
+    value: app.kubernetes.io/%v
+    action: merge
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream

@@ -4,8 +4,8 @@
 
 There are four types of actions that you can use to apply changes to a YAML document within Yot.
 
+* **Combine**
 * **Delete**
-* **Format**
 * **Merge**
 * **Replace**
 
@@ -18,47 +18,31 @@ There are two types of actions that you can use to apply changes to a YAML docum
 
 ## Overlay actions
 
-### 1. Delete
+
+### 1. Combine
+
+The `combine` action lets a Yot user combine booleans with booleans, integers with integers, and strings with strings.  The product of this action is a new value.
+
+1. Combining booleans produces the result of boolean addition.
+1. Combining integers produces the result of integer addition.
+1. Combining strings produces the result of string concatenation.
+
+
+### 2. Delete
 
 The `delete` action lets a Yot user remove unwanted pieces of a YAML document.   
 
 
-### 2. Format
-
-The `format` action lets a Yot user do something with data looked up by a JSONPath query, where the returned value is represented by `%s`.  You can use `format` to put text before an existing value, after an existing value, or both before and after the existing value.  
-
->**NOTE:** To use `%s` at the start of the `value` field, wrap the value in double-quotation marks. For example,`"%sSomeNewText"`.
-
-
-#### Format usage example
-
-In the following example, the `name` label is now called `app.kubernetes.io/name`.
-
-```yaml
-commonOverlays:
-  - name: Update all 'name' labels to 'app.kubernetes.io/name'
-    query: metadata.labels.name~
-    value: app.kubernetes.io/%s
-    action: format
-
-yamlFiles:
-  - name: Pile of YAML files
-    path: /tmp/yamls
-```
-
-
-
 ### 3. Merge
 
-The `merge` action lets a Yot user merge new data with existing data. You'll find this action works best with lists/arrays and dictionaries/maps, and that the `merge` behavior differs according to the type of data being merged.
+The `merge` action lets a Yot user merge new data with existing data, and is primarily used for performing a deep merge on a map/dictionary and arrays.  
 
-See [Details on How Data Types are Handled with Merge Actions](mergeTypeFunctionality.md).
+However, `merge` can also be used to format string data with some special [Format Markers](formatMarkers.md).
 
 
 ### 4. Replace
 
 The `replace` action lets a Yot user replace existing data with new data.
-
 
 
 ## On Missing Actions

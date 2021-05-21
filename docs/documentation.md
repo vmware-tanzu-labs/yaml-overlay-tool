@@ -15,7 +15,8 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 1. [Overlay Qualifiers](sections/qualifiers.md)
 1. [Comment Preservation and Injection](sections/comments.md)
 1. [Order of Operations/Processing](sections/orderOfOperations.md)
-1. [Kubernetes Common Use-Cases and Patterns](sections/kubernetesUseCases.md)
+1. [Output Directory Structure](sections/outputDirStructure.md)
+1. [Common Use-Cases and Patterns for Kubernetes](sections/useCasesForKubernetes.md)
 1. [Interactive Tutorials and Learning Paths](sections/tutorials.md)
 
 

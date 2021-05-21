@@ -83,7 +83,7 @@ yamlFiles:  # what to overlay onto
       - name: "add some more text to existing label (string concatenation test)"
         query: metadata.labels['app.kubernetes.io/name']
         value: "ing"
-        action: merge
+        action: combine
       - name: "add to a sequence (array extension)"
         query: spec.accessModes
         value:
