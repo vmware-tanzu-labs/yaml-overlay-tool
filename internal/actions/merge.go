@@ -13,8 +13,10 @@ import (
 )
 
 var (
+	// ErrMergeMustBeOfSameKind occurs when attempting to merge two different types.
 	ErrMergeMustBeOfSameKind = errors.New("both values must be of same type to use 'merge' action")
-	ErrMergeUnsupportedType  = errors.New("not a supported yaml type for merging")
+	// ErrMergeUnsupportedType occurs when an unsupported YAML type is attempted to be merged.
+	ErrMergeUnsupportedType = errors.New("not a supported yaml type for merging")
 )
 
 func MergeNode(nodes ...*yaml.Node) error {

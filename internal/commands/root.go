@@ -13,6 +13,7 @@ import (
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
+// ErrMissingRequired occurs when a required flag is not passed.
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
 type Command struct {

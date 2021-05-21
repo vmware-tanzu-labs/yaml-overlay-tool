@@ -14,7 +14,9 @@ import (
 )
 
 var (
-	ErrInvalidPathSyntax  = errors.New("invalid path syntax")
+	// ErrInvalidPathSyntax occurs when a fully-qualified dot-notation path is not passed.
+	ErrInvalidPathSyntax = errors.New("invalid path syntax")
+	// ErrWildCardNotAllowed occurs when a '*' symbol is passed in the query.
 	ErrWildCardNotAllowed = errors.New("wildcard notation not allowed for build")
 )
 

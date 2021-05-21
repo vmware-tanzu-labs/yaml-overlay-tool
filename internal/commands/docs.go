@@ -4,7 +4,8 @@
 package commands
 
 const (
-	Version = "v0.1.0"
+	// Version of YAML Overlay Tool.
+	Version = "unstable"
 
 	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
 
