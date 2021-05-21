@@ -146,7 +146,7 @@ func addNode(o *yaml.Node, nv ...*yaml.Node) error {
 		DeepCopy:    true,
 	}
 
-	temp := make([]*yaml.Node, 2)
+	temp := make([]*yaml.Node, len(nv))
 
 	if err := copier.CopyWithOption(&temp, nv, options); err != nil {
 		return fmt.Errorf("failed to insert value during merge: %w", err)

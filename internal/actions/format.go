@@ -27,6 +27,10 @@ func format(formatStr string, v ...interface{}) string {
 
 func sanatizeNode(n ...*yaml.Node) {
 	for _, nv := range n {
+		if nv == nil {
+			continue
+		}
+
 		switch nv.Kind {
 		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
 			nv.Value = format(nv.Value, "", "", "", "")
