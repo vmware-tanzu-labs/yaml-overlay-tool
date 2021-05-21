@@ -4,9 +4,9 @@ commonOverlays:
     query: metadata.labels.name~
     value: app.kubernetes.io/%v  # the old key was %v
     action: merge
-  - name: 
+  - name:
     query: spec.selector
-    value: 
+    value:
       app.kubernetes.io/%k: "%v"  # the old key was %k
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream

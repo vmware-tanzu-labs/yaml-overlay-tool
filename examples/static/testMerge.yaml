@@ -3,6 +3,6 @@ commonOverlays:
   - name: "test"
     query: metadata.labels
     value:
-      "app.kubernetes.io/%k-%v": "%v" # +workload:%k:default="%v":type=string
+      "app.kubernetes.io/%k-%v": "%v"  # +workload:%k:default="%v":type=string
 yamlFiles:
   - path: "examples/kubernetes/manifests"

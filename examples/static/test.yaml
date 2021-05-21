@@ -134,5 +134,5 @@ yamlFiles:  # what to overlay onto
       - name: "Replace image name"
         query: "..image"
         value:
-          "registry-harbor.vmware.com/docker-hub-cache/%v" # %v
+          "registry-harbor.vmware.com/docker-hub-cache/%v"  # %v
         action: merge
