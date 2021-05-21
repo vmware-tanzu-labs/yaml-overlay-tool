@@ -14,7 +14,7 @@ The Yaml Overlay Tool `Yot` has two kinds of qualifiers that can be used togethe
 
 The `documentQuery` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yamlFiles.path`. It cannot be used under the `documents` key.  The purpose of a `documentQuery` is to qualify an overlay operation by checking for a value or multiple values contained in a YAML document within a file.
 
-The `documentQuery` results include groups of conditions that must be met before applying this overlay to the YAML document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
+The `documentQuery` includes groups of conditions that must be met before applying this overlay to the YAML document. Only one group of `conditions` must all match prior to qualifying the application of an overlay.
 
 The `documentQuery` key is a list/array which contains a list of the following top-level keys:
 
