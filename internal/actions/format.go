@@ -5,19 +5,12 @@ package actions
 
 import (
 	"fmt"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 )
 
 func format(formatStr string, v ...interface{}) string {
-	for i, t := range []string{"%v", "%l", "%h", "%f"} {
-		for j := range v {
-			v[j] = strings.ReplaceAll(v[j].(string), t, "")
-		}
-
-		formatStr = strings.ReplaceAll(formatStr, t, fmt.Sprintf("%%[%d]v", i+1))
-	}
+	formatStr, v = sanitizeMarkers(formatStr, v...)
 
 	v = append(v, "")
 
@@ -38,7 +31,7 @@ func sanitizeNode(n ...*yaml.Node) {
 
 		values := []*string{&nv.Value, &nv.HeadComment, &nv.LineComment, &nv.FootComment}
 		for _, v := range values {
-			*v = format(*v, "", "", "", "")
+			*v = format(*v, "", "", "", "", "")
 		}
 	}
 }

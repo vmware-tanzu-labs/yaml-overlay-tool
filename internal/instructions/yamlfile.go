@@ -86,6 +86,8 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 			if err != nil {
 				return err
 			}
+
+			defer o.Close()
 		}
 
 		if _, err = output.WriteTo(o); err != nil {

@@ -6,6 +6,8 @@ metadata:
     my.custom.annotation/fake: idk
   labels:
     name: my-web-page
+    app: my-web-page
+    owner: my-web-page
   name: my-web-page
   namespace: my-web-page
 spec:
