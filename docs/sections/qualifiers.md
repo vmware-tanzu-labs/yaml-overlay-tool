@@ -26,7 +26,7 @@ The `documentQuery` key is a list/array which contains a list of the following t
 
 | **Key** | **Description** | **Type** |
 | --- | --- | --- |
-| Conditions | A group of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or more `conditions` groups.  Each list/array of `conditions` contain a list/array of key/value pairs that must all return valid matches with expected values prior to qualifying the application of an overlay. Each group of `conditions` is treated as an implicit "or", while the key/value conditions in each grouping is treated as an implicit "and". | List/array |
+| conditions | A group of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or more `conditions` groups.  Each list/array of `conditions` contain a list/array of key/value pairs that must all return valid matches with expected values prior to qualifying the application of an overlay. Each group of `conditions` is treated as an implicit "or", while the key/value conditions in each grouping is treated as an implicit "and". | List/array |
 
 
 ##### documentQuery conditions keys
