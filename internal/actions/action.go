@@ -19,7 +19,7 @@ const (
 	Replace
 	Delete
 	Format
-	Math
+	Combine
 )
 
 func (a Action) String() string {
@@ -28,7 +28,7 @@ func (a Action) String() string {
 		Merge:   "merge",
 		Replace: "replace",
 		Delete:  "delete",
-		Math:    "math",
+		Combine: "combine",
 	}
 
 	return toString[a]
@@ -48,7 +48,7 @@ func (a *Action) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		"merge":   Merge,
 		"replace": Replace,
 		"delete":  Delete,
-		"math":    Math,
+		"combine": Combine,
 	}
 
 	if toID[y] == Invalid {

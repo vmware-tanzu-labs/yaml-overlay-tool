@@ -34,9 +34,9 @@ func TestAction_String(t *testing.T) {
 			want: "replace",
 		},
 		{
-			name: "test Math String",
-			a:    actions.Math,
-			want: "math",
+			name: "test Combine String",
+			a:    actions.Combine,
+			want: "combine",
 		},
 		{
 			name: "Test invalid String",
@@ -94,10 +94,10 @@ func TestAction_UnmarshalYAML(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Unmarshal Math",
+			name: "Unmarshal Combine",
 			a:    actions.Invalid,
 			args: args{
-				unmarshal: testUnmarshal("math"),
+				unmarshal: testUnmarshal("combine"),
 			},
 			wantErr: false,
 		},
@@ -172,9 +172,9 @@ func TestAction_MarshalYAML(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "Unmarshal Math",
-			a:       actions.Math,
-			want:    "math",
+			name:    "Unmarshal Combine",
+			a:       actions.Combine,
+			want:    "combine",
 			wantErr: false,
 		},
 		{

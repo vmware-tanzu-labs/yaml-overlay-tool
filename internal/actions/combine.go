@@ -11,11 +11,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var ErrMathOnlyForScalars = errors.New("math action can only be used on scalar values")
+var ErrCombineOnlyForScalars = errors.New("combine action can only be used on scalar values")
 
-func MathNode(originalValue, newValue *yaml.Node) error {
+func CombineNode(originalValue, newValue *yaml.Node) error {
 	if originalValue.Kind != yaml.ScalarNode || newValue.Kind != yaml.ScalarNode {
-		return ErrMathOnlyForScalars
+		return ErrCombineOnlyForScalars
 	}
 
 	mergeComments(originalValue, newValue)

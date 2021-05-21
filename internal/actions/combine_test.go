@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-// contains tests for the yaml-overlay-tool 'math' action
+// contains tests for the yaml-overlay-tool 'combine' action
 
 package actions_test
 
@@ -9,12 +9,12 @@ import (
 	"testing"
 )
 
-func TestMathNode(t *testing.T) {
+func TestCombineNode(t *testing.T) {
 	t.Parallel()
 
 	tests := testCases{
 		{
-			name: "Math Scalar Node - string",
+			name: "Combine Scalar Node - string",
 			args: args{
 				query: "metadata.labels['app.kubernetes.io/name']",
 				value: "es",
@@ -50,7 +50,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - integer",
+			name: "Combine Scalar Node - integer",
 			args: args{
 				query: "spec.ports[1].port",
 				value: "53",
@@ -86,7 +86,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - true boolean with false boolean",
+			name: "Combine Scalar Node - true boolean with false boolean",
 			args: args{
 				query: "spec.boolTest.case0",
 				value: "true",
@@ -122,7 +122,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - false boolean with false boolean",
+			name: "Combine Scalar Node - false boolean with false boolean",
 			args: args{
 				query: "spec.boolTest.case0",
 				value: "false",
@@ -158,7 +158,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - true boolean with true boolean",
+			name: "Combine Scalar Node - true boolean with true boolean",
 			args: args{
 				query: "spec.boolTest.case1",
 				value: "true",
@@ -194,7 +194,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - false boolean with true boolean",
+			name: "Combine Scalar Node - false boolean with true boolean",
 			args: args{
 				query: "spec.boolTest.case1",
 				value: "false",
@@ -230,7 +230,7 @@ spec:
 `,
 		},
 		{
-			name: "Math Scalar Node - string (with comments)",
+			name: "Combine Scalar Node - string (with comments)",
 			args: args{
 				query: "metadata.annotations['service.beta.kubernetes.io/aws-load-balancer-type']",
 				value: "# head\ns #line\n# foot",
@@ -270,5 +270,5 @@ spec:
 		},
 	}
 
-	tests.runTests(t, "math")
+	tests.runTests(t, "combine")
 }
