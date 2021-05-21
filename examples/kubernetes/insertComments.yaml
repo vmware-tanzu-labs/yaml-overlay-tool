@@ -4,11 +4,11 @@ commonOverlays:
     query:
       - metadata.annotations['my.custom.annotation/fake']
       - metadata.annotations['service.beta.kubernetes.io/aws-load-balancer-type']
-    value: "%v" # insert a line comment
+    value: "%v"  # insert a line comment
     action: merge
   - name: insert a line comment via replace
     query: spec.containers[0].image
-    value: new-image:latest # old value was: %v
+    value: new-image:latest  # old value was: %v
     action: replace
   - name: insert head, foot, and line comments via merge
     query: metadata.labels

@@ -19,7 +19,7 @@ spec:
       port: 53
       protocol: UDP
       targetPort: dns-udp
-status: {} 
+status: {}
 
 ---
 kind: PersistentVolumeClaim
