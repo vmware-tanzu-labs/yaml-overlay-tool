@@ -137,4 +137,4 @@ yamlFiles:  # what to overlay onto
           # Test Comment
           "registry-harbor.vmware.com/docker-hub-cache/%s"
           # Test Foot Comment
-        action: format
+        action: merge

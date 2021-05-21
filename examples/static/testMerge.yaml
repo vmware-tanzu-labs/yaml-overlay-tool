@@ -1,0 +1,8 @@
+---
+commonOverlays:
+  - name: "test"
+    query: metadata.labels
+    value:
+      app.kubernetes.io/Name: hello%v #%v
+yamlFiles:
+  - path: "examples/manifests/test.yaml"
