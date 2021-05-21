@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/jinzhu/copier"
 	"gopkg.in/yaml.v3"
 )
 
@@ -44,9 +45,9 @@ func merge(o, n *yaml.Node) error {
 	case yaml.MappingNode:
 		return mergeMap(o, n)
 	case yaml.SequenceNode:
-		mergeArray(o, n)
+		return mergeArray(o, n)
 	case yaml.ScalarNode:
-		return mergeScalar(o, n)
+		mergeScalar(o, n)
 	case yaml.AliasNode:
 		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
 	}
@@ -67,26 +68,30 @@ func mergeDocument(o, n *yaml.Node) error {
 }
 
 func mergeMap(o, n *yaml.Node) error {
-	if o.Content != nil && n.Content != nil {
-		for ni := 0; ni < len(n.Content)-1; ni += 2 {
-			resultFound := false
+	if n.Content == nil {
+		return nil
+	}
 
-			for oi := 0; oi < len(o.Content)-1; oi += 2 {
-				if o.Content[oi].Value == n.Content[ni].Value {
-					resultFound = true
+	for ni := 0; ni < len(n.Content)-1; ni += 2 {
+		resultFound := false
 
-					mergeComments(o.Content[oi], n.Content[ni])
+		for oi := 0; oi < len(o.Content)-1; oi += 2 {
+			if o.Content[oi].Value == n.Content[ni].Value {
+				resultFound = true
 
-					if err := merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
-						return err
-					}
+				mergeComments(o.Content[oi], n.Content[ni])
 
-					break
+				if err := merge(o.Content[oi+1], n.Content[ni+1]); err != nil {
+					return err
 				}
-			}
 
-			if !resultFound {
-				o.Content = append(o.Content, n.Content[ni:ni+2]...)
+				break
+			}
+		}
+
+		if !resultFound {
+			if err := addNode(o, n.Content[ni:ni+2]...); err != nil {
+				return err
 			}
 		}
 	}
@@ -94,37 +99,62 @@ func mergeMap(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeArray(o, n *yaml.Node) {
+func mergeArray(o, n *yaml.Node) error {
 	if o.Content != nil && n.Content != nil {
 		mergeComments(o, n)
 
-		o.Content = append(o.Content, n.Content...)
+		if err := addNode(o, n.Content...); err != nil {
+			return err
+		}
 	}
-}
-
-func mergeScalar(ov, nv *yaml.Node) error {
-	mergeComments(ov, nv)
-
-	ov.Value = CondSprintf(nv.Value, ov.Value, strings.TrimPrefix(ov.LineComment, "#"))
 
 	return nil
 }
 
-func mergeComments(o, n *yaml.Node) {
+func mergeScalar(o, n *yaml.Node) {
 	hc := strings.TrimPrefix(o.HeadComment, "#")
 	lc := strings.TrimPrefix(o.LineComment, "#")
 	fc := strings.TrimPrefix(o.FootComment, "#")
 
+	mergeComments(o, n)
+
+	o.Value = format(n.Value, o.Value, lc, hc, fc)
+}
+
+func mergeComments(o, n *yaml.Node) {
+	lc := strings.TrimPrefix(o.LineComment, "#")
+	hc := strings.TrimPrefix(o.HeadComment, "#")
+	fc := strings.TrimPrefix(o.FootComment, "#")
+
 	switch {
 	case n.HeadComment != "":
-		o.HeadComment = CondSprintf(n.HeadComment, o.Value, lc, hc, fc)
+		o.HeadComment = format(n.HeadComment, o.Value, lc, hc, fc)
 
 		fallthrough
 	case n.LineComment != "":
-		o.LineComment = CondSprintf(n.LineComment, o.Value, lc, hc, fc)
+		o.LineComment = format(n.LineComment, o.Value, lc, hc, fc)
 
 		fallthrough
 	case n.FootComment != "":
-		o.FootComment = CondSprintf(n.FootComment, o.Value, lc, hc, fc)
+		o.FootComment = format(n.FootComment, o.Value, lc, hc, fc)
 	}
+}
+
+func addNode(o *yaml.Node, nv ...*yaml.Node) error {
+	options := copier.Option{
+		IgnoreEmpty: false,
+		DeepCopy:    true,
+	}
+
+	temp := make([]*yaml.Node, 2)
+
+	if err := copier.CopyWithOption(&temp, nv, options); err != nil {
+		return fmt.Errorf("failed to insert value during merge: %w", err)
+	}
+
+	sanatizeNode(temp...)
+
+	o.Content = append(o.Content, temp...)
+
+	return nil
 }
