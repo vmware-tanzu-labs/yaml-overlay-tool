@@ -60,7 +60,7 @@ spec:
       protocol: TCP
       targetPort: 443
   selector:
-    app: my-service
+    name: my-web-page
   type: LoadBalancer
 
 ```
@@ -100,7 +100,7 @@ Now apply the changes by generating a new set of YAML files:
 
 In this example we use the `merge` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.  
 
-We also demonstrate use of the `%v` format marker by injecting the original value into a new line comment.
+We also demonstrate use of the `%v` format marker by inserting the original value into a new line comment.
 
 ```yaml
 ---
@@ -130,9 +130,12 @@ In this example we will manipulate the `name` label key with `app.kubernetes.io/
 commonOverlays:
   - name: Update name label's key to app.kubernetes.io/name
     query: metadata.labels.name~
-    value: app.kubernetes.io/%v
+    value: app.kubernetes.io/%v  # the old key was %v
     action: merge
-
+  - name: 
+    query: spec.selector
+    value: 
+      app.kubernetes.io/%k: "%v"  # the old key was %k
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
     path: ./examples/kubernetes/manifests
@@ -212,35 +215,35 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
 
 
-## Inject Comments
+## insert Comments
 
 Sometimes you would like to add some additional comments to denote why you did something.  Additionally, to document what something used to be set to in case you want to restore it to a previous state later.
 
 There are other times where you want to add comments as annotations for another application's consumption.
 
-Yot **can** inject comments!
+Yot **can** insert comments!
 
 ```yaml
 ---
-# injectComments.yaml
+# insertComments.yaml
 commonOverlays:
-  - name: Inject line comments via merge
+  - name: insert line comments via merge
     query:
       - metadata.annotations['my.custom.annotation/fake']
-      - metadata.annoations['service.beta.kubernetes.io/aws-load-balancer-type']
-    value: "%v" # inject a line comment
+      - metadata.annotations['service.beta.kubernetes.io/aws-load-balancer-type']
+    value: "%v" # insert a line comment
     action: merge
-  - name: Inject a line comment via replace
+  - name: insert a line comment via replace
     query: spec.containers[0].image
     value: new-image:latest # old value was: %v
     action: replace
-  - name: Inject head, foot, and line comments via merge
+  - name: insert head, foot, and line comments via merge
     query: metadata.labels
     value:
-      # inject a head comment
-      app.kubernetes.io/owner: Jeff Smith  # inject a line comment
-      app.kubernetes.io/purpose: static-webpage  # inject another line comment
-      # inject a foot comment
+      # insert a head comment
+      app.kubernetes.io/owner: Jeff Smith  # insert a line comment
+      app.kubernetes.io/purpose: static-webpage  # insert another line comment
+      # insert a foot comment
     action: merge
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
@@ -248,7 +251,7 @@ yamlFiles:
 ```
 
 Now apply the changes by generating a new set of YAML files:  
->`yot -i ./examples/kubernetes/injectComments.yaml -o /tmp/new`
+>`yot -i ./examples/kubernetes/insertComments.yaml -o /tmp/new`
 
 
 [Back to Table of Contents](../documentation.md)  
