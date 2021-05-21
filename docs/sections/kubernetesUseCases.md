@@ -207,5 +207,37 @@ Now apply the changes by generating a new set of YAML files:
 `yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
 
 
+## Inject Comments
+```yaml
+---
+# injectComments.yaml
+commonOverlays:
+  - name: Inject line comments via merge
+    query:
+      - metadata.annotations['my.custom.annotation/fake']
+      - metadata.annoations['service.beta.kubernetes.io/aws-load-balancer-type']
+    value: "" # inject a line comment
+    action: merge
+  - name: Inject a line comment via format
+    query: spec.containers[0].image
+    value: "%s" # inject a line comment
+    action: format
+  - name: Inject header, footer, and line comments via merge
+    query: metadata.labels
+    value:
+      # inject a header comment
+      app.kubernetes.io/owner: Jeff Smith  # inject a line comment
+      app.kubernetes.io/purpose: static-webpage  # inject another line comment
+      # inject a footer comment
+    action: merge
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests
+```
+
+Now apply the changes by generating a new set of YAML files:
+`yot -i ./examples/kubernetes/injectComments.yaml -o /tmp/new`
+
+
 [Back to Table of Contents](../documentation.md)  
 [Next Up: Interactive Tutorials and Learning Paths](tutorials.md)

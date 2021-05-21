@@ -11,9 +11,9 @@ By default (v0.1.0), YAML Overlay Tool preserves all existing comments within a 
 
 ## Comment Injection
 
-Comments can be injected into YAML files similarly to how `yot` preserves existing comments in YAML files.
+Comments can be injected into YAML files by simply adding a comment above, below, or on the same line as data within the `value` key of your overlay within the instructions.  Due to [some minor bugs within go's yaml.v3 library](https://github.com/go-yaml/yaml/issues/610), header comments in a dictionary/map do not always apply where they should, and will be addressed in a future version of Yot.  However, line and footer comments can be reliably injected today.  
 
-WIP
+
 
 
 [Back to Table of Contents](../documentation.md)  
