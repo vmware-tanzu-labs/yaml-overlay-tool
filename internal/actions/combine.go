@@ -11,6 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// ErrCombineOnlyForScalars occurs when a non-scalar is attempted to be combined with a scalar value.
 var ErrCombineOnlyForScalars = errors.New("combine action can only be used on scalar values")
 
 func CombineNode(originalValue, newValue *yaml.Node) error {

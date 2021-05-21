@@ -9,16 +9,20 @@ import (
 	"strings"
 )
 
+// ErrInvalidAction occurs when user passes a action that is not one of merge, replace, delete, combine.
 var ErrInvalidAction = errors.New("invalid overlay action")
 
 type Action int
 
 const (
 	Invalid = iota
+	// Merge overlay action.
 	Merge
+	// Replace overlay action.
 	Replace
+	// Delete overlay action.
 	Delete
-	Format
+	// Combine overlay action.
 	Combine
 )
 
@@ -67,7 +71,9 @@ func (a Action) MarshalYAML() (interface{}, error) {
 type OnMissingAction int
 
 const (
+	// Ignore onMissing action.
 	Ignore = iota
+	// Inject onMissing action.
 	Inject
 )
 
