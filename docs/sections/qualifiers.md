@@ -33,7 +33,7 @@ The `documentQuery` key is a list/array which contains a list of the following t
 
 | **Key** | **Description** | **Type** |
 | --- | --- | --- |
-| Key | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | String |
+| key | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | String |
 | Value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action is applied to a document. | String |
 
 
