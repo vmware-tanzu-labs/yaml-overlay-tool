@@ -9,11 +9,16 @@ import (
 )
 
 const (
-	ValueMarker       = `%v`
+	// marker for the previous value.
+	ValueMarker = `%v`
+	// marker for the previous line comment.
 	LineCommentMarker = `%l`
+	// marker for the previous head comment.
 	HeadCommentMarker = `%h`
+	// marker for the previous foot comment.
 	FootCommentMarker = `%f`
-	KeyMarker         = `%k`
+	// marker for the previous key name.
+	KeyMarker = `%k`
 )
 
 func sanitizeMarkers(formatStr string, v ...interface{}) (sanitizedfmt string, sanitizedV []interface{}) {
