@@ -78,8 +78,9 @@ func mergeMap(o, n *yaml.Node) error {
 			resultFound = true
 
 			keyName := o.Content[oi].Value
+			value := o.Content[oi+1].Value
 
-			mergeComments(o.Content[oi], n.Content[ni], keyName)
+			mergeComments(o.Content[oi], n.Content[ni], value, keyName)
 
 			if err := merge(o.Content[oi+1], n.Content[ni+1], keyName); err != nil {
 				return err
@@ -89,7 +90,7 @@ func mergeMap(o, n *yaml.Node) error {
 				break
 			}
 
-			mergeScalar(o.Content[oi+1], n.Content[ni], keyName)
+			mergeScalar(o.Content[oi], n.Content[ni], value, keyName)
 		}
 
 		if !resultFound {
@@ -114,40 +115,64 @@ func mergeArray(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeScalar(o, n *yaml.Node, keyName ...string) {
+func mergeScalar(o, n *yaml.Node, values ...string) {
+	var keyName string
+
+	var value string
+
 	hc := strings.TrimPrefix(o.HeadComment, "#")
 	lc := strings.TrimPrefix(o.LineComment, "#")
 	fc := strings.TrimPrefix(o.FootComment, "#")
 
-	mergeComments(o, n, keyName...)
+	mergeComments(o, n, values...)
 
-	if keyName == nil {
-		keyName = []string{""}
+	switch {
+	case values == nil:
+		value = o.Value
+		keyName = ""
+	case len(values) > 1:
+		value = values[0]
+		keyName = values[1]
+	case len(values) == 1:
+		value = o.Value
+		keyName = values[0]
 	}
 
-	o.Value = format(n.Value, o.Value, lc, hc, fc, keyName[0])
+	o.Value = format(n.Value, value, lc, hc, fc, keyName)
 }
 
-func mergeComments(o, n *yaml.Node, keyName ...string) {
+func mergeComments(o, n *yaml.Node, values ...string) {
+	var keyName string
+
+	var value string
+
 	lc := strings.TrimPrefix(o.LineComment, "#")
 	hc := strings.TrimPrefix(o.HeadComment, "#")
 	fc := strings.TrimPrefix(o.FootComment, "#")
 
-	if keyName == nil {
-		keyName = []string{""}
+	switch {
+	case values == nil:
+		value = o.Value
+		keyName = ""
+	case len(values) > 1:
+		value = values[0]
+		keyName = values[1]
+	case len(values) == 1:
+		value = o.Value
+		keyName = values[0]
 	}
 
 	switch {
 	case n.HeadComment != "":
-		o.HeadComment = format(n.HeadComment, o.Value, lc, hc, fc, keyName[0])
+		o.HeadComment = format(n.HeadComment, value, lc, hc, fc, keyName)
 
 		fallthrough
 	case n.LineComment != "":
-		o.LineComment = format(n.LineComment, o.Value, lc, hc, fc, keyName[0])
+		o.LineComment = format(n.LineComment, value, lc, hc, fc, keyName)
 
 		fallthrough
 	case n.FootComment != "":
-		o.FootComment = format(n.FootComment, o.Value, lc, hc, fc, keyName[0])
+		o.FootComment = format(n.FootComment, value, lc, hc, fc, keyName)
 	}
 }
 
