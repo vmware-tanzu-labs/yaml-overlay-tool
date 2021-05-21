@@ -18,6 +18,8 @@ There are two types of actions that you can use to apply changes to a YAML docum
 
 ## Overlay actions
 
+If the `action` key is omitted from an overlay, an action of `merge` is assumed.
+
 
 ### 1. Combine
 
@@ -35,9 +37,10 @@ The `delete` action lets a Yot user remove unwanted pieces of a YAML document.
 
 ### 3. Merge
 
+As mentioned above, `merge` is the default action, should the `action` keyword be omitted.  
 The `merge` action lets a Yot user merge new data with existing data, and is primarily used for performing a deep merge on a map/dictionary and arrays.  
 
-However, `merge` can also be used to format string data with some special [Format Markers](formatMarkers.md).
+However, `merge` can also be used to format string/scalar data with some special [Format Markers](formatMarkers.md).  When merging scalar data, it is treated as a `replace`.  However, you can use the format markers to manipulate the existing data with `%v`, or insert a new value or a new line comment.
 
 
 ### 4. Replace
