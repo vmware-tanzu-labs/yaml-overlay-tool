@@ -60,7 +60,7 @@ spec:
       protocol: TCP
       targetPort: 443
   selector:
-    app: my-service
+    name: my-web-page
   type: LoadBalancer
 
 ```
