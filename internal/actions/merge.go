@@ -152,7 +152,7 @@ func addNode(o *yaml.Node, nv ...*yaml.Node) error {
 		return fmt.Errorf("failed to insert value during merge: %w", err)
 	}
 
-	sanatizeNode(temp...)
+	sanitizeNode(temp...)
 
 	o.Content = append(o.Content, temp...)
 

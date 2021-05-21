@@ -25,19 +25,19 @@ func format(formatStr string, v ...interface{}) string {
 	return fmt.Sprintf(formatStr, v...)
 }
 
-func sanatizeNode(n ...*yaml.Node) {
+func sanitizeNode(n ...*yaml.Node) {
 	for _, nv := range n {
 		if nv == nil {
 			continue
 		}
 
-		switch nv.Kind {
-		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
-			nv.Value = format(nv.Value, "", "", "", "")
+		if nv.Kind == yaml.DocumentNode|yaml.MappingNode|yaml.SequenceNode|yaml.AliasNode {
+			sanitizeNode(nv.Content...)
+		}
 
-			sanatizeNode(nv.Content...)
-		case yaml.ScalarNode:
-			nv.Value = format(nv.Value, "", "", "", "")
+		values := []*string{&nv.Value, &nv.HeadComment, &nv.LineComment, &nv.FootComment}
+		for _, v := range values {
+			*v = format(*v, "", "", "", "")
 		}
 	}
 }
