@@ -14,6 +14,7 @@ import (
 
 var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals
 
+// Execute takes in configuratation options and executes overlays on an instruction file specified.
 func Execute(cfg *Config) error {
 	eg, ctx := errgroup.WithContext(context.Background())
 
@@ -71,6 +72,8 @@ func Execute(cfg *Config) error {
 	return nil
 }
 
+// PostProcessHandler waits for YamlFile objects and preforms post overlay tasks like rendering,
+// saving to file or displaying to screen.
 func PostProcessHandler(cfg *Config, pChan <-chan *YamlFile) error {
 	for yf := range pChan {
 		if err := yf.doPostProcessing(cfg); err != nil {

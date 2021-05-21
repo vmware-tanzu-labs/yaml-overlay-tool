@@ -12,11 +12,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Instructions is a struct used for decoding an instructions file.
 type Instructions struct {
+	// Common Overlays that will apply to all files specified.
 	CommonOverlays []*overlays.Overlay `yaml:"commonOverlays,omitempty"`
-	YamlFiles      []*YamlFile         `yaml:"yamlFiles,omitempty"`
+	// List of YamlFiles and overlays to apply.
+	YamlFiles []*YamlFile `yaml:"yamlFiles,omitempty"`
 }
 
+// ReadInstructionFile reads a file and decodes it into an Instructions struct.
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
@@ -37,6 +41,7 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	return &instructions, nil
 }
 
+// addCommonOverlays, takes all common overlays and adds them to each yamlFile entry.
 func (i *Instructions) addCommonOverlays() {
 	for _, yf := range i.YamlFiles {
 		yf.Overlays = append(i.CommonOverlays, yf.Overlays...)

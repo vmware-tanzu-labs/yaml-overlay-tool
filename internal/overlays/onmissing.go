@@ -13,9 +13,11 @@ import (
 )
 
 var (
+	// ErrOnMissingNoInjectAction occurrs if there are not matches found and no inject action present.
 	ErrOnMissingNoInjectAction = errors.New("no matches and no onMissing.action of 'inject'")
-	ErrOnMissingNoInjectPath   = errors.New("no matches and no onMissing.injectPath")
-	ErrOnMissingInvalidType    = errors.New("invalid type for onMissing.injectPath")
+
+	// ErrOnMissingNoInjectPath occurrs if there are no matches found for the injectPath.
+	ErrOnMissingNoInjectPath = errors.New("no matches and no onMissing.injectPath")
 )
 
 type OnMissing struct {

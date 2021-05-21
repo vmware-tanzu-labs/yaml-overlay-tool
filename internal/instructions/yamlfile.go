@@ -13,13 +13,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// YamlFile is used to define which files should be manipulated and overlays specific to that file.
 type YamlFile struct {
-	Name      string              `yaml:"name,omitempty"`
-	Overlays  []*overlays.Overlay `yaml:"overlays,omitempty"`
-	Documents []*Document         `yaml:"documents,omitempty"`
-	Files     Files               `yaml:"path,omitempty"`
+	// Optional Name to define for organization purposes.
+	Name string `yaml:"name,omitempty"`
+	// List of Overlays specific to this yamlFile.
+	Overlays []*overlays.Overlay `yaml:"overlays,omitempty"`
+	// a list of more specific entries and overlays for a specific document within the yamlFile.
+	Documents []*Document `yaml:"documents,omitempty"`
+	// a list of unmarshaled yaml.Nodes and their path to which the overlays apply.
+	Files Files `yaml:"path,omitempty"`
 }
 
+// queueOverlays sends all overlay jobs to the workstream for processing.
 func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
 	for _, f := range yf.Files {
 		for nodeIndex, n := range f.Nodes {
@@ -42,6 +48,7 @@ func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
 	stream.CloseStream()
 }
 
+// doPostProcessing renders a document and outputs it to the location specified in config.
 func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 	var o *os.File
 

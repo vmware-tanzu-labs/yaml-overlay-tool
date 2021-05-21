@@ -13,6 +13,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// File is unmarshalled yaml file and its path that overlay's will be applied to.
 type File struct {
 	Nodes      []*yaml.Node
 	Origin     string
@@ -20,8 +21,10 @@ type File struct {
 	outputPath string
 }
 
+// Files is a collection of file objects.
 type Files []*File
 
+// readYamlFile will resolve a list of file names from a path and read them into a files collection.
 func (f *Files) readYamlFile(p string) error {
 	var paths []string
 
@@ -73,6 +76,7 @@ func (f *Files) readYamlFile(p string) error {
 	return nil
 }
 
+// UnmarshalYAML is a custom unmarshal function to unmarshal Files objects.
 func (f *Files) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var p string
 
@@ -83,6 +87,7 @@ func (f *Files) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return f.readYamlFile(p)
 }
 
+// OpenOutputFile opens or creates a file for outputing results.
 func (f *File) OpenOutputFile(o *Config) (*os.File, error) {
 	fileName := path.Join(o.OutputDir, "yamlFiles", f.outputPath)
 	dirName := path.Dir(fileName)

@@ -25,12 +25,14 @@ func ReadStream(fileName string) (io.Reader, error) {
 	return file, nil
 }
 
+// CloseFile safely closes a file handle.
 func CloseFile(file *os.File) {
 	if err := file.Close(); err != nil {
 		log.Errorf("error closing file!: %s", err)
 	}
 }
 
+// GetCommonPrefix determines the longest common prefix in a set of paths.
 func GetCommonPrefix(sep byte, paths ...string) string {
 	switch len(paths) {
 	case 0:
@@ -68,6 +70,7 @@ func GetCommonPrefix(sep byte, paths ...string) string {
 	return c
 }
 
+// isDirectory determines if the given path is a directory.
 func isDirectory(p string) (bool, error) {
 	fileInfo, err := os.Stat(p)
 	if err != nil {
@@ -77,6 +80,7 @@ func isDirectory(p string) (bool, error) {
 	return fileInfo.IsDir(), err
 }
 
+// getFileNames recursively walks a path and outputs all filenames found.
 func getFileNames(p string) ([]string, error) {
 	var results []string
 
