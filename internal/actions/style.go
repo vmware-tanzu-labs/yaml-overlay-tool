@@ -16,7 +16,7 @@ const (
 	DoubleQuotedStyle
 	// SingleQuotedStyle chooses YAML Single Quoted style for rendering.
 	SingleQuotedStyle
-	// FoldedStyle chooses use YAML Literal style for rendering.
+	// LiteralStyle chooses use YAML Literal style for rendering.
 	LiteralStyle
 	// FoldedStyle chooses use YAML Folded style for rendering.
 	FoldedStyle

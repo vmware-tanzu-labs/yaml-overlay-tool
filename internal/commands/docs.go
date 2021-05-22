@@ -1,7 +1,7 @@
 // Copyright 2021 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
-package commands // nolint:revive
+package commands
 
 const (
 	// Version of YAML Overlay Tool.
