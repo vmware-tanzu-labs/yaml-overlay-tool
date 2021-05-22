@@ -15,7 +15,7 @@ var ErrInvalidAction = errors.New("invalid overlay action")
 type Action int
 
 const (
-	// Invalid overlay action
+	// Invalid overlay action.
 	Invalid = iota
 	// Merge overlay action.
 	Merge
