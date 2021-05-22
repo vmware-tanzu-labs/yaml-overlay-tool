@@ -9,15 +9,15 @@ import (
 )
 
 const (
-	// marker for the previous value.
+	// ValueMarker is a format marker for the previous value.
 	ValueMarker = `%v`
-	// marker for the previous line comment.
+	// LineCommentMarker is a format marker for the previous line comment.
 	LineCommentMarker = `%l`
-	// marker for the previous head comment.
+	// HeadCommentMarker is a format marker for the previous head comment.
 	HeadCommentMarker = `%h`
-	// marker for the previous foot comment.
+	// FootCommentMarker is a format marker for the previous foot comment.
 	FootCommentMarker = `%f`
-	// marker for the previous key name.
+	// KeyMarker is a format marker for the previous key name.
 	KeyMarker = `%k`
 )
 

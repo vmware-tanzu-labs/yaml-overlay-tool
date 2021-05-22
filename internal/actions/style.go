@@ -10,19 +10,19 @@ type Style uint
 type Styles []Style
 
 const (
-	// use YAML Tag style for rendering.
+	// TaggedStyle chooses YAML Tag style for rendering.
 	TaggedStyle Style = 1 << iota
-	// use YAML Double Quoted style for rendering.
+	// DoubleQuotedStyle chooses YAML Double Quoted style for rendering.
 	DoubleQuotedStyle
-	// use YAML Single Quoted style for rendering.
+	// SingleQuotedStyle chooses YAML Single Quoted style for rendering.
 	SingleQuotedStyle
-	// use YAML Literal style for rendering.
+	// FoldedStyle chooses use YAML Literal style for rendering.
 	LiteralStyle
-	// use YAML Folded style for rendering.
+	// FoldedStyle chooses use YAML Folded style for rendering.
 	FoldedStyle
-	// use YAML Flow style for rendering.
+	// FlowStyle chooses YAML Flow style for rendering.
 	FlowStyle
-	// use YAML Normal style for rendering.
+	// NormalStyle chooses YAML Normal style for rendering.
 	NormalStyle
 )
 
