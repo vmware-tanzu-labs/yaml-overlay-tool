@@ -1,0 +1,18 @@
+---
+commonOverlays:
+  - name: Remove all annotations with conditions
+    query: metadata.annotations
+    action: delete
+    documentQuery:
+      - conditions:
+          - key: kind
+            value: Service
+          - key: metadata.namespace
+            value: my-web-page
+      - conditions:
+          - key: metadata.name
+            value: my-service
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests

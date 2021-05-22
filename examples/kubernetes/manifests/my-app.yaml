@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    my.custom.annotation/fake: idk
+  labels:
+    name: my-web-page
+    app: my-web-page
+    owner: my-web-page
+  name: my-web-page
+  namespace: my-web-page
+spec:
+  containers:
+    - image: nginx:latest
+      name: my-web-page
+      ports:
+        - containerPort: 443
+      resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always

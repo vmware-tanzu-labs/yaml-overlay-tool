@@ -1,0 +1,10 @@
+---
+commonOverlays:
+  - name: Replace name label's key to my-new-label
+    query: metadata.labels.name~
+    value: my-new-label  # old label key was: %v
+    action: replace
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests

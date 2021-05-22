@@ -1,0 +1,10 @@
+---
+commonOverlays:
+  - name: Set our private container registry in manifests
+    query: ..image
+    value: my-private-reg/%v  # old value was: %v
+    action: merge
+
+yamlFiles:
+  - name: Set of Kubernetes manifests from upstream
+    path: ./examples/kubernetes/manifests

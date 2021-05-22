@@ -1,0 +1,34 @@
+---
+yamlFiles:
+  - path: internal/instructions/testdata/manifests/arrayMergeTests.yaml
+    overlays:
+      - name: simple array merge
+        query: apples
+        value:
+          - pink lady
+          - fuji
+        action: merge
+      - name: big merge
+        query: apple
+        value:
+          juice:
+            - favorites:
+                - name: big apple
+                  price: premium
+                - name: old orchard reserves
+                  price: low
+        action: merge
+      - name: medium merge
+        query: apple.sauce
+        value:
+          - oh
+          - so
+          - delicious
+      - name: specific array item
+        query: apple.juice[0]
+        value:
+          brands:
+            - name: dem apples
+              price: premium
+            - name: old reserve
+              price: low

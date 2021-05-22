@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  labels:
+    name: my-web-page
+  name: my-service
+  namespace: my-web-page
+spec:
+  ports:
+    - name: 8443-443
+      port: 8443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    name: my-web-page
+  type: LoadBalancer
