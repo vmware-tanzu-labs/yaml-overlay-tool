@@ -4,9 +4,6 @@
 package commands
 
 const (
-	// Version of YAML Overlay Tool.
-	Version = "unstable"
-
 	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
 
 	YotLong = `yot (YAML Overlay Tool) is a YAML overlay tool which uses a YAML schema to 

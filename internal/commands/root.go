@@ -33,7 +33,7 @@ func New() *RootCommand {
 	}
 }
 
-func (rc RootCommand) Command() *cobra.Command {
+func (rc RootCommand) Command(version string) *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
 		Use:                        "yot",
@@ -49,7 +49,7 @@ func (rc RootCommand) Command() *cobra.Command {
 		Deprecated:                 "",
 		Hidden:                     false,
 		Annotations:                map[string]string{},
-		Version:                    Version,
+		Version:                    version,
 		PersistentPreRun:           rc.SetupLogging,
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,

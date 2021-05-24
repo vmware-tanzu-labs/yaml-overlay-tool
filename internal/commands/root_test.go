@@ -26,7 +26,7 @@ func TestNew(t *testing.T) {
 				SuggestFor:       []string{},
 				Short:            commands.YotShort,
 				Long:             commands.YotLong,
-				Version:          commands.Version,
+				Version:          "unstable",
 				PersistentPreRun: commands.New().SetupLogging,
 				Run:              commands.New().Execute,
 			},
@@ -37,7 +37,7 @@ func TestNew(t *testing.T) {
 		test := tt
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			got := commands.New().Command()
+			got := commands.New().Command("unstable")
 			if got.Use != test.want.Use {
 				t.Errorf("New() = %v, want %v", got.Use, test.want.Use)
 			}
