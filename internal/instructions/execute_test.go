@@ -26,18 +26,18 @@ func TestExecute(t *testing.T) {
 			args: args{
 				cfg: &instructions.Config{
 					InstructionsFile: "testdata/instructions.yaml",
-					OutputDir:        "testdata/output/",
+					OutputDir:        "output/",
 					Indent:           2,
 				},
 			},
 			wantErr: false,
 		},
 		{
-			name: "test diretory execution",
+			name: "test directory execution",
 			args: args{
 				cfg: &instructions.Config{
-					InstructionsFile: "testdata/test.yaml",
-					OutputDir:        "testdata/output/",
+					InstructionsFile: "testdata/testInstructions.yaml",
+					OutputDir:        "output/",
 					Indent:           2,
 				},
 			},

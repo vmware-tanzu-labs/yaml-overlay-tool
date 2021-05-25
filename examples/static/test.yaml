@@ -27,7 +27,7 @@ commonOverlays:
     action: replace
 yamlFiles:  # what to overlay onto
   - name: "some arbitrary descriptor"  # Name is Optional
-    path: "examples/manifests/test.yaml"
+    path: "../manifests/test.yaml"
     overlays:  # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
         query: metadata.annotations
@@ -129,7 +129,7 @@ yamlFiles:  # what to overlay onto
                 - z
   # demoing application of 'commonOverlays' without a 'overlays' or 'documents'
   - name: "another file"
-    path: "examples/manifests/another.yaml"
+    path: "../manifests/another.yaml"
     overlays:
       - name: "Replace image name"
         query: "..image"

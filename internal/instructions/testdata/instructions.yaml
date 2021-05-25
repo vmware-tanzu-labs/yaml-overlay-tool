@@ -22,7 +22,7 @@ commonOverlays:
     action: merge
 yamlFiles:  # what to overlay onto
   - name: "some arbitrary descriptor"  # Name is Optional
-    path: "testdata/manifests/test.yaml"
+    path: "manifests/test.yaml"
     overlays:  # if multi-doc yaml file, applies to all docs, gets applied first
       - name: "delete all annotations"
         query: metadata.annotations
@@ -105,7 +105,7 @@ yamlFiles:  # what to overlay onto
                 - z
   # demoing application of 'commonOverlays' without a 'overlays' or 'documents'
   - name: "another file"
-    path: "testdata/manifests/another.yaml"
+    path: "manifests/another.yaml"
     # uncomment the following 3 lines to see this affect 2 of 3 docs in
     ## 'another.yaml' with commonOverlays {'cool_label': 'bro'}
     # documents:

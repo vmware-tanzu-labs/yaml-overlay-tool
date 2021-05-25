@@ -6,11 +6,15 @@ package instructions
 import (
 	"fmt"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
+
+var instructionsDir string //nolint:gochecknoglobals // needed for path lookups relative to instructions file
 
 // Instructions is a struct used for decoding an instructions file.
 type Instructions struct {
@@ -24,9 +28,18 @@ type Instructions struct {
 func ReadInstructionFile(fileName *string) (*Instructions, error) {
 	var instructions Instructions
 
+	var err error
+
 	log.Debugf("Instructions File: %s\n", *fileName)
 
-	reader, err := ReadStream(*fileName)
+	instructionsPath, err := filepath.Abs(*fileName)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", *fileName, err)
+	}
+
+	instructionsDir = path.Dir(instructionsPath)
+
+	reader, err := ReadStream(instructionsPath)
 	if err != nil {
 		return nil, err
 	}

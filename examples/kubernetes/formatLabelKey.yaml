@@ -10,4 +10,4 @@ commonOverlays:
       app.kubernetes.io/%k: "%v"  # the old key was %k
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ../kubernetes/manifests

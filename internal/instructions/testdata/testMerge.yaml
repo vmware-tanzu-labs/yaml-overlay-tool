@@ -5,4 +5,4 @@ commonOverlays:
     value:
       app.kubernetes.io/Name: hello%v  # %v
 yamlFiles:
-  - path: "internal/instructions/testdata/manifests/test.yaml"
+  - path: "manifests/test.yaml"

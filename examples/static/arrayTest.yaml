@@ -1,6 +1,6 @@
 ---
 yamlFiles:
-  - path: examples/manifests/arrayMergeTests.yaml
+  - path: ../manifests/arrayMergeTests.yaml
     overlays:
       - name: simple array merge
         query: apples
