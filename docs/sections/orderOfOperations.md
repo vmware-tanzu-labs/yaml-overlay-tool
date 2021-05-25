@@ -54,11 +54,11 @@ If no `commonOverlays` have been defined, processing starts at the first path of
 
 ### 3. Output
 
-If no templating was performed, then output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output/yamlFiles`.
+If no templating was performed, then output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output/`.
 
-If values files in addition to a defaults.yaml were passed at runtime, then the output for each values file will be `< output directory >/yaml_files/< value file basename >` (not implemented in v0.1.0 of `yot`).
+If values files in addition to a defaults.yaml were passed at runtime, then the output for each values file will be `< output directory >/< value file basename >` (not implemented in v0.1.0 of `yot`).
 
-If only a defaults.yaml value file was passed, then the output will be placed in the < output directory specified at runtime >/yamlFiles, or if it was not provided, the default path of `./output/yamlFiles`.
+If only a defaults.yaml value file was passed, then the output will be placed in the < output directory specified at runtime >/, or if it was not provided, the default path of `./output/`.
 
 
 [Back to Table of Contents](../documentation.md)  
