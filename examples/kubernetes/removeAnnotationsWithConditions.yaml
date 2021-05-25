@@ -5,12 +5,12 @@ commonOverlays:
     action: delete
     documentQuery:
       - conditions:
-          - key: kind
+          - query: kind
             value: Service
-          - key: metadata.namespace
+          - query: metadata.namespace
             value: my-web-page
       - conditions:
-          - key: metadata.name
+          - query: metadata.name
             value: my-service
 
 yamlFiles:

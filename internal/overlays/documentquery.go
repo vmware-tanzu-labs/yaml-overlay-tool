@@ -17,7 +17,7 @@ type DocumentQuery struct {
 }
 
 type Condition struct {
-	Key   string    `yaml:"key,omitempty"`
+	Query string    `yaml:"query,omitempty"`
 	Value yaml.Node `yaml:"value,omitempty"`
 }
 
@@ -49,9 +49,9 @@ func (dq *DocumentQuery) checkQuery(node *yaml.Node) (bool, error) {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
 	for _, c := range dq.Conditions {
-		yp, err := yamlpath.NewPath(c.Key)
+		yp, err := yamlpath.NewPath(c.Query)
 		if err != nil {
-			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", c.Key, err)
+			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", c.Query, err)
 		}
 
 		results, _ := yp.Find(node)

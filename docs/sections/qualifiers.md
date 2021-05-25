@@ -18,20 +18,20 @@ The `documentQuery` key is a list/array which contains a list of the following t
 
 | Key | Description | Type |
 | --- | --- | --- |
-| conditions | A grouping of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or many `conditions` groups.  Each list/array of `conditions` contains a list/array of key/value pairs that must all return valid matches with expected values prior to qualifying application of an overlay. Each group of `conditions` is treated as an implicit "or", while the key/value conditions in each grouping is treated as an implicit "and". | list/array |
+| conditions | A grouping of conditions that must exist in a YAML document to qualify application of an overlay. Each `documentQuery` list/array can contain one or many `conditions` groups.  Each list/array of `conditions` contains a list/array of query/value pairs that must all return valid matches with expected values prior to qualifying application of an overlay. Each group of `conditions` is treated as an implicit "or", while the query/value conditions in each grouping is treated as an implicit "and". | list/array |
 
 
 ##### documentQuery conditions keys
 
 | Key | Description | Type |
 | --- | --- | --- |
-| key | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | string |
-| value | The value that the JSONPath query must return from one of the results of the `key`'s query before an overlay action will be applied to a document. | string |
+| query | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | string |
+| value | The value that the JSONPath query must return from one of the results of the `query`'s query before an overlay action will be applied to a document. | string |
 
 
 #### documentQuery Examples
 
-The following example demonstrates use of `commonOverlays` with a `documentQuery` to qualify when the overlay will be applied.  All key/value pairs within each `conditions` item would have to contain a valid matched result within the YAML document prior to the overlay's application.  
+The following example demonstrates use of `commonOverlays` with a `documentQuery` to qualify when the overlay will be applied.  All query/value pairs within each `conditions` item would have to contain a valid matched result within the YAML document prior to the overlay's application.  
 
 Think of each grouping of `conditions` as "match this" or "match this" (implicit "or").  Think of each condition within a group of `conditions` as "match this" and "match this" (implicit "and").  This allows you a great deal of flexibility on when to apply overlays. 
 
@@ -43,7 +43,7 @@ commonOverlays:
   action: replace
   documentQuery:
   - conditions:
-    - key: kind
+    - query: kind
       value: Deployment
 
 # With multiple conditions, must be a Deployment with a specific label to get applied
@@ -54,13 +54,13 @@ commonOverlays:
   action: replace
   documentQuery:
   - conditions:
-    - key: kind
+    - query: kind
       value: Deployment
-    - key: metadata.labels.`app.kubernetes.io/name`
+    - query: metadata.labels.`app.kubernetes.io/name`
       value: cool-app
 ```
 
-The following example demonstrates use of multiple `documentQuery` groupings.  Any single one of these key/value conditions groups would need to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this".
+The following example demonstrates use of multiple `documentQuery` groupings.  Any single one of these query/value conditions groups would need to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this".
 
 ```yaml
 commonOverlays:
@@ -70,10 +70,10 @@ commonOverlays:
   action: replace
   documentQuery:
   - conditions:
-    - key: kind
+    - query: kind
       value: Deployment
   - conditions:
-    - key: kind
+    - query: kind
       value: Service
 ```
 
@@ -112,7 +112,7 @@ commonOverlays: # optional way to apply overlays to all 'yamlFiles'
   # each grouping of conditions must all match. If 1 group of conditions returns
   ## True, then the overlay will get applied
   - conditions:
-    - key: kind # search for the 'kind' key in the yaml doc
+    - query: kind # search for the 'kind' key in the yaml doc
       value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
 yamlFiles: # what to overlay onto
 - name: "some arbitrary descriptor" # Name is Optional

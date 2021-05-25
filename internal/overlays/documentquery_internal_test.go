@@ -66,7 +66,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 				{
 					Conditions: []*Condition{
 						{
-							Key: "kind",
+							Query: "kind",
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
 								Tag:   "!!str",
@@ -91,7 +91,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 				{
 					Conditions: []*Condition{
 						{
-							Key: "kind",
+							Query: "kind",
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
 								Tag:   "!!str",
@@ -110,7 +110,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 				{
 					Conditions: []*Condition{
 						{
-							Key: "@&^#badd/example",
+							Query: "@&^#badd/example",
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
 								Tag:   "!!str",
