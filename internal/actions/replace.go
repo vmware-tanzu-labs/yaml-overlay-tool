@@ -6,19 +6,18 @@ package actions
 import (
 	"fmt"
 
-	"github.com/ulule/deepcopier"
+	"github.com/qdm12/reprint"
 	"gopkg.in/yaml.v3"
 )
 
-func ReplaceNode(original, replaceValue *yaml.Node) error {
+func ReplaceNode(original, replace *yaml.Node) error {
 	ov := *original
 
-	mergeComments(&ov, replaceValue)
-
-	if err := deepcopier.Copy(replaceValue).To(original); err != nil {
+	if err := reprint.FromTo(replace, original); err != nil {
 		return fmt.Errorf("failed to replace value: %w", err)
 	}
 
+	mergeComments(&ov, original)
 	original.HeadComment = ov.HeadComment
 	original.LineComment = ov.LineComment
 	original.FootComment = ov.FootComment
