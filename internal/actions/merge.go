@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jinzhu/copier"
+	"github.com/qdm12/reprint"
 	"gopkg.in/yaml.v3"
 )
 
@@ -179,14 +179,9 @@ func mergeComments(o, n *yaml.Node, values ...string) {
 }
 
 func addNode(o *yaml.Node, nv ...*yaml.Node) error {
-	options := copier.Option{
-		IgnoreEmpty: false,
-		DeepCopy:    true,
-	}
-
 	temp := make([]*yaml.Node, len(nv))
 
-	if err := copier.CopyWithOption(&temp, nv, options); err != nil {
+	if err := reprint.FromTo(&nv, &temp); err != nil {
 		return fmt.Errorf("failed to insert value during merge: %w", err)
 	}
 
