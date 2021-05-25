@@ -130,7 +130,7 @@ func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 // OpenOutputFile opens or creates a file for outputing results.
 func (yf *YamlFile) OpenOutputFile(o *Config) (*os.File, error) {
-	fileName := path.Join(o.OutputDir, "yamlFiles", yf.OutputPath)
+	fileName := path.Join(o.OutputDir, yf.OutputPath)
 	dirName := path.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
