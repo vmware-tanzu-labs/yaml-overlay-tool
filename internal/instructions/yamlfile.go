@@ -184,6 +184,10 @@ func (yfs *YamlFiles) expandDirectories() error {
 	var removeItems []int
 
 	for i, yf := range y {
+		if !path.IsAbs(yf.Path) {
+			yf.Path = path.Join(instructionsDir, yf.Path)
+		}
+
 		if ok, err := isDirectory(yf.Path); err != nil {
 			return err
 		} else if ok {

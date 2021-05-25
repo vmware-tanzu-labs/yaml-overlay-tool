@@ -5,4 +5,4 @@ commonOverlays:
     value:
       "app.kubernetes.io/%k-%v": "%v"  # +workload:%k:default="%v":type=string
 yamlFiles:
-  - path: "examples/kubernetes/manifests"
+  - path: "../kubernetes/manifests"
