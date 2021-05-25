@@ -5,8 +5,11 @@ package instructions
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"path"
 
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
@@ -21,25 +24,29 @@ type YamlFile struct {
 	Overlays []*overlays.Overlay `yaml:"overlays,omitempty"`
 	// a list of more specific entries and overlays for a specific document within the yamlFile.
 	Documents []*Document `yaml:"documents,omitempty"`
-	// a list of unmarshaled yaml.Nodes and their path to which the overlays apply.
-	Files Files `yaml:"path,omitempty"`
+
+	Nodes []*yaml.Node
+
+	Path string `yaml:"path,omitempty"`
+
+	OutputPath string
 }
+
+type YamlFiles []*YamlFile
 
 // queueOverlays sends all overlay jobs to the workstream for processing.
 func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
-	for _, f := range yf.Files {
-		for nodeIndex, n := range f.Nodes {
-			for _, o := range yf.Overlays {
-				if ok := o.CheckDocumentIndex(nodeIndex); ok {
-					stream.AddWorkload(o, n, nodeIndex, f.Path)
-				}
+	for nodeIndex, n := range yf.Nodes {
+		for _, o := range yf.Overlays {
+			if ok := o.CheckDocumentIndex(nodeIndex); ok {
+				stream.AddWorkload(o, n, nodeIndex, yf.Path)
 			}
+		}
 
-			for _, d := range yf.Documents {
-				if ok := d.checkDocumentIndex(nodeIndex); ok {
-					for _, o := range d.Overlays {
-						stream.AddWorkload(o, n, nodeIndex, f.Path)
-					}
+		for _, d := range yf.Documents {
+			if ok := d.checkDocumentIndex(nodeIndex); ok {
+				for _, o := range d.Overlays {
+					stream.AddWorkload(o, n, nodeIndex, yf.Path)
 				}
 			}
 		}
@@ -67,35 +74,146 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 
 	output.WriteString("---\n")
 
-	for _, f := range yf.Files {
-		for _, node := range f.Nodes {
-			actions.SetStyle(cfg.Styles, node)
+	for _, node := range yf.Nodes {
+		actions.SetStyle(cfg.Styles, node)
 
-			err = ye.Encode(node)
-			if err != nil {
-				return fmt.Errorf("unable to marshal final document %s, error: %w", f.Path, err)
-			}
+		err = ye.Encode(node)
+		if err != nil {
+			return fmt.Errorf("unable to marshal final document %s, error: %w", yf.Path, err)
+		}
+	}
+
+	// added so we can quickly see the results of the run
+	if cfg.StdOut {
+		o = os.Stdout
+	} else {
+		log.Debugf("Final: >>>\n%s\n", output)
+		o, err = yf.OpenOutputFile(cfg)
+		if err != nil {
+			return err
 		}
 
-		// added so we can quickly see the results of the run
-		if cfg.StdOut {
-			o = os.Stdout
-		} else {
-			log.Debugf("Final: >>>\n%s\n", output)
-			o, err = f.OpenOutputFile(cfg)
+		defer CloseFile(o)
+	}
+
+	if _, err = output.WriteTo(o); err != nil {
+		return fmt.Errorf("failed to %w", err)
+	}
+
+	output.Reset()
+
+	return nil
+}
+
+func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var yft []*YamlFile
+
+	if err := unmarshal(&yft); err != nil {
+		return err
+	}
+
+	y := YamlFiles(yft)
+	if err := y.expandDirectories(); err != nil {
+		return err
+	}
+
+	for _, yf := range y {
+		if err := yf.readYamlFile(); err != nil {
+			return err
+		}
+	}
+
+	*yfs = y
+
+	return nil
+}
+
+// OpenOutputFile opens or creates a file for outputing results.
+func (yf *YamlFile) OpenOutputFile(o *Config) (*os.File, error) {
+	fileName := path.Join(o.OutputDir, "yamlFiles", yf.OutputPath)
+	dirName := path.Dir(fileName)
+
+	if _, err := os.Stat(dirName); os.IsNotExist(err) {
+		if err := os.MkdirAll(dirName, 0755); err != nil {
+			return nil, fmt.Errorf("failed to create output directory %s, %w", dirName, err)
+		}
+	}
+
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
+	}
+
+	os.Stdout.WriteString(fileName + "\n")
+
+	return file, nil
+}
+
+func (yf *YamlFile) readYamlFile() error {
+	reader, err := ReadStream(yf.Path)
+	if err != nil {
+		return err
+	}
+
+	dc := yaml.NewDecoder(reader)
+
+	for {
+		var y yaml.Node
+
+		if err := dc.Decode(&y); errors.Is(err, io.EOF) {
+			if reader, ok := reader.(*os.File); ok {
+				CloseFile(reader)
+
+				break
+			}
+		} else if err != nil {
+			return fmt.Errorf("failed to read file %s: %w", yf.Path, err)
+		}
+
+		yf.Nodes = append(yf.Nodes, &y)
+	}
+
+	return nil
+}
+
+func (yfs *YamlFiles) expandDirectories() error {
+	y := []*YamlFile(*yfs)
+
+	var paths []string
+
+	var removeItems []int
+
+	for i, yf := range y {
+		if ok, err := isDirectory(yf.Path); err != nil {
+			return err
+		} else if ok {
+			paths, err = getFileNames(yf.Path)
 			if err != nil {
 				return err
 			}
 
-			defer o.Close()
-		}
+			removeItems = append(removeItems, i)
 
-		if _, err = output.WriteTo(o); err != nil {
-			return fmt.Errorf("failed to %w", err)
-		}
+			for _, p := range paths {
+				sp := &YamlFile{
+					Name:       yf.Name,
+					Overlays:   yf.Overlays,
+					Documents:  yf.Documents,
+					Path:       p,
+					OutputPath: yf.OutputPath,
+				}
 
-		output.Reset()
+				y = append(y, sp)
+			}
+		}
 	}
+
+	for _, remove := range removeItems {
+		y[remove] = y[len(y)-1]
+		y = y[:len(y)-1]
+	}
+
+	*yfs = y
 
 	return nil
 }
