@@ -16,6 +16,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var ErrFoundDirectoryWithPathOutput = errors.New("found directory as input path with file as output path")
+
+var ErrAbsolutePathForOutputPath = errors.New("absolute paths are currently not supported for outputPath")
+
 // YamlFile is used to define which files should be manipulated and overlays specific to that file.
 type YamlFile struct {
 	// Optional Name to define for organization purposes.
@@ -29,7 +33,7 @@ type YamlFile struct {
 
 	Path string `yaml:"path,omitempty"`
 
-	OutputPath string
+	OutputPath string `yaml:"outputPath,omitempty"`
 }
 
 type YamlFiles []*YamlFile
@@ -188,9 +192,16 @@ func (yfs *YamlFiles) expandDirectories() error {
 			yf.Path = path.Join(instructionsDir, yf.Path)
 		}
 
+		if path.IsAbs(yf.OutputPath) {
+			return ErrAbsolutePathForOutputPath
+		}
+
 		if ok, err := isDirectory(yf.Path); err != nil {
 			return err
 		} else if ok {
+			if path.Ext(yf.OutputPath) != "" {
+				return fmt.Errorf("%w, provide a directory for outputPath instead", ErrFoundDirectoryWithPathOutput)
+			}
 			paths, err = getFileNames(yf.Path)
 			if err != nil {
 				return err

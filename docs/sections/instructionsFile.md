@@ -28,6 +28,7 @@ Each list item in the `yamlFiles` key is treated as a dictionary/map with the fo
 | path | yes | A fully qualified path to the YAML file to modify, or a path relative to the location of the instructions file. Can be a path to a YAML file or a directory containing YAML files. | None | string |
 | overlays | no | List/array of overlay operations to apply. If your YAML file contains multiple documents separated by `---`, then this would apply to every YAML document first, unless a qualifier or combination of qualifiers `documentQuery` and `documentIndex` are provided.  If you need to apply overlays only to a specific YAML document in a multi-document YAML file, then see the `documents` key. See [overlays keys](#overlays-keys) for available dictionary/map keys. | None | list/array of dictionaries |
 | documents | no | List/array of overlay operations to apply to a multi-document YAML file.  When each document from a multi-document YAML file is loaded, an overlay can be applied by addressing the document by its index.  See [documents keys](#documents-keys) for available dictionary/map keys. | None | list/array of dictionaries/maps |
+| outputPath | no | alter the name of the output path. if a filename is given this will also alter the outputted filename. absolute paths are not currently supported, all paths are relative to outputDirectory defined by -o. if a directory is given then this directory will be prepended to the filename after the outputDirectory. | None | string |
 
 ### `overlays` keys
 

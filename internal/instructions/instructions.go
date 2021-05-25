@@ -71,6 +71,10 @@ func (i *Instructions) setOutputPath() {
 	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
 
 	for _, yf := range i.YamlFiles {
-		yf.OutputPath = strings.TrimPrefix(yf.Path, pathPrefix)
+		if yf.OutputPath == "" {
+			yf.OutputPath = strings.TrimPrefix(yf.Path, pathPrefix)
+		} else if path.Ext(yf.OutputPath) == "" {
+			yf.OutputPath = path.Join(yf.OutputPath, path.Base(yf.Path))
+		}
 	}
 }
