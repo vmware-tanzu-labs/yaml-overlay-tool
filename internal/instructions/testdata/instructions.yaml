@@ -9,12 +9,12 @@ commonOverlays:
     # qualifier to further refine when this overlay is applied
     documentQuery:
       - conditions:
-          - key: kind
+          - query: kind
             value: Service
-          - key: metadata.labels.'app.kubernetes.io/name'
+          - query: metadata.labels.'app.kubernetes.io/name'
             value: external-dns
       - conditions:
-          - key: metadata.name
+          - query: metadata.name
             value: pvc-var-cache-bind
   - name: "add a common label to everything"
     query: metadata.labels

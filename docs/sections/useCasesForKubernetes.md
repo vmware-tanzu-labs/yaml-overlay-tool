@@ -122,7 +122,7 @@ Now apply the changes by generating a new set of YAML files:
 
 ## Modify the Name of a Label's Key
 
-In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `merge` action and retaining the existing value.  The `~` character in JSONPath+ always returns the value of the key, rather than the value of the key/value pair.
+In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `merge` action and retaining the existing value.  The `~` character in JSONPath+ always returns the key, rather than the value itself.
 
 ```yaml
 ---
@@ -146,7 +146,7 @@ Now apply the changes by generating a new set of YAML files:
 
 ## Replace the Name of a Label's Key
 
-In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always retures the value of the key, rather than the value of the key/value pair.
+In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always returns the key, rather than the value itself.
 
 ```yaml
 ---
@@ -198,12 +198,12 @@ commonOverlays:
     action: delete
     documentQuery:
       - conditions:
-          - key: kind
+          - query: kind
             value: Service
-          - key: metadata.namespace
+          - query: metadata.namespace
             value: my-web-page
       - conditions:
-          - key: metadata.name
+          - query: metadata.name
             value: my-service
 
 yamlFiles:
