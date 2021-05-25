@@ -17,7 +17,7 @@ type Instructions struct {
 	// Common Overlays that will apply to all files specified.
 	CommonOverlays []*overlays.Overlay `yaml:"commonOverlays,omitempty"`
 	// List of YamlFiles and overlays to apply.
-	YamlFiles []*YamlFile `yaml:"yamlFiles,omitempty"`
+	YamlFiles YamlFiles `yaml:"yamlFiles,omitempty"`
 }
 
 // ReadInstructionFile reads a file and decodes it into an Instructions struct.
@@ -52,16 +52,12 @@ func (i *Instructions) setOutputPath() {
 	p := make([]string, 0, len(i.YamlFiles))
 
 	for _, yf := range i.YamlFiles {
-		for _, src := range yf.Files {
-			p = append(p, src.Path)
-		}
+		p = append(p, yf.Path)
 	}
 
 	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
 
 	for _, yf := range i.YamlFiles {
-		for _, src := range yf.Files {
-			src.outputPath = strings.TrimPrefix(src.Path, pathPrefix)
-		}
+		yf.OutputPath = strings.TrimPrefix(yf.Path, pathPrefix)
 	}
 }
