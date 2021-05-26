@@ -12,40 +12,36 @@ const (
 	define overlay operations on a set of YAML documents. yot only produces valid YAML 
 	documents on output, and can preserve and inject comments.`
 
-	/*helpDefaultValueFile = `Path to your default values file. If not set, you must
-	pass a values file of defaults.yaml or
-	defaults.yml within a path from the -f option.
-	Takes multiple default values files in case you would
+	helpValueFile = `Path to your values file.
+	Takes multiple values files in case you would
 	like to separate out some of the values. After the
-	first default values file, each subsequent file passed
-	with -d will be merged with the values from the
-	first. If a defaults.yaml or defaults.yml file is
-	discovered in one of your -f paths, it will be
-	merged with these values last.`
+	first values file, each subsequent file passed
+	with -f will be merged with the values from the
+	first. these will get applied to your instructions file if go templating is found.`
+	/*
+			helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
 
-		helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
+			helpCommonValues = `Path to your common values file. If not set, you must
+		pass a values file of common.yaml or
+		common.yml within a path from the -f option.
+		Takes multiple common values files in case you would
+		like to separate out some of the values. After the
+		first common values file, each subsequent file passed
+		with -d will be merged with the values from the
+		first. If a common.yaml or common.yml file is
+		discovered in one of your -f paths, it will be
+		merged with these values last.`
 
-		helpCommonValues = `Path to your common values file. If not set, you must
-	pass a values file of common.yaml or
-	common.yml within a path from the -f option.
-	Takes multiple common values files in case you would
-	like to separate out some of the values. After the
-	first common values file, each subsequent file passed
-	with -d will be merged with the values from the
-	first. If a common.yaml or common.yml file is
-	discovered in one of your -f paths, it will be
-	merged with these values last.`
-
-		helpValuesPath = `Values file path. May be a path to a file or directory
-	containing value files ending in either .yml or .yaml.
-	This option can be provided multiple times as required.
-	A file named defaults.yaml or defaults.yml is required
-	within the path(s) if not using the -d option, and you
-	may have only 1 default value file in that scenario.
-	Additional values files are merged over the defaults.yaml
-	file values. Each values file is treated as a unique site
-	and will render your instructions differently based on its
-	values`
+			helpValuesPath = `Values file path. May be a path to a file or directory
+		containing value files ending in either .yml or .yaml.
+		This option can be provided multiple times as required.
+		A file named defaults.yaml or defaults.yml is required
+		within the path(s) if not using the -d option, and you
+		may have only 1 default value file in that scenario.
+		Additional values files are merged over the defaults.yaml
+		file values. Each values file is treated as a unique site
+		and will render your instructions differently based on its
+		values`
 	*/
 
 	HelpUsageExample = "yot -i instructions.yaml -o /tmp/output"

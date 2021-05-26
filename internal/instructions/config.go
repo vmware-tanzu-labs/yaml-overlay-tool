@@ -17,4 +17,5 @@ type Config struct {
 	StdOut           bool
 	Indent           int
 	Styles           actions.Styles
+	Values           []string
 }
