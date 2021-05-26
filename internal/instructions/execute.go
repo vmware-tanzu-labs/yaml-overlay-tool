@@ -18,7 +18,12 @@ var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals
 func Execute(cfg *Config) error {
 	eg, ctx := errgroup.WithContext(context.Background())
 
-	instructions, err := ReadInstructionFile(&cfg.InstructionsFile)
+	values, err := getValues(cfg.Values)
+	if err != nil {
+		return err
+	}
+
+	instructions, err := ReadInstructionFile(&cfg.InstructionsFile, values)
 	if err != nil {
 		return err
 	}

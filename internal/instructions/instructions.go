@@ -25,7 +25,7 @@ type Instructions struct {
 }
 
 // ReadInstructionFile reads a file and decodes it into an Instructions struct.
-func ReadInstructionFile(fileName *string) (*Instructions, error) {
+func ReadInstructionFile(fileName *string, values interface{}) (*Instructions, error) {
 	var instructions Instructions
 
 	var err error
@@ -39,7 +39,7 @@ func ReadInstructionFile(fileName *string) (*Instructions, error) {
 
 	instructionsDir = path.Dir(instructionsPath)
 
-	reader, err := ReadStream(instructionsPath)
+	reader, err := renderInstructionsTemplate(*fileName, values)
 	if err != nil {
 		return nil, err
 	}

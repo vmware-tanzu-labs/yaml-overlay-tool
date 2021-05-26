@@ -81,6 +81,7 @@ func (r Root) NewCommand() *cobra.Command {
 
 func (r *Root) AddFlags() {
 	r.initializeGlobalFlags()
+	r.initializeTemplateFlags()
 }
 
 func (r *Root) AddCommands() {

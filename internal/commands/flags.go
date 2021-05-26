@@ -74,3 +74,13 @@ func (r *Root) initializeGlobalFlags() {
 		HelpOutputStyle,
 	)
 }
+
+func (r *Root) initializeTemplateFlags() {
+	r.Command.Flags().StringArrayVarP(
+		&r.Options.Values,
+		"values",
+		"f",
+		nil,
+		"test",
+	)
+}
