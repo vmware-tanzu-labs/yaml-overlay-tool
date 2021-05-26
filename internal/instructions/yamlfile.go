@@ -121,6 +121,8 @@ func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
+	y.mergeDuplicates()
+
 	for _, yf := range y {
 		if err := yf.readYamlFile(); err != nil {
 			return err
@@ -231,4 +233,32 @@ func (yfs *YamlFiles) expandDirectories() error {
 	*yfs = y
 
 	return nil
+}
+
+func (yfs *YamlFiles) mergeDuplicates() {
+	y := []*YamlFile(*yfs)
+
+	search := make(map[string]*YamlFile, len(y))
+
+	var removeIndex []int
+
+	for i, y := range *yfs {
+		if search[y.Path] == nil {
+			search[y.Path] = y
+		} else {
+			search[y.Path].Overlays = append(search[y.Path].Overlays, y.Overlays...)
+			search[y.Path].Documents = append(search[y.Path].Documents, y.Documents...)
+			if y.OutputPath != "" {
+				search[y.Path].OutputPath = y.OutputPath
+			}
+			removeIndex = append(removeIndex, i)
+		}
+	}
+
+	for _, remove := range removeIndex {
+		y[remove] = y[len(y)-1]
+		y = y[:len(y)-1]
+	}
+
+	*yfs = y
 }
