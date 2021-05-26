@@ -39,7 +39,7 @@ func DeleteNode(pn, child *yaml.Node) {
 		// if given a key node this value would be +2
 		end := 1
 
-		if pn.Kind == yaml.SequenceNode {
+		if pn.Kind == yaml.SequenceNode || pn.Kind == yaml.DocumentNode {
 			start--
 			nodesToDelete--
 		} else if i%2 == 0 {
