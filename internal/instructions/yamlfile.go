@@ -134,6 +134,8 @@ func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
+	y.mergeDuplicates()
+
 	for _, yf := range y {
 		if err := yf.readYamlFile(); err != nil {
 			return err
@@ -200,39 +202,40 @@ func (yfs *YamlFiles) expandDirectories() error {
 
 	var removeItems []int
 
-	for i, yf := range y {
-		if !path.IsAbs(yf.Path) {
-			yf.Path = path.Join(instructionsDir, yf.Path)
+	for i := 0; i <= len(y)-1; i++ {
+		if !path.IsAbs(y[i].Path) {
+			y[i].Path = path.Join(instructionsDir, y[i].Path)
 		}
 
-		if path.IsAbs(yf.OutputPath) {
+		if path.IsAbs(y[i].OutputPath) {
 			return ErrAbsolutePathForOutputPath
 		}
 
-		if ok, err := isDirectory(yf.Path); err != nil {
+		if ok, err := isDirectory(y[i].Path); err != nil {
 			return err
 		} else if ok {
-			if path.Ext(yf.OutputPath) != "" {
+			if path.Ext(y[i].OutputPath) != "" {
 				return fmt.Errorf("%w, provide a directory for outputPath instead", ErrFoundDirectoryWithPathOutput)
 			}
-			paths, err = getFileNames(yf.Path)
+			paths, err = getFileNames(y[i].Path)
 			if err != nil {
 				return err
 			}
 
-			removeItems = append(removeItems, i)
-
 			for _, p := range paths {
 				sp := &YamlFile{
-					Name:       yf.Name,
-					Overlays:   yf.Overlays,
-					Documents:  yf.Documents,
+					Name:       y[i].Name,
+					Overlays:   y[i].Overlays,
+					Documents:  y[i].Documents,
 					Path:       p,
-					OutputPath: yf.OutputPath,
+					OutputPath: y[i].OutputPath,
 				}
 
 				y = append(y, sp)
 			}
+
+			y = append(y[:i], y[i+1:]...)
+			i--
 		}
 	}
 
@@ -244,4 +247,27 @@ func (yfs *YamlFiles) expandDirectories() error {
 	*yfs = y
 
 	return nil
+}
+
+func (yfs *YamlFiles) mergeDuplicates() {
+	ys := []*YamlFile(*yfs)
+
+	search := make(map[string]*YamlFile, len(*yfs))
+
+	for i := 0; i <= len(ys)-1; i++ {
+		if search[ys[i].Path] == nil {
+			search[ys[i].Path] = ys[i]
+		} else {
+			search[ys[i].Path].Overlays = append(search[ys[i].Path].Overlays, ys[i].Overlays...)
+			search[ys[i].Path].Documents = append(search[ys[i].Path].Documents, ys[i].Documents...)
+			if ys[i].OutputPath != "" {
+				search[ys[i].Path].OutputPath = ys[i].OutputPath
+			}
+
+			ys = append(ys[:i], ys[i+1:]...)
+			i--
+		}
+	}
+
+	*yfs = ys
 }
