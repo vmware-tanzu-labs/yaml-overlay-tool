@@ -1,0 +1,13 @@
+---
+foo:
+  bar:
+    potato:
+      badayda:
+        - 1
+        - cheese: burger
+        - soup:
+            - minestrone
+            - chicken noodle
+            - clam chowder
+barf: oo
+yoo: czar

@@ -1,0 +1,7 @@
+---
+foo: foo
+values:
+  - 1
+  - 2
+  - 3
+yoo: bar
