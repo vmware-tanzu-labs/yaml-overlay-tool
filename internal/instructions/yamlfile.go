@@ -65,26 +65,39 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 
 	var err error
 
+	var fileWritten bool
+
 	output := new(bytes.Buffer)
 
 	ye := yaml.NewEncoder(output)
+
 	defer func() {
-		if err = ye.Close(); err != nil {
-			log.Fatalf("error closing encoder, %w", err)
+		if fileWritten {
+			if err = ye.Close(); err != nil {
+				log.Criticalf("error closing encoder, %s", err)
+			}
 		}
 	}()
 
 	ye.SetIndent(cfg.Indent)
 
-	output.WriteString("---\n")
+	for i, node := range yf.Nodes {
+		if len(node.Content) == 0 {
+			continue
+		}
 
-	for _, node := range yf.Nodes {
+		if i == 0 {
+			output.WriteString("---\n")
+		}
+
 		actions.SetStyle(cfg.Styles, node)
 
 		err = ye.Encode(node)
 		if err != nil {
 			return fmt.Errorf("unable to marshal final document %s, error: %w", yf.Path, err)
 		}
+
+		fileWritten = true
 	}
 
 	// added so we can quickly see the results of the run
