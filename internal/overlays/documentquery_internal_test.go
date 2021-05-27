@@ -6,6 +6,7 @@ package overlays
 import (
 	"testing"
 
+	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -55,10 +56,9 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		name    string
-		dq      DocumentQueries
-		want    bool
-		wantErr bool
+		name string
+		dq   DocumentQueries
+		want bool
 	}{
 		{
 			name: "query should return true if it exists",
@@ -66,7 +66,16 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 				{
 					Conditions: []*Condition{
 						{
-							Query: "kind",
+							Query: func() Queries {
+								q, _ := yamlpath.NewPath("kind")
+
+								return Queries{
+									Query{
+										yamlPath:    q,
+										queryString: "kind",
+									},
+								}
+							}(),
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
 								Tag:   "!!str",
@@ -76,14 +85,12 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 					},
 				},
 			},
-			want:    true,
-			wantErr: false,
+			want: true,
 		},
 		{
-			name:    "query should return true if there are no conditions",
-			dq:      DocumentQueries{},
-			want:    true,
-			wantErr: false,
+			name: "query should return true if there are no conditions",
+			dq:   DocumentQueries{},
+			want: true,
 		},
 		{
 			name: "query should return false it it does not exist",
@@ -91,7 +98,16 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 				{
 					Conditions: []*Condition{
 						{
-							Query: "kind",
+							Query: func() Queries {
+								q, _ := yamlpath.NewPath("kind")
+
+								return Queries{
+									Query{
+										yamlPath:    q,
+										queryString: "kind",
+									},
+								}
+							}(),
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
 								Tag:   "!!str",
@@ -101,27 +117,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 					},
 				},
 			},
-			want:    false,
-			wantErr: false,
-		},
-		{
-			name: "an error should raise if path is malformed",
-			dq: DocumentQueries{
-				{
-					Conditions: []*Condition{
-						{
-							Query: "@&^#badd/example",
-							Value: yaml.Node{
-								Kind:  yaml.ScalarNode,
-								Tag:   "!!str",
-								Value: `Potato`,
-							},
-						},
-					},
-				},
-			},
-			want:    false,
-			wantErr: true,
+			want: false,
 		},
 	}
 
@@ -130,12 +126,8 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			y := testInit()
-			got, err := tt.dq.checkQueries(y)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DocumentQueries.checkQueries(%v) error = %v, wantErr %v", y, err, tt.wantErr)
 
-				return
-			}
+			got := tt.dq.checkQueries(y)
 			if got != tt.want {
 				t.Errorf("DocumentQueries.checkQueries(%v) = %v, want %v", y, got, tt.want)
 			}
