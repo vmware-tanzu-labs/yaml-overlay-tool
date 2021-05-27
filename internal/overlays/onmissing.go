@@ -22,7 +22,7 @@ var (
 
 type OnMissing struct {
 	Action     actions.OnMissingAction `yaml:"action,omitempty"`
-	InjectPath multiString             `yaml:"injectPath,omitempty"`
+	InjectPath Queries                 `yaml:"injectPath,omitempty"`
 }
 
 func (o *Overlay) onMissing(n *yaml.Node) error {
@@ -41,8 +41,8 @@ func (o *Overlay) onMissing(n *yaml.Node) error {
 	}
 }
 
-func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
-	bps, err := builder.NewPaths(ip)
+func (o *Overlay) doInjectPath(ip Queries, node *yaml.Node) error {
+	bps, err := builder.NewPaths(ip.Paths())
 	if err != nil {
 		return fmt.Errorf("failed to build inject path %s, %w", ip, err)
 	}
@@ -54,10 +54,7 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 		return fmt.Errorf("failed to merge injectpath scaffolding %s with document, %w", ip, err)
 	}
 
-	results, err := searchYAMLPaths(ip, node)
-	if err != nil {
-		return fmt.Errorf("%w, on injectPath %s", err, ip)
-	}
+	results := ip.Find(node)
 
 	for _, r := range results {
 		if err := actions.ReplaceNode(r, &o.Value); err != nil {
@@ -69,7 +66,7 @@ func (o *Overlay) doInjectPath(ip []string, node *yaml.Node) error {
 }
 
 func (o *Overlay) handleInjectPath(n *yaml.Node) error {
-	_, err := builder.NewPaths(o.Query)
+	_, err := builder.NewPaths(o.Query.Paths())
 	if err != nil {
 		if errors.Is(err, builder.ErrInvalidPathSyntax) {
 			if o.OnMissing.InjectPath == nil {

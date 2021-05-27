@@ -15,7 +15,7 @@ var log = logging.MustGetLogger("overlays") //nolint:gochecknoglobals
 
 type Overlay struct {
 	Name          string          `yaml:"name,omitempty"`
-	Query         multiString     `yaml:"query,omitempty"`
+	Query         Queries         `yaml:"query,omitempty"`
 	Value         yaml.Node       `yaml:"value,omitempty"`
 	Action        actions.Action  `yaml:"action,omitempty"`
 	DocumentQuery DocumentQueries `yaml:"documentQuery,omitempty"`
@@ -26,14 +26,11 @@ type Overlay struct {
 func (o *Overlay) Apply(n *yaml.Node) error {
 	log.Debugf("Checking Document Queries for [%q]", o.Name)
 
-	if ok, err := o.DocumentQuery.checkQueries(n); !ok {
-		return err
+	if ok := o.DocumentQuery.checkQueries(n); !ok {
+		return nil
 	}
 
-	results, err := searchYAMLPaths(o.Query, n)
-	if err != nil {
-		return err
-	}
+	results := o.Query.Find(n)
 
 	if results == nil {
 		log.Debugf("No results found checking onMissing")
@@ -90,8 +87,11 @@ func (o *Overlay) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
-	if o.Name == "" {
+	switch "" {
+	case o.Name:
 		o.Name = o.Query.String()
+	case o.Action.String():
+		o.Action = actions.Merge
 	}
 
 	return nil

@@ -4,11 +4,8 @@
 package overlays
 
 import (
-	"fmt"
-
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,51 +14,44 @@ type DocumentQuery struct {
 }
 
 type Condition struct {
-	Query string    `yaml:"query,omitempty"`
+	Query Queries   `yaml:"query,omitempty"`
 	Value yaml.Node `yaml:"value,omitempty"`
 }
 
 type DocumentQueries []*DocumentQuery
 
-func (dq DocumentQueries) checkQueries(node *yaml.Node) (bool, error) {
+func (dq DocumentQueries) checkQueries(node *yaml.Node) bool {
 	if len(dq) == 0 {
 		log.Debugf("No Document Queries found, continuing")
 
-		return true, nil
+		return true
 	}
 
 	for _, q := range dq {
-		if ok, err := q.checkQuery(node); ok {
+		if ok := q.checkQuery(node); ok {
 			log.Debugf("Document Query conditions were met, continuing")
 
-			return true, nil
-		} else if err != nil {
-			return false, err
+			return true
 		}
 	}
 
 	log.Debugf("Document Query conditions were not met, skipping")
 
-	return false, nil
+	return false
 }
 
-func (dq *DocumentQuery) checkQuery(node *yaml.Node) (bool, error) {
+func (dq *DocumentQuery) checkQuery(node *yaml.Node) bool {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
 	for _, c := range dq.Conditions {
-		yp, err := yamlpath.NewPath(c.Query)
-		if err != nil {
-			return false, fmt.Errorf("failed to parse the documentQuery condition %s due to %w", c.Query, err)
-		}
-
-		results, _ := yp.Find(node)
+		results := c.Query.Find(node)
 
 		for _, result := range results {
 			if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {
-				return false, nil
+				return false
 			}
 		}
 	}
 
-	return true, nil
+	return true
 }
