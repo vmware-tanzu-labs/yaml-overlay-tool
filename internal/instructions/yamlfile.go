@@ -65,26 +65,39 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 
 	var err error
 
+	var fileWritten bool
+
 	output := new(bytes.Buffer)
 
 	ye := yaml.NewEncoder(output)
+
 	defer func() {
-		if err = ye.Close(); err != nil {
-			log.Fatalf("error closing encoder, %w", err)
+		if fileWritten {
+			if err = ye.Close(); err != nil {
+				log.Criticalf("error closing encoder, %s", err)
+			}
 		}
 	}()
 
 	ye.SetIndent(cfg.Indent)
 
-	output.WriteString("---\n")
+	for i, node := range yf.Nodes {
+		if len(node.Content) == 0 {
+			continue
+		}
 
-	for _, node := range yf.Nodes {
+		if i == 0 {
+			output.WriteString("---\n")
+		}
+
 		actions.SetStyle(cfg.Styles, node)
 
 		err = ye.Encode(node)
 		if err != nil {
 			return fmt.Errorf("unable to marshal final document %s, error: %w", yf.Path, err)
 		}
+
+		fileWritten = true
 	}
 
 	// added so we can quickly see the results of the run
@@ -120,6 +133,8 @@ func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := y.expandDirectories(); err != nil {
 		return err
 	}
+
+	y.mergeDuplicates()
 
 	for _, yf := range y {
 		if err := yf.readYamlFile(); err != nil {
@@ -231,4 +246,32 @@ func (yfs *YamlFiles) expandDirectories() error {
 	*yfs = y
 
 	return nil
+}
+
+func (yfs *YamlFiles) mergeDuplicates() {
+	y := []*YamlFile(*yfs)
+
+	search := make(map[string]*YamlFile, len(y))
+
+	var removeIndex []int
+
+	for i, y := range *yfs {
+		if search[y.Path] == nil {
+			search[y.Path] = y
+		} else {
+			search[y.Path].Overlays = append(search[y.Path].Overlays, y.Overlays...)
+			search[y.Path].Documents = append(search[y.Path].Documents, y.Documents...)
+			if y.OutputPath != "" {
+				search[y.Path].OutputPath = y.OutputPath
+			}
+			removeIndex = append(removeIndex, i)
+		}
+	}
+
+	for _, remove := range removeIndex {
+		y[remove] = y[len(y)-1]
+		y = y[:len(y)-1]
+	}
+
+	*yfs = y
 }
