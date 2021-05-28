@@ -3,6 +3,8 @@
 
 package commands
 
+var version = "unstable"
+
 const (
 	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
 

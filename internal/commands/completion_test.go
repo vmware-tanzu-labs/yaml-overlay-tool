@@ -27,7 +27,7 @@ func TestCompletions(t *testing.T) {
 		{
 			name: "Without any args",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: nil,
 			},
 			wantErr: true,
@@ -35,15 +35,15 @@ func TestCompletions(t *testing.T) {
 		{
 			name: "With bash arg",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: []string{"bash"},
 			},
 			wantErr: false,
 		},
 		{
-			name: "Without Zsh arg",
+			name: "With Zsh arg",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: []string{"zsh"},
 			},
 			wantErr: false,
@@ -51,7 +51,7 @@ func TestCompletions(t *testing.T) {
 		{
 			name: "With fish arg",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: []string{"fish"},
 			},
 			wantErr: false,
@@ -59,7 +59,7 @@ func TestCompletions(t *testing.T) {
 		{
 			name: "With powershell arg",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: []string{"powershell"},
 			},
 			wantErr: false,
@@ -67,7 +67,7 @@ func TestCompletions(t *testing.T) {
 		{
 			name: "Without too many args",
 			args: args{
-				cmd:  commands.CompletionCommand{}.Command(),
+				cmd:  commands.New().CompletionCommand(),
 				args: []string{"bash", "zsh"},
 			},
 			wantErr: true,
@@ -88,7 +88,7 @@ func TestCompletions(t *testing.T) {
 					}
 				}
 			}()
-			commands.CompletionCommand{}.Completions(test.args.cmd, test.args.args)
+			commands.New().Completions(test.args.cmd, test.args.args)
 			if test.wantErr {
 				t.Errorf("Completions() error = %v, wantErr %v", nil, test.wantErr)
 			}

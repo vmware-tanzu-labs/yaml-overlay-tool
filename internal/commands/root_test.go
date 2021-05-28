@@ -37,21 +37,21 @@ func TestNew(t *testing.T) {
 		test := tt
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
-			got := commands.New().Command("unstable")
-			if got.Use != test.want.Use {
-				t.Errorf("New() = %v, want %v", got.Use, test.want.Use)
+			got := commands.New()
+			if got.Command.Use != test.want.Use {
+				t.Errorf("New() = %v, want %v", got.Command.Use, test.want.Use)
 			}
-			if got.Short != test.want.Short {
-				t.Errorf("New() = %v, want %v", got.Short, test.want.Short)
+			if got.Command.Short != test.want.Short {
+				t.Errorf("New() = %v, want %v", got.Command.Short, test.want.Short)
 			}
-			if got.Long != test.want.Long {
-				t.Errorf("New() = %v, want %v", got.Long, test.want.Long)
+			if got.Command.Long != test.want.Long {
+				t.Errorf("New() = %v, want %v", got.Command.Long, test.want.Long)
 			}
-			if got.Version != test.want.Version {
-				t.Errorf("New() = %v, want %v", got.Version, test.want.Version)
+			if got.Command.Version != test.want.Version {
+				t.Errorf("New() = %v, want %v", got.Command.Version, test.want.Version)
 			}
 			if reflect.DeepEqual(got.Execute, test.want.Execute) {
-				t.Errorf("New() = %v, want %v", got.Version, test.want.Version)
+				t.Errorf("New() = %v, want %v", got.Command.Version, test.want.Version)
 			}
 		})
 	}

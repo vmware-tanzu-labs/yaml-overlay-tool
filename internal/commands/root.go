@@ -16,24 +16,29 @@ import (
 // ErrMissingRequired occurs when a required flag is not passed.
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
-type Command struct {
+type Root struct {
 	Log     *logging.Logger
 	Options *instructions.Config
+	Command *cobra.Command
 }
 
-type RootCommand Command
-
-func New() *RootCommand {
-	return &RootCommand{
+func New() *Root {
+	rc := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
 			LogLevel: logging.ERROR,
 			Styles:   actions.Styles{actions.NormalStyle},
 		},
 	}
+
+	rc.Command = rc.NewCommand()
+	rc.AddFlags()
+	rc.AddCommands()
+
+	return rc
 }
 
-func (rc RootCommand) Command(version string) *cobra.Command {
+func (r Root) NewCommand() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
 		Use:                        "yot",
@@ -50,11 +55,11 @@ func (rc RootCommand) Command(version string) *cobra.Command {
 		Hidden:                     false,
 		Annotations:                map[string]string{},
 		Version:                    version,
-		PersistentPreRun:           rc.SetupLogging,
+		PersistentPreRun:           r.SetupLogging,
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		Run:                        rc.Execute,
+		Run:                        r.Execute,
 		RunE:                       nil,
 		PostRun:                    nil,
 		PostRunE:                   nil,
@@ -71,14 +76,18 @@ func (rc RootCommand) Command(version string) *cobra.Command {
 		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
 	}
 
-	rc.initializeGlobalFlags(rootCmd)
-
-	rootCmd.AddCommand(CompletionCommand(rc).Command())
-
 	return rootCmd
 }
 
-func (rc *RootCommand) SetupLogging(cmd *cobra.Command, args []string) {
+func (r *Root) AddFlags() {
+	r.initializeGlobalFlags()
+}
+
+func (r *Root) AddCommands() {
+	r.Command.AddCommand(r.CompletionCommand())
+}
+
+func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	cmd.SetOut(cmd.OutOrStdout())
 
 	format := logging.MustStringFormatter(
@@ -88,15 +97,21 @@ func (rc *RootCommand) SetupLogging(cmd *cobra.Command, args []string) {
 		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format),
 	)
 
-	backend.SetLevel(rc.Options.LogLevel, "")
+	backend.SetLevel(r.Options.LogLevel, "")
 	logging.SetBackend(backend)
 }
 
-func (rc *RootCommand) Execute(cmd *cobra.Command, args []string) {
-	if err := instructions.Execute(rc.Options); err != nil {
+func (r *Root) Execute(cmd *cobra.Command, args []string) {
+	if err := instructions.Execute(r.Options); err != nil {
 		cmd.SilenceUsage = true
 
-		rc.Log.Error(fmt.Errorf("%w", err))
+		r.Log.Error(fmt.Errorf("%w", err))
 		os.Exit(1)
+	}
+}
+
+func (r *Root) Run() {
+	if err := r.Command.Execute(); err != nil {
+		r.Log.Error(err)
 	}
 }
