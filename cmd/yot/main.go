@@ -7,10 +7,8 @@ import (
 	command "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
 )
 
-var version = "unstable"
-
 func main() {
-	yot := command.New().Command(version)
+	yot := command.New()
 
-	yot.Execute() //nolint:errcheck // not needed as command will handle errors
+	yot.Run()
 }

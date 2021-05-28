@@ -17,7 +17,7 @@ builds:
     main: ./cmd/yot
     binary: yot
     ldflags:
-      - -s -w -X main.version=v{{.Version}} -extldflags '-static'
+      - -s -w -X github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands.version={{.Version}} -extldflags '-static'
 archives:
   - replacements:
       darwin: Darwin
