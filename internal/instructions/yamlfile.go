@@ -122,16 +122,16 @@ func (yf *YamlFile) doPostProcessing(cfg *Config) error {
 	return nil
 }
 
-func (yfs *YamlFiles) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (yfs *YamlFiles) UnmarshalYAML(value *yaml.Node) error {
 	var yft []*YamlFile
 
-	if err := unmarshal(&yft); err != nil {
-		return err
+	if err := value.Decode(&yft); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	y := YamlFiles(yft)
 	if err := y.expandDirectories(); err != nil {
-		return err
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	y.mergeDuplicates()

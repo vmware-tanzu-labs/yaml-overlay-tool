@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // ErrInvalidAction occurs when user passes a action that is not one of merge, replace, delete, combine.
@@ -39,11 +41,11 @@ func (a Action) String() string {
 	return toString[a]
 }
 
-func (a *Action) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 	var y string
 
-	if err := unmarshal(&y); err != nil {
-		return err
+	if err := value.Decode(&y); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	y = strings.ToLower(y)
@@ -87,11 +89,11 @@ func (a OnMissingAction) String() string {
 	return toString[a]
 }
 
-func (a *OnMissingAction) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
 	var y string
 
-	if err := unmarshal(&y); err != nil {
-		return err
+	if err := value.Decode(&y); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	y = strings.ToLower(y)
