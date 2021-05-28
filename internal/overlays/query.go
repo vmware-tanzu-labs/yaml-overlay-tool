@@ -18,16 +18,16 @@ type Query struct {
 
 type Queries []Query
 
-func (q *Query) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (q *Query) UnmarshalYAML(value *yaml.Node) error {
 	var s string
 
-	if err := unmarshal(&s); err != nil {
-		return err
+	if err := value.Decode(&s); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	p, err := yamlpath.NewPath(s)
 	if err != nil {
-		return fmt.Errorf("failed to parse the query path %s due to %w", s, err)
+		return fmt.Errorf("failed to parse the query path %s due to %w at line %d column %d", s, err, value.Line, value.Column)
 	}
 
 	q.yamlPath = p
@@ -46,19 +46,26 @@ func (q *Query) Find(node *yaml.Node) []*yaml.Node {
 	return results
 }
 
-func (mq *Queries) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (mq *Queries) UnmarshalYAML(value *yaml.Node) error {
 	var q Query
-	if err := unmarshal(&q); err == nil {
+
+	if value.Kind == yaml.ScalarNode {
+		if err := value.Decode(&q); err != nil {
+			return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
+		}
+
 		*mq = []Query{q}
 
 		return nil
-	} else if !strings.Contains(err.Error(), "cannot unmarshal") {
-		return err
 	}
 
 	type qq []Query
 
-	return unmarshal((*qq)(mq))
+	if err := value.Decode((*qq)(mq)); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
+	}
+
+	return nil
 }
 
 func (mq *Queries) Paths() []string {

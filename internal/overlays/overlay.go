@@ -80,11 +80,11 @@ func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 	return nil
 }
 
-func (o *Overlay) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (o *Overlay) UnmarshalYAML(value *yaml.Node) error {
 	type temp Overlay
 
-	if err := unmarshal((*temp)(o)); err != nil {
-		return err
+	if err := value.Decode((*temp)(o)); err != nil {
+		return fmt.Errorf("failed to unmarshal overlay due to %w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	switch "" {
