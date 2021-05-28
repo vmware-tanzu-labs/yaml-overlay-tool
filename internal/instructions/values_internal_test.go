@@ -6,6 +6,8 @@ package instructions
 import (
 	"reflect"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 func Test_getValues(t *testing.T) {
@@ -29,13 +31,12 @@ func Test_getValues(t *testing.T) {
 					"testdata/values/on_premise.yml",
 				},
 			},
-			want: map[string]interface{}{
-				"too":  "bar",
-				"yoo":  "car",
-				"foo":  "you",
-				"test": "one",
-				"two":  "three",
-			},
+			want: `foo: you
+test: one
+too: bar
+two: three
+yoo: car
+`,
 			wantErr: false,
 		},
 		{
@@ -46,16 +47,14 @@ func Test_getValues(t *testing.T) {
 					"testdata/values/site_b.yml",
 				},
 			},
-			want: map[string]interface{}{
-				"too": "bar",
-				"foo": "foo",
-				"values": []interface{}{
-					1,
-					2,
-					3,
-				},
-				"yoo": "bar",
-			},
+			want: `foo: foo
+too: bar
+values:
+    - 1
+    - 2
+    - 3
+yoo: bar
+`,
 			wantErr: false,
 		},
 		{
@@ -68,18 +67,26 @@ func Test_getValues(t *testing.T) {
 					"testdata/values/site_a.yaml",
 				},
 			},
-			want: map[string]interface{}{
-				"too":  "bar",
-				"yoo":  "czar",
-				"test": "one",
-				"two":  "three",
-				"values": []interface{}{
-					1,
-					2,
-					3,
-				},
-				"barf": "oo",
-			},
+			want: `foo:
+    bar:
+        potato:
+            badayda:
+                - 1
+                - cheese: burger
+                - soup:
+                    - minestrone
+                    - chicken noodle
+                    - clam chowder
+test: one
+too: bar
+two: three
+values:
+    - 1
+    - 2
+    - 3
+yoo: czar
+zarf: oo
+`,
 		},
 	}
 
@@ -93,8 +100,9 @@ func Test_getValues(t *testing.T) {
 
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getValues(%v) = %+v, want %+v", tt.args.fileNames, got, tt.want)
+			b, _ := yaml.Marshal(got)
+			if !reflect.DeepEqual(string(b), tt.want) {
+				t.Errorf("getValues(%v) = %v, want %v", tt.args.fileNames, string(b), tt.want)
 			}
 		})
 	}
