@@ -32,17 +32,19 @@ func getValues(fileNames []string) (interface{}, error) {
 		yamlValues[i] = &yamlValue
 	}
 
-	if err := actions.MergeNode(yamlValues...); err != nil {
-		return nil, fmt.Errorf("failed to merge yaml values: %w", err)
-	}
+	if len(yamlValues) != 0 {
+		if err := actions.MergeNode(yamlValues...); err != nil {
+			return nil, fmt.Errorf("failed to merge yaml values: %w", err)
+		}
 
-	b, err := yaml.Marshal(yamlValues[0])
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal yaml values: %w", err)
-	}
+		b, err := yaml.Marshal(yamlValues[0])
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal yaml values: %w", err)
+		}
 
-	if err := yaml.Unmarshal(b, &values); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal yaml values: %w", err)
+		if err := yaml.Unmarshal(b, &values); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal yaml values: %w", err)
+		}
 	}
 
 	return values, nil

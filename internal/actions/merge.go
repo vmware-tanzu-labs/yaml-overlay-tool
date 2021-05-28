@@ -36,7 +36,7 @@ func MergeNode(nodes ...*yaml.Node) error {
 }
 
 func merge(o, n *yaml.Node, keyName ...string) error {
-	switch o.Kind {
+	switch n.Kind {
 	case yaml.DocumentNode:
 		return mergeDocument(o, n)
 	case yaml.MappingNode:
@@ -68,10 +68,16 @@ func mergeMap(o, n *yaml.Node) error {
 	for ni := 0; ni < len(n.Content)-1; ni += 2 {
 		resultFound := false
 
-		for oi := 0; oi < len(o.Content)-1; oi += 2 {
-			var formatKey bool
+		if o.Kind != yaml.MappingNode {
+			o.Kind = yaml.MappingNode
+			o.Value = ""
+			o.Content = []*yaml.Node{}
+		}
 
-			if formatKey = checkForMarkers(n.Content[ni].Value); !formatKey {
+		for oi := 0; oi < len(o.Content)-1; oi += 2 {
+			var foundMarker bool
+
+			if foundMarker = checkForMarkers(n.Content[ni].Value); !foundMarker {
 				if o.Content[oi].Value != n.Content[ni].Value {
 					continue
 				}
@@ -88,7 +94,7 @@ func mergeMap(o, n *yaml.Node) error {
 				return err
 			}
 
-			if !formatKey {
+			if !foundMarker {
 				break
 			}
 
@@ -106,7 +112,13 @@ func mergeMap(o, n *yaml.Node) error {
 }
 
 func mergeArray(o, n *yaml.Node) error {
-	if o.Content != nil && n.Content != nil {
+	if o.Kind != yaml.SequenceNode {
+		o.Kind = yaml.SequenceNode
+		o.Value = ""
+		o.Content = []*yaml.Node{}
+	}
+
+	if n.Content != nil {
 		mergeComments(o, n, o.Value)
 
 		if err := addNode(o, n.Content...); err != nil {
@@ -138,6 +150,12 @@ func mergeScalar(o, n *yaml.Node, values ...string) {
 	case len(values) == 1:
 		value = o.Value
 		keyName = values[0]
+	}
+
+	if o.Kind != yaml.ScalarNode {
+		o.Kind = yaml.ScalarNode
+		o.Value = ""
+		o.Content = nil
 	}
 
 	o.Value = format(n.Value, value, lc, hc, fc, keyName)
