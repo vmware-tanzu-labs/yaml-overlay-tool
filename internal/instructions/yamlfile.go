@@ -4,14 +4,12 @@
 package instructions
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
@@ -59,69 +57,6 @@ func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
 	stream.CloseStream()
 }
 
-// doPostProcessing renders a document and outputs it to the location specified in config.
-func (yf *YamlFile) doPostProcessing(cfg *Config) error {
-	var o *os.File
-
-	var err error
-
-	var fileWritten bool
-
-	output := new(bytes.Buffer)
-
-	ye := yaml.NewEncoder(output)
-
-	defer func() {
-		if fileWritten {
-			if err = ye.Close(); err != nil {
-				log.Criticalf("error closing encoder, %s", err)
-			}
-		}
-	}()
-
-	ye.SetIndent(cfg.Indent)
-
-	for i, node := range yf.Nodes {
-		if len(node.Content) == 0 {
-			continue
-		}
-
-		if i == 0 {
-			output.WriteString("---\n")
-		}
-
-		actions.SetStyle(cfg.Styles, node)
-
-		err = ye.Encode(node)
-		if err != nil {
-			return fmt.Errorf("unable to marshal final document %s, error: %w", yf.Path, err)
-		}
-
-		fileWritten = true
-	}
-
-	// added so we can quickly see the results of the run
-	if cfg.StdOut {
-		o = os.Stdout
-	} else {
-		log.Debugf("Final: >>>\n%s\n", output)
-		o, err = yf.OpenOutputFile(cfg)
-		if err != nil {
-			return err
-		}
-
-		defer CloseFile(o)
-	}
-
-	if _, err = output.WriteTo(o); err != nil {
-		return fmt.Errorf("failed to %w", err)
-	}
-
-	output.Reset()
-
-	return nil
-}
-
 func (yfs *YamlFiles) UnmarshalYAML(value *yaml.Node) error {
 	var yft []*YamlFile
 
@@ -145,27 +80,6 @@ func (yfs *YamlFiles) UnmarshalYAML(value *yaml.Node) error {
 	*yfs = y
 
 	return nil
-}
-
-// OpenOutputFile opens or creates a file for outputing results.
-func (yf *YamlFile) OpenOutputFile(o *Config) (*os.File, error) {
-	fileName := path.Join(o.OutputDir, yf.OutputPath)
-	dirName := path.Dir(fileName)
-
-	if _, err := os.Stat(dirName); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirName, 0755); err != nil {
-			return nil, fmt.Errorf("failed to create output directory %s, %w", dirName, err)
-		}
-	}
-
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
-	}
-
-	os.Stdout.WriteString(fileName + "\n")
-
-	return file, nil
 }
 
 func (yf *YamlFile) readYamlFile() error {
