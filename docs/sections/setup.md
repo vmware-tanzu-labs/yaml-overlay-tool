@@ -1,15 +1,43 @@
 [Back to Table of Contents](../documentation.md)
 
 
-## Installation and Setup
+# Installation and Setup
 
-The compiled `yot` binary can be downloaded from the repository's releases page [here](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases).
+## Install
 
-Be sure to download the appropriate release for your system's architecture and Operating System.
+### [Download the latest binary](https://github.com/vmare-tanzu-labs/yaml-overlay-tool/releases/latest)
 
-On Linux and Unix based systems it is recommended to move the binary into your path, such as `/usr/local/bin/yot` or `/usr/bin`.
+### wget
+Use wget to download the pre-compiled binaries:
 
-Once the `yot` binary is installed to a path in your system's `$PATH` you can then run the `yot` command.
+```bash
+wget https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
+  tar xz && mv ${BINARY} /usr/bin/yot
+```
+
+For instance, VERSION=v0.3.1 and BINARY=yot_${VERSION}_linux_amd64
+
+### Run with Docker
+
+#### Oneshot use:
+
+```bash
+docker run --rm -v "${PWD}":/workdir ghcr.io/vmware-tanzu-labs/yot [flags]
+```
+
+#### Run commands interactively:
+
+```bash
+docker run --rm -it -v "${PWD}":/workdir --entrypoint sh ghcr.io/vmawre-tanzu-labs/yot
+```
+
+It can be useful to have a bash function to avoid typing the whole docker command:
+
+```bash
+yot() {
+  docker run --rm -i -v "${PWD}":/workdir ghcr.io/vmware-tanzu-labs/yot "$@"
+}
+```
 
 
 [Back to Table of Contents](../documentation.md)  
