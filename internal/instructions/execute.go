@@ -81,7 +81,7 @@ func Execute(cfg *Config) error {
 // saving to file or displaying to screen.
 func PostProcessHandler(cfg *Config, pChan <-chan *YamlFile) error {
 	for yf := range pChan {
-		if err := yf.doPostProcessing(cfg); err != nil {
+		if err := cfg.doPostProcessing(yf); err != nil {
 			return err
 		}
 	}
