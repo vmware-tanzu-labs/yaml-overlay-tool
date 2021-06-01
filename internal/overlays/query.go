@@ -87,6 +87,10 @@ func (mq *Queries) Find(node *yaml.Node) []*yaml.Node {
 	for _, q := range *mq {
 		log.Debugf("searching path %s\n", q)
 
+		if node.Kind == yaml.DocumentNode && len(node.Content) == 0 {
+			continue
+		}
+
 		result := q.Find(node)
 
 		results = append(results, result...)
