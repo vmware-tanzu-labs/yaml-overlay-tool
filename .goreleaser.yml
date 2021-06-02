@@ -1,14 +1,11 @@
 ---
-# This is an example .goreleaser.yml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
 before:
   hooks:
-    # You may remove this if you don't use go modules.
     - go mod tidy
-    # you may remove this if you don't need go generate
-    - go generate ./...
+    - ./scripts/completions.sh
 builds:
-  - env:
+  - id: yot
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -18,6 +15,8 @@ builds:
     binary: yot
     ldflags:
       - -s -w -X github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands.version={{.Version}} -extldflags '-static'
+signs:
+  - artifacts: checksum
 archives:
   - replacements:
       darwin: Darwin
@@ -55,3 +54,75 @@ dockers:
       - "--label=org.opencontainers.image.licenses=MIT"
       - "--label=VERSION={{.Version}}"
       - "--platform=linux/amd64"
+brews:
+  - name: yot
+
+    tap:
+      owner: vmware-tanzu-labs
+      name: homebrew-tap
+
+    # Git author used to commit to the repository.
+    # Defaults are shown.
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@vmware-tanzu-labs.com
+
+    # Folder inside the repository to put the formula.
+    # Default is the root folder.
+    folder: Formula
+
+    # Your app's homepage.
+    # Default is empty.
+    homepage: "https://github.com/vmware-tanzu-labs/yaml-overlay-tool"
+
+    # Template of your app's description.
+    # Default is empty.
+    description: "A YAML Overlay Tool with templating tendencies."
+
+    # SPDX identifier of your app's license.
+    # Default is empty.
+    license: "MIT"
+
+    # Setting this will prevent goreleaser to actually try to commit the updated
+    # formula - instead, the formula file will be stored on the dist folder only,
+    # leaving the responsibility of publishing it to the user.
+    # If set to auto, the release will not be uploaded to the homebrew tap
+    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
+    # Default is false.
+    skip_upload: auto
+
+    # Packages your package depends on.
+    dependencies:
+      - name: kubectl
+        type: optional
+
+    install: |-
+      bin.install "yot"
+      bash_completion.install "completions/yot.bash" => "yot"
+      zsh_completion.install "completions/yot.zsh" => "_yot"
+      fish_completion.install "completions/yot.fish"
+
+    # So you can `brew test` your formula.
+    # Default is empty.
+    test: |
+      system "#{bin}/yot --version"
+nfpms:
+  - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://github.com/vmware-tanzu-labs/yaml-overlay-tool.com
+    description: "A YAML Overlay Tool with templating tendencies."
+    maintainer: Jeff Davis <jeffda@vmware.com>, Andrew Huffman <ahuffman@vmware.com>
+    license: MIT
+    vendor: VMware Tanzu Labs
+    contents:
+      - src: ./completions/yot.bash
+        dst: /etc/bash_completion.d/yot
+      - src: ./completions/yot.fish
+        dst: /usr/share/fish/completions/yot.fish
+      - src: ./completions/yot.zsh
+        dst: /usr/local/share/zsh/site-functions/_yot
+    formats:
+      - apk
+      - deb
+      - rpm
+    recommends:
+      - kubectl
