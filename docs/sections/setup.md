@@ -17,6 +17,35 @@ wget https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases/download/${
 
 For instance, VERSION=v0.3.1 and BINARY=yot_${VERSION}_linux_amd64
 
+### MacOS / Linux via Homebrew:
+Using [Homebrew](https://brew.sh/)
+```
+brew tap vmware-tanzu-labs/tap
+brew install yot
+```
+
+### Linux via snap:
+```
+snap install yaml-overlay-tool
+```
+
+#### Snap notes
+`yot` installs with [_strict confinement_](https://docs.snapcraft.io/snap-confinement/6233) in snap, this means it doesn't have direct access to root files. To read root files you can:
+
+```
+sudo cat /etc/myfile.yaml | yot -i -
+```
+
+And to write to a root file you can either use [sponge](https://linux.die.net/man/1/sponge):
+```
+sudo cat /etc/myfile.yaml | yot -s -i - | sudo sponge /etc/myfile.yaml
+```
+or write to a temporary file:
+```
+sudo cat /etc/myfile.yaml | yot -s -i  | sudo tee /etc/myfiletmp.yaml
+sudo mv /etc/myfiletmp.yaml /etc/myfile.yaml
+```
+
 ### Run with Docker
 
 #### Oneshot use:
@@ -37,6 +66,11 @@ It can be useful to have a bash function to avoid typing the whole docker comman
 yot() {
   docker run --rm -i -v "${PWD}":/workdir ghcr.io/vmware-tanzu-labs/yot "$@"
 }
+```
+
+### Go Get:
+```
+GO111MODULE=on go get github.com/vmware-tanzu-labs/yaml-overlay-tool/cmd/yot
 ```
 
 
