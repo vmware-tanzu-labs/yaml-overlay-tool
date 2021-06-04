@@ -15,6 +15,7 @@ import (
 var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals
 
 // Execute takes in configuratation options and executes overlays on an instruction file specified.
+// nolint:cyclop
 func Execute(cfg *Config) error {
 	eg, ctx := errgroup.WithContext(context.Background())
 
@@ -34,6 +35,13 @@ func Execute(cfg *Config) error {
 
 	for _, yamlFile := range instructions.YamlFiles {
 		yf := yamlFile
+
+		// remove the comments if requested
+		if cfg.RemoveComments {
+			for _, node := range yf.Nodes {
+				removeCommentsFromNode(node)
+			}
+		}
 
 		eg.Go(
 			func() error {
