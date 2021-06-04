@@ -75,6 +75,8 @@ const (
 		code 0 prior to processing instructions`
 	*/
 
+	HelpRemoveComments = `Remove comments from the source YAML files prior to templating`
+
 	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
 	HelpOutputStyle = `style to be used for rendering final documents.

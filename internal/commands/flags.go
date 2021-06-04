@@ -59,6 +59,14 @@ func (r *Root) initializeGlobalFlags() {
 		HelpRenderStdOut,
 	)
 
+	r.Command.Flags().BoolVarP(
+		&r.Options.RemoveComments,
+		"remove-comments",
+		"",
+		false,
+		HelpRemoveComments,
+	)
+
 	r.Command.Flags().IntVarP(
 		&r.Options.Indent,
 		"indent-level",

@@ -185,3 +185,18 @@ func (yfs *YamlFiles) mergeDuplicates() {
 
 	*yfs = ys
 }
+
+// removeCommentsFromNode will traverse the tree of yaml nodes and remove all comments.
+func removeCommentsFromNode(node *yaml.Node) {
+	if node.Content == nil {
+		return
+	}
+
+	for _, child := range node.Content {
+		child.HeadComment = ""
+		child.LineComment = ""
+		child.FootComment = ""
+
+		removeCommentsFromNode(node)
+	}
+}

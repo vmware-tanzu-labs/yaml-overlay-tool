@@ -21,6 +21,7 @@ type Config struct {
 	InstructionsFile string
 	OutputDir        string
 	StdOut           bool
+	RemoveComments   bool
 	Indent           int
 	Styles           actions.Styles
 	Values           []string
