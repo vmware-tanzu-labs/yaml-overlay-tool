@@ -143,5 +143,5 @@ snapcrafts:
       nodes. It is able to preserve and inject head, foot, and line comments into the 
       new output versions of the files that you manipulate.
     grade: stable
-    confinement: classic
+    confinement: strict
     publish: true
