@@ -1,10 +1,10 @@
 [Back to Table of Contents](../documentation.md)
 
-# Kubernetes Common Use-Cases and Patterns
+# Common use-cases and patterns for Kubernetes
 
 The following set of examples will help you quickly achieve common tasks in the context of Kubernetes YAML manifests.  
 
-All of these examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
+All examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
 
 ```bash
 yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output path >
@@ -13,7 +13,7 @@ yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output 
 <br/>
 
 
-### Example Kubernetes YAML Manifests
+### Example Kubernetes YAML manifests
 
 Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
 
@@ -68,9 +68,9 @@ spec:
 <br/>
 
 
-## Adding Additional Labels and Selectors To All YAML Files In a Directory
+## Adding additional labels and selectors to all YAML files on a directory
 
-In this example we use the `merge` action to add in 2 new labels to a set of YAML files contained in a directory.
+In the following example, the `merge` action adds in 2 new labels to a set of YAML files contained in a directory.
 
 ```yaml
 ---
@@ -96,11 +96,11 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/addLabels.yaml -o /tmp/new`
 
 
-## Prepend a Private Registry URL to All Container Images
+## Prepend a private registry URL to all container images
 
-In this example we use the `merge` action to take the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepending with a private registry URL.  
+In the following example, the `merge` action takes the images which are currently pointing to the Docker Hub registry (only base imagename:tag), and prepends with a private registry URL.  
 
-We also demonstrate use of the `%v` format marker by inserting the original value into a new line comment.
+This example also demonstrates how the `%v` format marker is used to insert the original value into a new line comment.
 
 ```yaml
 ---
@@ -120,9 +120,9 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/privateContainerRegistry.yaml -o /tmp/new`
 
 
-## Modify the Name of a Label's Key
+## Modify the name of a label's key
 
-In this example we will manipulate the `name` label key with `app.kubernetes.io/name` by using the `merge` action and retaining the existing value.  The `~` character in JSONPath+ always returns the key, rather than the value itself.
+In the following example, the `name` label key and `app.kubernetes.io/name` are manipulated by using the `merge` action and retaining the existing value.  The `~` character in JSONPath+ always returns the key, rather than the value itself.
 
 ```yaml
 ---
@@ -144,9 +144,9 @@ yamlFiles:
 Now apply the changes by generating a new set of YAML files:  
 >`yot -i ./examples/kubernetes/formatLabelKey.yaml -o /tmp/new`
 
-## Replace the Name of a Label's Key
+## Replace the name of a label's key
 
-In this example we will replace the `name` label with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always returns the key, rather than the value itself.
+In the following example, the `name` label is replaced with `my-new-label` by using the `replace` action and retaining the existing value. The `~` character in JSONPath+ always returns the key, rather than the value itself.
 
 ```yaml
 ---
@@ -166,9 +166,10 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/replaceLabelKey.yaml -o /tmp/new`
 
 
-## Remove All Annotations
+## Remove all annotations
 
-Often times annotations are set for certain environments that may not apply to your environment.  To remove all annotations we will use the `delete` action.
+Annotations are set for specific environments that may not apply to your environment.  
+Use the `delete` action to remove all annotations in the following example:  
 
 ```yaml
 # removeAnnotations.yaml
@@ -186,9 +187,9 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/removeAnnotations.yaml -o /tmp/new`
 
 
-## Remove Annotations from Specific Kubernetes Object Types
+## Remove annotations from specific Kubernetes object types
 
-To build on the previous example, there are often times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove these annotations, we will use the `delete` action and a `documentQuery`.
+To build on the previous example, there are times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove annotations, use the `delete` action and a `documentQuery`.
 
 ```yaml
 # removeAnnotationsWithConditions.yaml
@@ -215,13 +216,13 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/removeAnnotationsWithConditions.yaml -o /tmp/new`
 
 
-## insert Comments
+## Insert comments
 
-Sometimes you would like to add some additional comments to denote why you did something.  Additionally, to document what something used to be set to in case you want to restore it to a previous state later.
+Add additional comments to denote why something was done.  Document what the original value was set to in the event you later want to restore it to a previous state.  
 
-There are other times where you want to add comments as annotations for another application's consumption.
+Add comments as annotations for another application's consumption.
 
-Yot **can** insert comments!
+Yot **can** insert comments!  
 
 ```yaml
 ---
