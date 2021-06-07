@@ -25,31 +25,45 @@ type Instructions struct {
 }
 
 // ReadInstructionFile reads a file and decodes it into an Instructions struct.
-func ReadInstructionFile(fileName *string, values interface{}) (*Instructions, error) {
+func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
+	log.Debugf("Instructions File: %s\n", cfg.InstructionsFile)
+
 	var instructions Instructions
 
-	var err error
-
-	log.Debugf("Instructions File: %s\n", *fileName)
-
-	instructionsPath, err := filepath.Abs(*fileName)
+	instructionsPath, err := filepath.Abs(cfg.InstructionsFile)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", *fileName, err)
+		return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", cfg.InstructionsFile, err)
 	}
 
 	instructionsDir = path.Dir(instructionsPath)
 
-	reader, err := renderInstructionsTemplate(*fileName, values)
+	values, err := getValues(cfg.Values)
+	if err != nil {
+		return nil, err
+	}
+
+	reader, err := renderInstructionsTemplate(cfg.InstructionsFile, values)
 	if err != nil {
 		return nil, err
 	}
 
 	dc := yaml.NewDecoder(reader)
 	if err := dc.Decode(&instructions); err != nil {
-		return nil, fmt.Errorf("unable to read instructions file %s: %w", *fileName, err)
+		return nil, fmt.Errorf("unable to read instructions file %s: %w", cfg.InstructionsFile, err)
 	}
 
 	instructions.setOutputPath()
+
+	instructions.addCommonOverlays()
+
+	// remove the comments if requested
+	if cfg.RemoveComments {
+		for _, yamlFile := range instructions.YamlFiles {
+			for _, node := range yamlFile.Nodes {
+				removeCommentsFromNode(node)
+			}
+		}
+	}
 
 	return &instructions, nil
 }
