@@ -6,18 +6,16 @@ package commands
 var version = "unstable"
 
 const (
-	YotShort = "yot (YAML Overlay Tool) is a YAML overlay tool."
+	YotShort = "Yot (YAML Overlay Tool) is a YAML overlay tool."
 
-	YotLong = `yot (YAML Overlay Tool) is a YAML overlay tool which uses a YAML schema to 
-	define overlay operations on a set of YAML documents. yot only produces valid YAML 
-	documents on output, and can preserve and inject comments.`
+	YotLong = `Yot (YAML Overlay Tool) is a YAML overlay tool which uses a templatable YAML schema to define overlay 
+operations on a set of YAML documents. Yot only produces valid YAML documents on output, 
+and can preserve and inject comments.`
 
-	helpValueFile = `Path to your values file.
-	Takes multiple values files in case you would
-	like to separate out some of the values. After the
-	first values file, each subsequent file passed
-	with -f will be merged with the values from the
-	first. these will get applied to your instructions file if go templating is found.`
+	helpValueFile = `Path to a values file for use with templating an instructions file.
+Takes multiple values files in case you would like to better organize the values. 
+Each subsequent file passed with -f will be merged over the values 
+from the previous. Values are applied to your instructions file when using templating.`
 	/*
 			helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
 
@@ -59,13 +57,13 @@ const (
 
 	HelpInstructionsFile = "Path to the instructions file (required)"
 
-	HelpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by yot`
+	HelpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
 		defaults.yaml/.yml then the rendered templates will land
 		in <output dir>/<addl value file name>.`
 	*/
 
-	HelpRenderStdOut = `Output YAML files which were operated on by yot to stdout`
+	HelpRenderStdOut = `Output YAML files which were operated on by Yot to stdout`
 	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -75,7 +73,7 @@ const (
 		code 0 prior to processing instructions`
 	*/
 
-	HelpRemoveComments = `Remove comments from the source YAML files prior to templating`
+	HelpRemoveComments = `Remove all comments from the source YAML files prior to overlayment`
 
 	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
