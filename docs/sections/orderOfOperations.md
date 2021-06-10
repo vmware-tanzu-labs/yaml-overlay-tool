@@ -1,9 +1,9 @@
-[Back to Table of Contents](../documentation.md)  
+[Back to Table of contents](../documentation.md)  
 
 
-## Order of Operations
+## Order of operations/Processing Order
 
-### 1a. Dynamic Instructions (Templating) - Not currently implemented in v0.1.0
+### 1a. Dynamic instructions (Templating) - Not currently implemented in v0.1.0
 
 When one or more values files have been passed to `yot` a `defaults.yaml` or `defaults.yml` file must exist within that path, when passing a directory with the `-v` option.  
 
@@ -33,7 +33,7 @@ $ tree
 `yot` only takes values files with the file extension of `.yml` or `.yaml`, therefore the file `bar` above would not be read.  The values contained in values/defaults.yaml would be read and then the instructions file would be rendered by applying the values of foo.yaml over defaults.yaml, and then render the instructions.yaml template into memory for processing.  Then the test.yml will merge over defaults.yaml and render the instructions.yaml again, producing a total of 2 unique instruction sets.  When processing is complete, the modified yaml documents will be placed in `./output/yaml_files/foo` and `./output/yaml_files/test` respectively.  
 > **NOTE:**  Please be careful about naming your values files, as a values file called test.yaml and test.yml would dump both of their rendered contents into ./output/test
 
-### 1b. Static Instructions (No Templating) - v0.1.0 behavior
+### 1b. Static instructions (No templating) - v0.1.0 behavior
 
 If no values files were passed, then the instructions file skips the templating mechanism and is loaded directly, as long as the document is valid yaml.
 
@@ -44,7 +44,7 @@ yot -i instructions.yaml -o ./output
 
 `yot` will read the instructions.yaml file and any outputs will be placed directly in ./output/ .
 
-### 2. Processing Instructions
+### 2. Processing instructions
 
 After the instructions have either been rendered or read, they are processed.
 
@@ -61,5 +61,5 @@ If values files in addition to a defaults.yaml were passed at runtime, then the 
 If only a defaults.yaml value file was passed, then the output will be placed in the < output directory specified at runtime >/, or if it was not provided, the default path of `./output/`.
 
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Output Directory Structure](outputDirStructure.md)
+[Back to Table of contents](../documentation.md)  
+[Next Up: Output directory structure](outputDirStructure.md)

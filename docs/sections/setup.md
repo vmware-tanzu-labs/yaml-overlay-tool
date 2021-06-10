@@ -1,4 +1,4 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
 
 # Installation and setup
@@ -86,5 +86,5 @@ GO111MODULE=on go get github.com/vmware-tanzu-labs/yaml-overlay-tool/cmd/yot
 ```
 
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Command Line Usage and Overview](usage.md)
+[Back to Table of contents](../documentation.md)  
+[Next Up: Command line interface usage and overview](usage.md)
