@@ -95,8 +95,7 @@ commonOverlays: # optional way to apply overlays to all 'yamlFiles'
           value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
 yamlFiles: # what to overlay onto
   - name: "some arbitrary descriptor" # Name is Optional
-    path: "path/relative/to/directory/of/execution.yaml" # or
-    # path: "/fully/qualified/path.yaml"
+    path: "path/relative/to/instructions/file.yaml" 
     outputPath: mynewfilename.yaml # renames the original filename within the output directory
     overlays: # if multi-doc yaml file, applies to all docs, gets applied first
       - name: Inject label to documents 0 2 or 4 if a Deployment
@@ -107,8 +106,9 @@ yamlFiles: # what to overlay onto
           action: "inject" # inject | ignore
           injectPath: "metadata.labels" # if your key (metadata.labels) in this instance was a JSONPath expression, we can't exactly inject to an expression.  We need a real path to plug it into. If you had a JSONPath expression and no onMissing.injectPath we would assume ignore and print a warning
         documentQuery: # qualifier, only modify if a k8s Deployment
-          key: kind
-          value: Deployment
+          - conditions:
+              - query: kind
+                value: Deployment
         documentIndex: # qualifier, only modify docs 0, 2, and 4 in multi-yaml doc
           - 0
           - 2
