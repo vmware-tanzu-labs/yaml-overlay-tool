@@ -8,19 +8,21 @@ import (
 	"fmt"
 	"io"
 	"text/template"
+
+	"github.com/Masterminds/sprig/v3"
 )
 
 func renderInstructionsTemplate(fileName string, values interface{}) (io.Reader, error) {
-	tmpl, err := template.ParseFiles(fileName)
+	tpl, err := template.ParseFiles(fileName)
 	if err != nil {
 		return nil, fmt.Errorf("unable to process template for instructions file %s, %w", fileName, err)
 	}
 
-	tmpl = tmpl.Option("missingkey=zero")
+	tpl = tpl.Funcs(template.FuncMap(sprig.FuncMap())).Option("missingkey=zero")
 
 	var b bytes.Buffer
 
-	if err := tmpl.Execute(&b, values); err != nil {
+	if err := tpl.Execute(&b, values); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 

@@ -3,6 +3,7 @@ module github.com/vmware-tanzu-labs/yaml-overlay-tool
 go 1.16
 
 require (
+	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/google/go-cmp v0.5.6
 	github.com/kr/text v0.2.0 // indirect
 	github.com/onsi/ginkgo v1.16.2 // indirect
