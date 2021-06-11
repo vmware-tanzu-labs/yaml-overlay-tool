@@ -61,4 +61,4 @@ Flags:
 ```
 
 [Back to Table of contents](../documentation.md)  
-[Next Up: Instructions file introduction](instructionsFileIntro.md)
+[Next Up: Example CLI usage](exampleUsage.md)

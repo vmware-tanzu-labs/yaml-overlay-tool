@@ -87,4 +87,4 @@ GO111MODULE=on go get github.com/vmware-tanzu-labs/yaml-overlay-tool/cmd/yot
 
 
 [Back to Table of contents](../documentation.md)  
-[Next Up: Command line interface usage and overview](usage.md)
+[Next Up: Command line interface usage and overview](commandUsage.md)
