@@ -128,13 +128,25 @@ func (r *Root) initializeInstructionFlags() {
 		&r.Options.InstructionsFile,
 		"instructions",
 		"i",
-		"instructions.yaml",
+		"",
 		helpInstructionsFile,
 	)
 
 	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
 		r.Log.Error(err)
 	}
+
+	r.Command.Flags().Var(
+		&r.Options.DefaultOnMissingAction,
+		"default-on-missing-action",
+		helpDefaultOnMissingAction,
+	)
+
+	if err := viper.BindPFlag("default-on-missing-action", r.Command.Flags().Lookup("default-on-missing-action")); err != nil {
+		r.Log.Fatal(err)
+	}
+
+	viper.RegisterAlias("defaultOnMissingAction", "default-on-missing-action")
 }
 
 func (r *Root) initializeStdInFlags() {

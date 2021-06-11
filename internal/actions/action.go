@@ -86,16 +86,19 @@ func (a *Action) Type() string {
 type OnMissingAction int
 
 const (
+	// Default onMissing action. settable via viepr config, defaults to ignore.
+	Default = iota
 	// Ignore onMissing action.
-	Ignore = iota
+	Ignore
 	// Inject onMissing action.
 	Inject
 )
 
 func (a OnMissingAction) String() string {
 	toString := map[OnMissingAction]string{
-		Ignore: "ignore",
-		Inject: "inject",
+		Default: "default",
+		Ignore:  "ignore",
+		Inject:  "inject",
 	}
 
 	return toString[a]
@@ -111,8 +114,9 @@ func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
 	y = strings.ToLower(y)
 
 	toID := map[string]OnMissingAction{
-		"ignore": Ignore,
-		"inject": Inject,
+		"default": Default,
+		"ignore":  Ignore,
+		"inject":  Inject,
 	}
 
 	*a = toID[y]
@@ -122,4 +126,16 @@ func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
 
 func (a OnMissingAction) MarshalYAML() (interface{}, error) {
 	return a.String(), nil
+}
+
+func (a *OnMissingAction) Set(val string) error {
+	if err := yaml.Unmarshal([]byte(val), a); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	return nil
+}
+
+func (a *OnMissingAction) Type() string {
+	return "actions.OnMissingAction"
 }

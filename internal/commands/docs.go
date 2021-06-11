@@ -70,6 +70,10 @@ multiple values can be provided to achieve the desired result, valid values are:
 	FOLDED:       {"folded", "fold", "fo"},
 	FLOW:         {"flow", "fl"}
 `
+	helpDefaultOnMissingAction = `(YOT_DEFAULT_ON_MISSING_ACTION) change the default on missing action, valid values are:
+	ignore (default)
+	inject
+`
 
 	completionUse   = "completion [bash|zsh|fish|powershell]"
 	completionShort = "Generate shell auto-completion scripts"

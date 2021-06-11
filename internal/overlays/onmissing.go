@@ -6,7 +6,9 @@ package overlays
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/builder"
 	"gopkg.in/yaml.v3"
@@ -26,6 +28,12 @@ type OnMissing struct {
 }
 
 func (o *Overlay) onMissing(n *yaml.Node) error {
+	if o.OnMissing.Action == actions.Default {
+		if strings.EqualFold(viper.GetString("defaultOnMissingAction"), "inject") {
+			o.OnMissing.Action = actions.Inject
+		}
+	}
+
 	// check if the query has a match
 	// if no match then we require an inject path
 	// we need to then check if each inject path is valid (does it exist)

@@ -49,10 +49,10 @@ func (r *Root) initConfig() {
 		// Use config file from the flag.
 		viper.SetConfigFile(r.configFile)
 	} else {
-		viper.SetConfigName(".yot")
+		viper.SetConfigName(".yotconfig")
 		viper.SetConfigType("yaml")
-		viper.AddConfigPath("/etc/appname/")  // path to look for the config file in
-		viper.AddConfigPath("$HOME/.appname") // call multiple times to add many search paths
+		viper.AddConfigPath("/etc/yot/")  // path to look for the config file in
+		viper.AddConfigPath("$HOME/.yot") // call multiple times to add many search paths
 		viper.AddConfigPath(".")
 	}
 

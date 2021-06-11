@@ -18,18 +18,19 @@ import (
 
 // Config contains configuration options used with instruction files.
 type Config struct {
-	Verbose          bool
-	LogLevel         logging.Level
-	InstructionsFile string
-	OutputDir        string
-	StdOut           bool
-	RemoveComments   bool
-	Indent           int
-	Styles           actions.Styles
-	Values           []string
-	Overlay          overlays.Overlay
-	Value            string
-	Path             string
+	Verbose                bool
+	LogLevel               logging.Level
+	InstructionsFile       string
+	OutputDir              string
+	StdOut                 bool
+	RemoveComments         bool
+	Indent                 int
+	Styles                 actions.Styles
+	Values                 []string
+	Overlay                overlays.Overlay
+	Value                  string
+	Path                   string
+	DefaultOnMissingAction actions.OnMissingAction
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
