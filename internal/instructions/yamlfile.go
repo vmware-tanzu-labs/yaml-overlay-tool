@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
@@ -118,7 +119,7 @@ func (yfs *YamlFiles) expandDirectories() error {
 
 	for i := 0; i <= len(y)-1; i++ {
 		if !path.IsAbs(y[i].Path) {
-			y[i].Path = path.Join(instructionsDir, y[i].Path)
+			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
 		}
 
 		if path.IsAbs(y[i].OutputPath) {

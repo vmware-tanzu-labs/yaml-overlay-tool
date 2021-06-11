@@ -16,8 +16,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var instructionsDir string //nolint:gochecknoglobals // needed for path lookups relative to instructions file
-
 // Instructions is a struct used for decoding an instructions file.
 type Instructions struct {
 	// Common Overlays that will apply to all files specified.
@@ -29,14 +27,9 @@ type Instructions struct {
 func (cfg *Config) GetInstructions() (*Instructions, error) {
 	instructions := new(Instructions)
 
+	var err error
+
 	if cfg.InstructionsFile != "" {
-		instructionsPath, err := filepath.Abs(cfg.InstructionsFile)
-		if err != nil {
-			return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", cfg.InstructionsFile, err)
-		}
-
-		instructionsDir = path.Dir(instructionsPath)
-
 		instructions, err = cfg.ReadInstructionFile()
 		if err != nil {
 			return nil, err
@@ -47,7 +40,7 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 			return nil, fmt.Errorf("could not determine working directory, %w", err)
 		}
 
-		instructionsDir = wd
+		viper.Set("instructionDir", wd)
 	}
 
 	if err := cfg.ReadAdHocOverlays(instructions); err != nil {
@@ -85,7 +78,7 @@ func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
 		return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", cfg.InstructionsFile, err)
 	}
 
-	instructionsDir = path.Dir(instructionsPath)
+	viper.Set("instructionsDir", path.Dir(instructionsPath))
 
 	if cfg.Values != nil {
 		values, err = getValues(cfg.Values)
