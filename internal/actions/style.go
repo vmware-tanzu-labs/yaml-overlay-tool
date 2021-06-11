@@ -3,7 +3,11 @@
 
 package actions
 
-import "gopkg.in/yaml.v3"
+import (
+	"strings"
+
+	"gopkg.in/yaml.v3"
+)
 
 type Style uint
 
@@ -77,4 +81,32 @@ func setStyle(s Style, n ...*yaml.Node) {
 			nv.Style = yaml.Style(s)
 		}
 	}
+}
+
+func GetStyleFromConfig(v ...string) Styles {
+	var result Styles
+
+	for _, ss := range v {
+		ssp := strings.Split(strings.Trim(strings.ToLower(ss), "[]"), ",")
+		for _, s := range ssp {
+			switch s {
+			case "normal", "n":
+				result = append(result, NormalStyle)
+			case "tagged", "tag", "t":
+				result = append(result, TaggedStyle)
+			case "doublequoted", "doublequote", "double", "dq":
+				result = append(result, DoubleQuotedStyle)
+			case "singlequoted", "singlequote", "single", "sq":
+				result = append(result, SingleQuotedStyle)
+			case "literal", "l":
+				result = append(result, LiteralStyle)
+			case "folded", "fold", "fo":
+				result = append(result, FoldedStyle)
+			case "flow", "fl":
+				result = append(result, FlowStyle)
+			}
+		}
+	}
+
+	return result
 }

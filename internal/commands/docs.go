@@ -16,35 +16,10 @@ and can preserve and inject comments.`
 Takes multiple values files in case you would like to better organize the values. 
 Each subsequent file passed with -f will be merged over the values 
 from the previous. Values are applied to your instructions file when using templating.`
-	/*
-			helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
-
-			helpCommonValues = `Path to your common values file. If not set, you must
-		pass a values file of common.yaml or
-		common.yml within a path from the -f option.
-		Takes multiple common values files in case you would
-		like to separate out some of the values. After the
-		first common values file, each subsequent file passed
-		with -d will be merged with the values from the
-		first. If a common.yaml or common.yml file is
-		discovered in one of your -f paths, it will be
-		merged with these values last.`
-
-			helpValuesPath = `Values file path. May be a path to a file or directory
-		containing value files ending in either .yml or .yaml.
-		This option can be provided multiple times as required.
-		A file named defaults.yaml or defaults.yml is required
-		within the path(s) if not using the -d option, and you
-		may have only 1 default value file in that scenario.
-		Additional values files are merged over the defaults.yaml
-		file values. Each values file is treated as a unique site
-		and will render your instructions differently based on its
-		values`
-	*/
 
 	helpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	helpLogLevel = `Log-level to display to stdout, one of: 
+	helpLogLevel = `(YOT_LOG_LEVEL) Log-level to display to stdout, one of: 
 	CRITICAL: {"critical", "crit", "c"},
 	ERROR:    {"error", "err", "e"},
 	WARNING:  {"warning", "warn", "w"},
@@ -55,13 +30,13 @@ from the previous. Values are applied to your instructions file when using templ
 
 	helpInstructionsFile = "Path to the instructions file (required)"
 
-	helpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by Yot`
+	helpOutputDirectory = `(YOT_OUTPUT_DIRECTORY) Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
 		defaults.yaml/.yml then the rendered templates will land
 		in <output dir>/<addl value file name>.`
 	*/
 
-	helpRenderStdOut = `Output YAML files which were operated on by Yot to stdout`
+	helpRenderStdOut = `(YOT_STDOUT) Output YAML files which were operated on by Yot to stdout`
 	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -81,11 +56,11 @@ these will get added to the common overlays in conjunction with action and value
 	helpPath = `add extra yaml files outside of the instructions file to process against, theses will receive the common overlays defined,
 using a path of "-" will read from stdIn`
 
-	helpRemoveComments = `Remove all comments from the source YAML files prior to overlayment`
+	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment`
 
-	helpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
+	helpIndentLevel = `(YOT_INDENT_LEVEL) Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
-	helpOutputStyle = `style to be used for rendering final documents.
+	helpOutputStyle = `(YOT_OUTPUT_STYLE) style to be used for rendering final documents.
 multiple values can be provided to achieve the desired result, valid values are:
 	NORMAL:       {"normal", "n"},
 	TAGGED:       {"tagged", "tag", "t"},

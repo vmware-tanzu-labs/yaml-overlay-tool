@@ -4,11 +4,14 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
@@ -17,9 +20,10 @@ import (
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
 type Root struct {
-	Log     *logging.Logger
-	Options *instructions.Config
-	Command *cobra.Command
+	configFile string
+	Log        *logging.Logger
+	Options    *instructions.Config
+	Command    *cobra.Command
 }
 
 func New() *Root {
@@ -31,11 +35,44 @@ func New() *Root {
 		},
 	}
 
+	cobra.OnInitialize(rc.initConfig)
+
 	rc.Command = rc.NewCommand()
 	rc.AddFlags()
 	rc.AddCommands()
 
 	return rc
+}
+
+func (r *Root) initConfig() {
+	if r.configFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(r.configFile)
+	} else {
+		viper.SetConfigName(".yot")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath("/etc/appname/")  // path to look for the config file in
+		viper.AddConfigPath("$HOME/.appname") // call multiple times to add many search paths
+		viper.AddConfigPath(".")
+	}
+
+	viper.SetEnvPrefix("yot")
+
+	replacer := strings.NewReplacer("-", "_")
+
+	viper.SetEnvKeyReplacer(replacer)
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
+		if ok := errors.As(err, &viper.ConfigFileNotFoundError{}); !ok {
+			r.Log.Fatal(err)
+		}
+
+		return
+	}
+
+	r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
 }
 
 func (r Root) NewCommand() *cobra.Command {
@@ -79,7 +116,10 @@ func (r Root) NewCommand() *cobra.Command {
 }
 
 func (r *Root) AddFlags() {
-	r.initializeGlobalFlags()
+	r.initializeCommonFlags()
+	r.initializeInstructionFlags()
+	r.initializeOutputFlags()
+	r.initializeFormatFlags()
 	r.initializeTemplateFlags()
 	r.initializeStdInFlags()
 }
@@ -98,7 +138,13 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format),
 	)
 
-	backend.SetLevel(r.Options.LogLevel, "")
+	logLevel, err := logging.LogLevel((viper.GetString("log-level")))
+	if err != nil {
+		panic(err)
+	}
+
+	backend.SetLevel(logLevel, "")
+
 	logging.SetBackend(backend)
 }
 

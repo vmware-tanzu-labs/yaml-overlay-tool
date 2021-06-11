@@ -5,10 +5,14 @@ package commands
 
 import (
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 	"github.com/thediveo/enumflag"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 )
 
-func (r *Root) initializeGlobalFlags() {
+func (r *Root) initializeCommonFlags() {
+	r.Command.Flags().StringVar(&r.configFile, "config", "", "config file (default is $HOME/.yot)")
+
 	logMap := map[logging.Level][]string{
 		logging.CRITICAL: {"critical", "crit", "c"},
 		logging.ERROR:    {"error", "err", "e"},
@@ -27,18 +31,14 @@ func (r *Root) initializeGlobalFlags() {
 
 	r.Command.Flags().Lookup("log-level").NoOptDefVal = "debug"
 
-	r.Command.Flags().StringVarP(
-		&r.Options.InstructionsFile,
-		"instructions",
-		"i",
-		"",
-		helpInstructionsFile,
-	)
-
-	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
-		r.Log.Error(err)
+	if err := viper.BindPFlag("log-level", r.Command.Flags().Lookup("log-level")); err != nil {
+		r.Log.Fatal(err)
 	}
 
+	viper.RegisterAlias("logLevel", "log-level")
+}
+
+func (r *Root) initializeOutputFlags() {
 	r.Command.Flags().StringVarP(
 		&r.Options.OutputDir,
 		"output-directory",
@@ -59,14 +59,20 @@ func (r *Root) initializeGlobalFlags() {
 		helpRenderStdOut,
 	)
 
-	r.Command.Flags().BoolVarP(
-		&r.Options.RemoveComments,
-		"remove-comments",
-		"",
-		false,
-		helpRemoveComments,
-	)
+	if err := viper.BindPFlag("output-directory", r.Command.Flags().Lookup("output-directory")); err != nil {
+		r.Log.Fatal(err)
+	}
 
+	viper.RegisterAlias("outputDirectory", "output-directory")
+
+	if err := viper.BindPFlag("stdout", r.Command.Flags().Lookup("stdout")); err != nil {
+		r.Log.Fatal(err)
+	}
+
+	viper.SetDefault("outputDirectory", "./output")
+}
+
+func (r *Root) initializeFormatFlags() {
 	r.Command.Flags().IntVarP(
 		&r.Options.Indent,
 		"indent-level",
@@ -76,11 +82,35 @@ func (r *Root) initializeGlobalFlags() {
 	)
 
 	r.Command.Flags().VarP(
-		enumflag.NewSlice(&r.Options.Styles, "style", r.Options.Styles.FlagMap(), enumflag.EnumCaseInsensitive),
+		enumflag.NewSlice(&r.Options.Styles, "style", actions.Styles{}.FlagMap(), enumflag.EnumCaseInsensitive),
 		"output-style",
 		"S",
 		helpOutputStyle,
 	)
+
+	r.Command.Flags().BoolVarP(
+		&r.Options.RemoveComments,
+		"remove-comments",
+		"",
+		false,
+		helpRemoveComments,
+	)
+
+	if err := viper.BindPFlag("remove-comments", r.Command.Flags().Lookup("remove-comments")); err != nil {
+		r.Log.Fatal(err)
+	}
+
+	if err := viper.BindPFlag("indent-level", r.Command.Flags().Lookup("indent-level")); err != nil {
+		r.Log.Fatal(err)
+	}
+
+	if err := viper.BindPFlag("output-style", r.Command.Flags().Lookup("output-style")); err != nil {
+		r.Log.Fatal(err)
+	}
+
+	viper.RegisterAlias("indentLevel", "indent-level")
+	viper.RegisterAlias("outputStyle", "output-style")
+	viper.RegisterAlias("removeComments", "remove-comments")
 }
 
 func (r *Root) initializeTemplateFlags() {
@@ -91,6 +121,20 @@ func (r *Root) initializeTemplateFlags() {
 		nil,
 		helpValueFile,
 	)
+}
+
+func (r *Root) initializeInstructionFlags() {
+	r.Command.Flags().StringVarP(
+		&r.Options.InstructionsFile,
+		"instructions",
+		"i",
+		"instructions.yaml",
+		helpInstructionsFile,
+	)
+
+	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
+		r.Log.Error(err)
+	}
 }
 
 func (r *Root) initializeStdInFlags() {

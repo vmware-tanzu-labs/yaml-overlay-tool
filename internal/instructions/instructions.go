@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
@@ -58,7 +59,7 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 	instructions.addCommonOverlays()
 
 	// remove the comments if requested
-	if cfg.RemoveComments {
+	if viper.GetBool("removeComments") {
 		for _, yamlFile := range instructions.YamlFiles {
 			for _, node := range yamlFile.Nodes {
 				removeCommentsFromNode(node)
