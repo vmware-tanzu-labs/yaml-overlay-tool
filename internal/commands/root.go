@@ -46,7 +46,7 @@ func (r Root) NewCommand() *cobra.Command {
 		SuggestFor:                 []string{},
 		Short:                      YotShort,
 		Long:                       YotLong,
-		Example:                    HelpUsageExample,
+		Example:                    helpUsageExample,
 		ValidArgs:                  []string{},
 		Args:                       nil,
 		ArgAliases:                 []string{},
@@ -59,8 +59,7 @@ func (r Root) NewCommand() *cobra.Command {
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		Run:                        r.Execute,
-		RunE:                       nil,
+		RunE:                       r.Execute,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
@@ -68,7 +67,7 @@ func (r Root) NewCommand() *cobra.Command {
 		SilenceErrors:              false,
 		SilenceUsage:               false,
 		DisableFlagParsing:         false,
-		DisableAutoGenTag:          false,
+		DisableAutoGenTag:          true,
 		DisableFlagsInUseLine:      false,
 		DisableSuggestions:         false,
 		SuggestionsMinimumDistance: 0,
@@ -82,6 +81,7 @@ func (r Root) NewCommand() *cobra.Command {
 func (r *Root) AddFlags() {
 	r.initializeGlobalFlags()
 	r.initializeTemplateFlags()
+	r.initializeStdInFlags()
 }
 
 func (r *Root) AddCommands() {
@@ -102,17 +102,19 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	logging.SetBackend(backend)
 }
 
-func (r *Root) Execute(cmd *cobra.Command, args []string) {
+func (r *Root) Execute(cmd *cobra.Command, args []string) error {
 	if err := instructions.Execute(r.Options); err != nil {
 		cmd.SilenceUsage = true
 
-		r.Log.Error(fmt.Errorf("%w", err))
-		os.Exit(1)
+		return fmt.Errorf("%w", err)
 	}
+
+	return nil
 }
 
 func (r *Root) Run() {
 	if err := r.Command.Execute(); err != nil {
 		r.Log.Error(err)
+		os.Exit(1)
 	}
 }

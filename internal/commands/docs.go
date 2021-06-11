@@ -42,11 +42,9 @@ from the previous. Values are applied to your instructions file when using templ
 		values`
 	*/
 
-	HelpUsageExample = "yot -i instructions.yaml -o /tmp/output"
+	helpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	HelpVerbose = "Verbose log-level stdout, equivalent to '--log-level debug'"
-
-	HelpLogLevel = `Log-level to display to stdout, one of: 
+	helpLogLevel = `Log-level to display to stdout, one of: 
 	CRITICAL: {"critical", "crit", "c"},
 	ERROR:    {"error", "err", "e"},
 	WARNING:  {"warning", "warn", "w"},
@@ -55,15 +53,15 @@ from the previous. Values are applied to your instructions file when using templ
 	DEBUG:    {"debug", "d", "verbose", "v"} * used if no argument is provided
 `
 
-	HelpInstructionsFile = "Path to the instructions file (required)"
+	helpInstructionsFile = "Path to the instructions file (required)"
 
-	HelpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by Yot`
+	helpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
 		defaults.yaml/.yml then the rendered templates will land
 		in <output dir>/<addl value file name>.`
 	*/
 
-	HelpRenderStdOut = `Output YAML files which were operated on by Yot to stdout`
+	helpRenderStdOut = `Output YAML files which were operated on by Yot to stdout`
 	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -73,11 +71,21 @@ from the previous. Values are applied to your instructions file when using templ
 		code 0 prior to processing instructions`
 	*/
 
-	HelpRemoveComments = `Remove all comments from the source YAML files prior to overlayment`
+	helpQuery = `define extra JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate.
+these will get added to the common overlays in conjunction with action and value`
 
-	HelpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
+	helpValue = "The desired value to take action with if `query` is found."
 
-	HelpOutputStyle = `style to be used for rendering final documents.
+	helpAction = "The action to take when the JSONPath expression is found in the YAML document. Can be one of delete, merge, or replace."
+
+	helpPath = `add extra yaml files outside of the instructions file to process against, theses will receive the common overlays defined,
+using a path of "-" will read from stdIn`
+
+	helpRemoveComments = `Remove all comments from the source YAML files prior to overlayment`
+
+	helpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
+
+	helpOutputStyle = `style to be used for rendering final documents.
 multiple values can be provided to achieve the desired result, valid values are:
 	NORMAL:       {"normal", "n"},
 	TAGGED:       {"tagged", "tag", "t"},
@@ -88,10 +96,10 @@ multiple values can be provided to achieve the desired result, valid values are:
 	FLOW:         {"flow", "fl"}
 `
 
-	CompletionUse   = "completion [bash|zsh|fish|powershell]"
-	CompletionShort = "Generate shell auto-completion scripts"
+	completionUse   = "completion [bash|zsh|fish|powershell]"
+	completionShort = "Generate shell auto-completion scripts"
 
-	CompletionLong = `To load completions:
+	completionLong = `To load completions:
 
 Bash:
 
