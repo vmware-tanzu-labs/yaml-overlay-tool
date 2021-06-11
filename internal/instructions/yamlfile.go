@@ -96,9 +96,9 @@ func (yf *YamlFile) readYamlFile() error {
 		if err := dc.Decode(&y); errors.Is(err, io.EOF) {
 			if reader, ok := reader.(*os.File); ok {
 				CloseFile(reader)
-
-				break
 			}
+
+			break
 		} else if err != nil {
 			return fmt.Errorf("failed to read file %s: %w", yf.Path, err)
 		}

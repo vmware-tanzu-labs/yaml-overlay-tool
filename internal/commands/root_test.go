@@ -28,7 +28,7 @@ func TestNew(t *testing.T) {
 				Long:             commands.YotLong,
 				Version:          "unstable",
 				PersistentPreRun: commands.New().SetupLogging,
-				Run:              commands.New().Execute,
+				RunE:             commands.New().Execute,
 			},
 		},
 	}

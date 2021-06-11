@@ -11,6 +11,7 @@ import (
 
 	"github.com/op/go-logging"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 
@@ -25,6 +26,9 @@ type Config struct {
 	Indent           int
 	Styles           actions.Styles
 	Values           []string
+	Overlay          overlays.Overlay
+	Value            string
+	Path             string
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
@@ -124,4 +128,34 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 	}
 
 	return output, nil
+}
+
+func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
+	if cfg.Path != "" {
+		yf := &YamlFile{
+			Name:       "StdIn",
+			Path:       cfg.Path,
+			OutputPath: "stdin.yaml",
+		}
+
+		if err := yf.readYamlFile(); err != nil {
+			return err
+		}
+
+		i.YamlFiles = append(i.YamlFiles, yf)
+	}
+
+	if cfg.Overlay.Query != nil {
+		if err := yaml.Unmarshal([]byte(cfg.Value), &cfg.Overlay.Value); err != nil {
+			return fmt.Errorf("unable to read overlay value from flag, %w", err)
+		}
+
+		if cfg.Overlay.Value.Kind == yaml.DocumentNode && cfg.Overlay.Value.Content != nil {
+			cfg.Overlay.Value = *cfg.Overlay.Value.Content[0]
+		}
+
+		i.CommonOverlays = append(i.CommonOverlays, &cfg.Overlay)
+	}
+
+	return nil
 }

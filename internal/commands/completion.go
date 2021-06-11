@@ -11,9 +11,9 @@ import (
 
 func (r *Root) CompletionCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:                   CompletionUse,
-		Short:                 CompletionShort,
-		Long:                  CompletionLong,
+		Use:                   completionUse,
+		Short:                 completionShort,
+		Long:                  completionLong,
 		DisableFlagsInUseLine: true,
 		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
 		Args:                  cobra.ExactValidArgs(1),
