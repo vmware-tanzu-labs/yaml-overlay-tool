@@ -22,7 +22,7 @@ func (r *Root) initializeGlobalFlags() {
 		enumflag.New(&r.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
 		"log-level",
 		"v",
-		HelpLogLevel,
+		helpLogLevel,
 	)
 
 	r.Command.Flags().Lookup("log-level").NoOptDefVal = "debug"
@@ -31,8 +31,8 @@ func (r *Root) initializeGlobalFlags() {
 		&r.Options.InstructionsFile,
 		"instructions",
 		"i",
-		"instructions.yaml",
-		HelpInstructionsFile,
+		"",
+		helpInstructionsFile,
 	)
 
 	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
@@ -44,7 +44,7 @@ func (r *Root) initializeGlobalFlags() {
 		"output-directory",
 		"o",
 		"./output",
-		HelpOutputDirectory,
+		helpOutputDirectory,
 	)
 
 	if err := r.Command.MarkFlagDirname("output-directory"); err != nil {
@@ -56,7 +56,7 @@ func (r *Root) initializeGlobalFlags() {
 		"stdout",
 		"s",
 		false,
-		HelpRenderStdOut,
+		helpRenderStdOut,
 	)
 
 	r.Command.Flags().BoolVarP(
@@ -64,7 +64,7 @@ func (r *Root) initializeGlobalFlags() {
 		"remove-comments",
 		"",
 		false,
-		HelpRemoveComments,
+		helpRemoveComments,
 	)
 
 	r.Command.Flags().IntVarP(
@@ -72,23 +72,54 @@ func (r *Root) initializeGlobalFlags() {
 		"indent-level",
 		"I",
 		2,
-		HelpIndentLevel,
+		helpIndentLevel,
 	)
 
 	r.Command.Flags().VarP(
 		enumflag.NewSlice(&r.Options.Styles, "style", r.Options.Styles.FlagMap(), enumflag.EnumCaseInsensitive),
 		"output-style",
 		"S",
-		HelpOutputStyle,
+		helpOutputStyle,
 	)
 }
 
 func (r *Root) initializeTemplateFlags() {
 	r.Command.Flags().StringArrayVarP(
 		&r.Options.Values,
-		"values",
+		"values-file",
 		"f",
 		nil,
 		helpValueFile,
+	)
+}
+
+func (r *Root) initializeStdInFlags() {
+	r.Command.Flags().VarP(
+		&r.Options.Overlay.Query,
+		"query",
+		"q",
+		helpQuery,
+	)
+
+	r.Command.Flags().VarP(
+		&r.Options.Overlay.Action,
+		"action",
+		"a",
+		helpAction,
+	)
+
+	r.Command.Flags().StringVarP(
+		&r.Options.Value,
+		"value",
+		"x",
+		"",
+		helpValue,
+	)
+	r.Command.Flags().StringVarP(
+		&r.Options.Path,
+		"path",
+		"p",
+		"",
+		helpPath,
 	)
 }

@@ -68,7 +68,7 @@ spec:
 <br/>
 
 
-## Adding additional labels and selectors to all YAML files in a directory
+## Adding additional labels and selectors to all YAML files on a directory
 
 In the following example, the `merge` action adds in 2 new labels to a set of YAML files contained in a directory.
 

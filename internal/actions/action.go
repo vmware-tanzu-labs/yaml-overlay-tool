@@ -71,6 +71,18 @@ func (a Action) MarshalYAML() (interface{}, error) {
 	return a.String(), nil
 }
 
+func (a *Action) Set(val string) error {
+	if err := yaml.Unmarshal([]byte(val), a); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	return nil
+}
+
+func (a *Action) Type() string {
+	return "actions.Action"
+}
+
 type OnMissingAction int
 
 const (

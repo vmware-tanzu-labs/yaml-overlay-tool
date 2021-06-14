@@ -11,9 +11,6 @@ By default, Yot preserves all existing comments within any YAML file that Yot ha
 
 In release (v0.5.0), a command-line option `--remove-comments` will allow a user to remove all comments from the original YAML files being operated on.
 
-
-## Comment injection
-
 You can inject comments into YAML files by simply adding a comment above (head comments), below (foot comments), or on the same line (line comments) as data within the `value` key of any overlay within the [instructions file](instructionsFile.md).  
 
 >**NOTE:** Due to [some minor bugs within Go's yaml.v3 library](https://github.com/go-yaml/yaml/issues/610), head comments in a map/dictionary do not always apply where they should, and will be addressed in a future version of Yot.  ***However***, line comments can be reliably injected today.  Head and foot comments are considered experimental.
