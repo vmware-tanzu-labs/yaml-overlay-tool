@@ -9,6 +9,8 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 
 ## Table of contents
 1. [Installation and setup](sections/setup.md)
+    - [Configuration file](sections/configFile.md)
+    - [Environment variables](sections/envVars.md)
 1. [Command line interface usage and overview](sections/commandUsage.md)
     - [Example CLI usage](sections/exampleUsage.md)
 1. [Instructions file introduction](sections/instructionsFileIntro.md)
