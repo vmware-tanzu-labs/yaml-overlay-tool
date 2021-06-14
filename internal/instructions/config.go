@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
@@ -17,17 +18,18 @@ import (
 
 // Config contains configuration options used with instruction files.
 type Config struct {
-	LogLevel         logging.Level
-	InstructionsFile string
-	OutputDir        string
-	StdOut           bool
-	RemoveComments   bool
-	Indent           int
-	Styles           actions.Styles
-	ValueFiles       []string
-	Overlay          overlays.Overlay
-	Value            string
-	Path             string
+	LogLevel               logging.Level
+	InstructionsFile       string
+	OutputDir              string
+	StdOut                 bool
+	RemoveComments         bool
+	Indent                 int
+	Styles                 actions.Styles
+	ValueFiles             []string
+	Overlay                overlays.Overlay
+	Value                  string
+	Path                   string
+	DefaultOnMissingAction actions.OnMissingAction
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
@@ -47,7 +49,7 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 		return nil
 	}
 
-	if cfg.StdOut {
+	if viper.GetBool("stdout") {
 		o = os.Stdout
 	} else {
 		log.Debugf("Final: >>>\n%s\n", output)
@@ -70,7 +72,7 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 
 // openOutputFile opens or creates a file for outputing results.
 func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
-	fileName := path.Join(cfg.OutputDir, yf.OutputPath)
+	fileName := path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
 	dirName := path.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
@@ -105,7 +107,7 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 		}
 	}()
 
-	ye.SetIndent(cfg.Indent)
+	ye.SetIndent(viper.GetInt("indentLevel"))
 
 	for i, node := range nodes {
 		if len(node.Content) == 0 {
@@ -116,7 +118,8 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 			output.WriteString("---\n")
 		}
 
-		actions.SetStyle(cfg.Styles, node)
+		style := actions.GetStyleFromConfig(viper.GetStringSlice("outputStyle")...)
+		actions.SetStyle(style, node)
 
 		err := ye.Encode(node)
 		if err != nil {

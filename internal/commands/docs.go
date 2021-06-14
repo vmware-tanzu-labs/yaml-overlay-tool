@@ -6,6 +6,9 @@ package commands
 var version = "unstable"
 
 const (
+	YotUse = `
+	yot -i File [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
+	yot -q Query -x Value [-a Action] [-i File [-f File]...] [-o Dir | -s] [-p Path]  [-v=[critical|error|warning|notice|info|debug]] `
 	YotShort = "Yot (YAML Overlay Tool) is a YAML overlay tool."
 
 	YotLong = `Yot (YAML Overlay Tool) is a YAML overlay tool which uses a templatable YAML schema to define overlay 
@@ -15,36 +18,12 @@ and can preserve and inject comments.`
 	helpValueFile = `Path to a values file for use with templating an instructions file.
 Takes multiple values files in case you would like to better organize the values. 
 Each subsequent file passed with -f will be merged over the values 
-from the previous. Values are applied to your instructions file when using templating.`
-	/*
-			helpDefaultValuesFileDeprecated = `--default-values-file argument is deprecated use --common-values instead`
-
-			helpCommonValues = `Path to your common values file. If not set, you must
-		pass a values file of common.yaml or
-		common.yml within a path from the -f option.
-		Takes multiple common values files in case you would
-		like to separate out some of the values. After the
-		first common values file, each subsequent file passed
-		with -d will be merged with the values from the
-		first. If a common.yaml or common.yml file is
-		discovered in one of your -f paths, it will be
-		merged with these values last.`
-
-			helpValuesPath = `Values file path. May be a path to a file or directory
-		containing value files ending in either .yml or .yaml.
-		This option can be provided multiple times as required.
-		A file named defaults.yaml or defaults.yml is required
-		within the path(s) if not using the -d option, and you
-		may have only 1 default value file in that scenario.
-		Additional values files are merged over the defaults.yaml
-		file values. Each values file is treated as a unique site
-		and will render your instructions differently based on its
-		values`
-	*/
+from the previous. Values are applied to your instructions file when using templating.
+`
 
 	helpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
-	helpLogLevel = `Log-level to display to stdout, one of: 
+	helpLogLevel = `(YOT_LOG_LEVEL) Log-level to display to stdout, one of: 
 	CRITICAL: {"critical", "crit", "c"},
 	ERROR:    {"error", "err", "e"},
 	WARNING:  {"warning", "warn", "w"},
@@ -55,13 +34,13 @@ from the previous. Values are applied to your instructions file when using templ
 
 	helpInstructionsFile = "Path to the instructions file"
 
-	helpOutputDirectory = `Path to a directory for writing the YAML files which were operated on by Yot`
+	helpOutputDirectory = `(YOT_OUTPUT_DIRECTORY) Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
 		defaults.yaml/.yml then the rendered templates will land
 		in <output dir>/<addl value file name>.`
 	*/
 
-	helpRenderStdOut = `Output YAML files which were operated on by Yot to stdout`
+	helpRenderStdOut = `(YOT_STDOUT) Output YAML files which were operated on by Yot to stdout`
 	// `Templated instructions files will still be output to the --output-directory.`.
 
 	/*	helpDumpRenderedInstructions = `If using a templated instructions file, you can dump
@@ -76,20 +55,24 @@ This will be treated as commonOverlays when used with 'action', 'value', and 'pa
 Typically used for one-off overlays from the CLI`
 
 	helpValue = `Desired 'value' to take 'action' with if 'query' is found within the YAML document. 
-Typically used for one-off overlays from the CLI.`
+Typically used for one-off overlays from the CLI.
+`
 
 	helpAction = `Action to take with 'value' when the JSONPath 'query' has results in a YAML document. 
 Can be one of combine, delete, merge, or replace. Typically used for one-off overlays from the CLI.
-Typically used for one-off overlays from the CLI.`
+Typically used for one-off overlays from the CLI.
+`
 
 	helpPath = `YAML files or directories outside of the instructions file to process. 
-Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.`
+Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.
+`
 
-	helpRemoveComments = `Remove all comments from the source YAML files prior to overlayment`
+	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment
+`
 
-	helpIndentLevel = `Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
+	helpIndentLevel = `(YOT_INDENT_LEVEL) Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
-	helpOutputStyle = `YAML output style to be used for rendering final documents.
+	helpOutputStyle = `(YOT_OUTPUT_STYLE) YAML output style to be used for rendering final documents.
 Multiple values can be provided to achieve the desired result, valid values are:
 	NORMAL:       {"normal", "n"},
 	TAGGED:       {"tagged", "tag", "t"},
@@ -98,6 +81,10 @@ Multiple values can be provided to achieve the desired result, valid values are:
 	LITERAL:      {"literal", "l"},
 	FOLDED:       {"folded", "fold", "fo"},
 	FLOW:         {"flow", "fl"}
+`
+	helpDefaultOnMissingAction = `(YOT_DEFAULT_ON_MISSING_ACTION) change the default on missing action, valid values are:
+	ignore
+	inject
 `
 
 	completionUse   = "completion [bash|zsh|fish|powershell]"
@@ -142,4 +129,6 @@ PowerShell:
   PS> yot completion powershell > yot.ps1
   # and source this file from your PowerShell profile.
 `
+	envShort = "yot environment information"
+	envLong  = `Env prints out all the environment information in use by yot`
 )

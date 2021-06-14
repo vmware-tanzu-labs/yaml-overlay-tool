@@ -10,6 +10,7 @@ require (
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
 	github.com/spf13/cobra v1.1.3
+	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/thediveo/enumflag v0.10.1
 	github.com/vmware-labs/yaml-jsonpath v0.3.0

@@ -6,6 +6,7 @@ package instructions_test
 import (
 	"testing"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
@@ -49,6 +50,7 @@ func TestExecute(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			viper.Set("outputDirectory", "./output")
 			if err := instructions.Execute(tt.args.cfg); (err != nil) != tt.wantErr {
 				t.Errorf("Execute(%v) error = %v, wantErr %v", tt.args.cfg, err, tt.wantErr)
 			}

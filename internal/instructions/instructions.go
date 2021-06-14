@@ -11,11 +11,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
-
-var instructionsDir string //nolint:gochecknoglobals // needed for path lookups relative to instructions file
 
 // Instructions is a struct used for decoding an instructions file.
 type Instructions struct {
@@ -28,14 +27,9 @@ type Instructions struct {
 func (cfg *Config) GetInstructions() (*Instructions, error) {
 	instructions := new(Instructions)
 
+	var err error
+
 	if cfg.InstructionsFile != "" {
-		instructionsPath, err := filepath.Abs(cfg.InstructionsFile)
-		if err != nil {
-			return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", cfg.InstructionsFile, err)
-		}
-
-		instructionsDir = path.Dir(instructionsPath)
-
 		instructions, err = cfg.ReadInstructionFile()
 		if err != nil {
 			return nil, err
@@ -46,7 +40,7 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 			return nil, fmt.Errorf("could not determine working directory, %w", err)
 		}
 
-		instructionsDir = wd
+		viper.Set("instructionDir", wd)
 	}
 
 	if err := cfg.ReadAdHocPaths(instructions); err != nil {
@@ -62,7 +56,7 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 	instructions.addCommonOverlays()
 
 	// remove the comments if requested
-	if cfg.RemoveComments {
+	if viper.GetBool("removeComments") {
 		for _, yamlFile := range instructions.YamlFiles {
 			for _, node := range yamlFile.Nodes {
 				removeCommentsFromNode(node)
@@ -88,7 +82,7 @@ func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
 		return nil, fmt.Errorf("cannot get absolute path of instructions file %s, %w", cfg.InstructionsFile, err)
 	}
 
-	instructionsDir = path.Dir(instructionsPath)
+	viper.Set("instructionsDir", path.Dir(instructionsPath))
 
 	if cfg.ValueFiles != nil {
 		values, err = getValues(cfg.ValueFiles)
