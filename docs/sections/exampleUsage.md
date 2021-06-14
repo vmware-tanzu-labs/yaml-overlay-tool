@@ -1,6 +1,28 @@
 [Back to Table of contents](../documentation.md)  
 
+
 ## Example CLI usage
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=3 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Use with an Instructions file](#use-with-an-instructions-file)
+  - [Specify an output path](#specify-an-output-path)
+  - [Direct output to stdout](#direct-output-to-stdout)
+  - [Pipe output to kubectl](#pipe-output-to-kubectl)
+  - [Manipulating the output style](#manipulating-the-output-style)
+  - [Manipulating the output indentation level](#manipulating-the-output-indentation-level)
+  - [Remove source YAML file comments prior to overlayment](#remove-source-yaml-file-comments-prior-to-overlayment)
+  - [Provide variable values to a templated Instructions file](#provide-variable-values-to-a-templated-instructions-file)
+  - [Obtain logging or debug information](#obtain-logging-or-debug-information)
+- [Use without an Instructions file](#use-without-an-instructions-file)
+  - [One-off overlay example](#one-off-overlay-example)
+  - [One-off overlay example from stdin](#one-off-overlay-example-from-stdin)
+  - [One-off overlay example in conjunction with an Instructions file](#one-off-overlay-example-in-conjunction-with-an-instructions-file)
+
+<!-- /code_chunk_output -->
+
 
 ### Use with an Instructions file
 
@@ -76,7 +98,7 @@ yot -i < instructions file > --remove-comments
 
 #### Provide variable values to a templated Instructions file
 
-Yot allows [templating within the Instructions file](instructionsFileTemplating.md).  To use templating, values must be supplied at run time for the particular templating engine to be able to render the instructions into a usable Instructions set.
+Yot allows [templating within the Instructions file](instructionsFileTemplating.md).  To use templating, values must be supplied at run-time for the particular templating engine to be able to render the instructions into a usable Instructions set.
 
 Pass variable values into Yot by using the `-f` paramater followed by the path to a YAML file containing values.  This parameter may be passed multiple times, where any overlapping values will be overridden from the newest instantiation of the `-f` parameter.
 
@@ -116,12 +138,33 @@ yot -i < instructions file > -v=WARNING
 
 Yot may also be used without an Instructions file, and behaves as a [`commonOverlay`](instructionsFileSpec.md#top-level-commonoverlays-keys) does (added in v0.5.0).  
 
+As of v0.5.0, an overlay can be applied purely from the CLI, and can be processed with or in combination with an instructions file.  [Overlay qualifiers](overlayQualifiers.md) are not supported via the CLI in v0.5.0.
 
-#### One-off overlays
+To process an overlay without an instructions file, a few parameters are required:  
+    * **Query:** `q`, `query`
+    * **Action:** `a`, `action`
+    * **Value:** `x`, `value`
+    * **Path:** `p`, `path`
 
-An overlay can be applied purely from the CLI, and can be performed with or without an instructions file.  
+#### One-off overlay example
 
-There are a WIP
+```bash
+yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
+```
+
+#### One-off overlay example from stdin
+
+```bash
+cat /path/to/yaml/files/*.yaml | yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p - -o /tmp/new
+```
+
+#### One-off overlay example in conjunction with an Instructions file
+
+An additional overlay can be added to be processed in addition to an Instructions file.  CLI based overlays are processed as if they were `commonOverlays`, and when specified in addition to an Instructions file they are always processed as the ***last*** `commonOverlay`.  
+
+```bash
+yot -i /paht/to/my/instructions/file.yaml -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
+```
 
 
 [Back to Table of contents](../documentation.md)  
