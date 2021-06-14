@@ -85,7 +85,7 @@ func (r *Root) initializeGlobalFlags() {
 
 func (r *Root) initializeTemplateFlags() {
 	r.Command.Flags().StringArrayVarP(
-		&r.Options.Values,
+		&r.Options.ValueFiles,
 		"values-file",
 		"f",
 		nil,
