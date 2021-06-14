@@ -12,6 +12,7 @@ The following table will display the available settings, their default values, a
 
 | Environment Variable | Default Value | Options |
 | --- | --- | --- |
+| YOT_CONFIG_FILE | "" | any path to a file you like |
 | YOT_INDENT_LEVEL | "2" | 2-9 |
 | YOT_LOG_LEVEL | "error" | critical, error, warning, notice, info, debug |
 | YOT_OUTPUT_DIRECTORY | "./output" | any path you like |
