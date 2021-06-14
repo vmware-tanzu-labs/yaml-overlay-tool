@@ -20,6 +20,7 @@
   - [One-off overlay example](#one-off-overlay-example)
   - [One-off overlay example from stdin](#one-off-overlay-example-from-stdin)
   - [One-off overlay example in conjunction with an Instructions file](#one-off-overlay-example-in-conjunction-with-an-instructions-file)
+- [Check YAML Overlay Tool's Configuration Setting](#check-yaml-overlay-tools-configuration-setting)
 
 <!-- /code_chunk_output -->
 
