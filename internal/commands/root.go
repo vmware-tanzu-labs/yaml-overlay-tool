@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
@@ -30,9 +29,11 @@ func New() *Root {
 	rc := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
-			LogLevel: logging.ERROR,
-			Styles:   actions.Styles{actions.NormalStyle},
+			LogLevel:               logging.ERROR,
+			Styles:                 actions.Styles{actions.NormalStyle},
+			DefaultOnMissingAction: actions.Ignore,
 		},
+		configFile: os.Getenv("YOT_CONFIG_FILE"),
 	}
 
 	cobra.OnInitialize(rc.initConfig)
@@ -45,24 +46,23 @@ func New() *Root {
 }
 
 func (r *Root) initConfig() {
+	for k, v := range envMap() {
+		if err := viper.BindEnv(k, v); err != nil {
+			r.Log.Fatal(err)
+		}
+	}
+
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("yot.config")
+
 	if r.configFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(r.configFile)
 	} else {
-		viper.SetConfigName(".yotconfig")
-		viper.SetConfigType("yaml")
-		viper.AddConfigPath("/etc/yot/")  // path to look for the config file in
-		viper.AddConfigPath("$HOME/.yot") // call multiple times to add many search paths
-		viper.AddConfigPath(".")
+		viper.AddConfigPath("./")
+		viper.AddConfigPath("$HOME/.yot/") // call multiple times to add many search paths
+		viper.AddConfigPath("/etc/yot/")   // path to look for the config file in
 	}
-
-	viper.SetEnvPrefix("yot")
-
-	replacer := strings.NewReplacer("-", "_")
-
-	viper.SetEnvKeyReplacer(replacer)
-
-	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
 		if ok := errors.As(err, &viper.ConfigFileNotFoundError{}); !ok {
@@ -72,13 +72,13 @@ func (r *Root) initConfig() {
 		return
 	}
 
-	r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+	viper.Set("configFile", viper.ConfigFileUsed())
 }
 
 func (r Root) NewCommand() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
-		Use:                        "yot",
+		Use:                        YotUse,
 		Aliases:                    []string{},
 		SuggestFor:                 []string{},
 		Short:                      YotShort,
@@ -126,6 +126,7 @@ func (r *Root) AddFlags() {
 
 func (r *Root) AddCommands() {
 	r.Command.AddCommand(r.CompletionCommand())
+	r.Command.AddCommand(r.EnvCommand())
 }
 
 func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
@@ -138,7 +139,7 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format),
 	)
 
-	logLevel, err := logging.LogLevel((viper.GetString("log-level")))
+	logLevel, err := logging.LogLevel((viper.GetString("logLevel")))
 	if err != nil {
 		panic(err)
 	}
@@ -146,6 +147,10 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	backend.SetLevel(logLevel, "")
 
 	logging.SetBackend(backend)
+
+	if viper.ConfigFileUsed() != "" {
+		r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+	}
 }
 
 func (r *Root) Execute(cmd *cobra.Command, args []string) error {

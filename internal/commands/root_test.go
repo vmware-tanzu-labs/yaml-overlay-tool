@@ -21,7 +21,7 @@ func TestNew(t *testing.T) {
 		{
 			name: "check initialization",
 			want: &cobra.Command{
-				Use:              "yot",
+				Use:              commands.YotUse,
 				Aliases:          []string{},
 				SuggestFor:       []string{},
 				Short:            commands.YotShort,

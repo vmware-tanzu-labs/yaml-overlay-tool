@@ -6,6 +6,9 @@ package commands
 var version = "unstable"
 
 const (
+	YotUse = `
+	yot -i File [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
+	yot -q Query -x Value [-a Action] [-i File [-f File]...] [-o Dir | -s] [-p Path]  [-v=[critical|error|warning|notice|info|debug]] `
 	YotShort = "Yot (YAML Overlay Tool) is a YAML overlay tool."
 
 	YotLong = `Yot (YAML Overlay Tool) is a YAML overlay tool which uses a templatable YAML schema to define overlay 
@@ -15,7 +18,8 @@ and can preserve and inject comments.`
 	helpValueFile = `Path to a values file for use with templating an instructions file.
 Takes multiple values files in case you would like to better organize the values. 
 Each subsequent file passed with -f will be merged over the values 
-from the previous. Values are applied to your instructions file when using templating.`
+from the previous. Values are applied to your instructions file when using templating.
+`
 
 	helpUsageExample = "yot -i instructions.yaml -o /tmp/output"
 
@@ -51,16 +55,20 @@ This will be treated as commonOverlays when used with 'action', 'value', and 'pa
 Typically used for one-off overlays from the CLI`
 
 	helpValue = `Desired 'value' to take 'action' with if 'query' is found within the YAML document. 
-Typically used for one-off overlays from the CLI.`
+Typically used for one-off overlays from the CLI.
+`
 
 	helpAction = `Action to take with 'value' when the JSONPath 'query' has results in a YAML document. 
 Can be one of combine, delete, merge, or replace. Typically used for one-off overlays from the CLI.
-Typically used for one-off overlays from the CLI.`
+Typically used for one-off overlays from the CLI.
+`
 
 	helpPath = `YAML files or directories outside of the instructions file to process. 
-Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.`
+Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.
+`
 
-	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment`
+	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment
+`
 
 	helpIndentLevel = `(YOT_INDENT_LEVEL) Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
@@ -75,7 +83,7 @@ Multiple values can be provided to achieve the desired result, valid values are:
 	FLOW:         {"flow", "fl"}
 `
 	helpDefaultOnMissingAction = `(YOT_DEFAULT_ON_MISSING_ACTION) change the default on missing action, valid values are:
-	ignore (default)
+	ignore
 	inject
 `
 
@@ -121,4 +129,6 @@ PowerShell:
   PS> yot completion powershell > yot.ps1
   # and source this file from your PowerShell profile.
 `
+	envShort = "yot environment information"
+	envLong  = `Env prints out all the environment information in use by yot`
 )
