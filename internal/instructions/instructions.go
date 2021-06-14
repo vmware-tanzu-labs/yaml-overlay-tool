@@ -49,6 +49,10 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 		instructionsDir = wd
 	}
 
+	if err := cfg.ReadAdHocPaths(instructions); err != nil {
+		return nil, err
+	}
+
 	if err := cfg.ReadAdHocOverlays(instructions); err != nil {
 		return nil, err
 	}
@@ -86,8 +90,8 @@ func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
 
 	instructionsDir = path.Dir(instructionsPath)
 
-	if cfg.Values != nil {
-		values, err = getValues(cfg.Values)
+	if cfg.ValueFiles != nil {
+		values, err = getValues(cfg.ValueFiles)
 		if err != nil {
 			return nil, err
 		}
