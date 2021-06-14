@@ -166,6 +166,14 @@ An additional overlay can be added to be processed in addition to an Instruction
 yot -i /paht/to/my/instructions/file.yaml -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
 ```
 
+### Check YAML Overlay Tool's Configuration Setting
+
+An option to override default settings was added in v0.5.0.  This can be done with either [environment variables](envVars.md) or a [configuration file](configFile.md).  To check Yot's current settings the following command can be run:
+
+```bash
+yot env
+```
+
 
 [Back to Table of contents](../documentation.md)  
 [Next Up: Instructions file introduction](instructionsFileIntro.md)
