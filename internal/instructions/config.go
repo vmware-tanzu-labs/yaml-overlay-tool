@@ -18,7 +18,6 @@ import (
 
 // Config contains configuration options used with instruction files.
 type Config struct {
-	Verbose                bool
 	LogLevel               logging.Level
 	InstructionsFile       string
 	OutputDir              string
@@ -26,7 +25,7 @@ type Config struct {
 	RemoveComments         bool
 	Indent                 int
 	Styles                 actions.Styles
-	Values                 []string
+	ValueFiles             []string
 	Overlay                overlays.Overlay
 	Value                  string
 	Path                   string
@@ -133,21 +132,33 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 	return output, nil
 }
 
-func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
+func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
 	if cfg.Path != "" {
-		yf := &YamlFile{
-			Name:       "StdIn",
-			Path:       cfg.Path,
-			OutputPath: "stdin.yaml",
+		yf := YamlFiles{
+			&YamlFile{
+				Name:       "StdIn",
+				Path:       cfg.Path,
+				OutputPath: determinePath(cfg.Path),
+			},
 		}
 
-		if err := yf.readYamlFile(); err != nil {
+		if err := yf.expandDirectories(); err != nil {
+			return fmt.Errorf("%w", err)
+		}
+
+		if err := yf[0].readYamlFile(); err != nil {
 			return err
 		}
 
-		i.YamlFiles = append(i.YamlFiles, yf)
+		i.YamlFiles = append(i.YamlFiles, yf...)
+
+		i.YamlFiles.mergeDuplicates()
 	}
 
+	return nil
+}
+
+func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
 	if cfg.Overlay.Query != nil {
 		if err := yaml.Unmarshal([]byte(cfg.Value), &cfg.Overlay.Value); err != nil {
 			return fmt.Errorf("unable to read overlay value from flag, %w", err)
@@ -161,4 +172,12 @@ func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
 	}
 
 	return nil
+}
+
+func determinePath(p string) string {
+	if p == "-" {
+		return "stdin.yaml"
+	}
+
+	return p
 }

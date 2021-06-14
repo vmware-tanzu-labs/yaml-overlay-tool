@@ -115,7 +115,7 @@ func (r *Root) initializeFormatFlags() {
 
 func (r *Root) initializeTemplateFlags() {
 	r.Command.Flags().StringArrayVarP(
-		&r.Options.Values,
+		&r.Options.ValueFiles,
 		"values-file",
 		"f",
 		nil,

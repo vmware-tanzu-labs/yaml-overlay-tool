@@ -1,0 +1,10 @@
+---
+commonOverlays:
+  - name: replace all instances of my-web-page
+    query: "..*[?(@ == 'my-web-page')]"
+    value: website
+    action: replace
+
+yamlFiles:
+  - path: ./manifests
+

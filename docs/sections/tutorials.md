@@ -1,9 +1,9 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
 
-# Interactive Tutorials and Learning Paths
+# Interactive tutorials and learning paths
 
 Coming Soon!
 
 
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)

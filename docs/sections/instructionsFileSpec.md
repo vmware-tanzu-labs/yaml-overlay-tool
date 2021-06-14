@@ -1,12 +1,9 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
-# Instructions file YAML schema
-
-What is an instructions file?  
-The instructions file is the instructions for manipulating a set of YAML files and documents.  It is a YAML document that contains an array of paths to YAML documents to perform operations.  Each instructions file starts with the optional key `commonOverlays`, which is an array, along with a required key `yamlFiles` which is also an array.  
+# Instructions file YAML specification
 
 
-## Top-level commonOverlays Keys
+## Top-level commonOverlays keys
 
 The `commonOverlays` key is optional. It provides overlays to apply to every item in the `yamlFiles` array, also referred to as `yamlFiles[*].path` or `yamlFiles[*].documents.path` as defined in the instructions. Each array item in the `commonOverlays` key is treated as a dictionary/map with the following top-level keys:
 
@@ -20,7 +17,7 @@ The `commonOverlays` key is optional. It provides overlays to apply to every ite
 | onMissing.injectPath | no | If your JSONPath expression is not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This is the path or list/array of paths to inject the value if your JSONPath expression was not found in the YAML document. | None | string or list/array |
 | documentQuery | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary/map |
 
-## Top-Level yamlFiles Keys
+## Top-Level yamlFiles keys
 
 Each list item in the `yamlFiles` key is treated as a dictionary/map with the following top-level keys:
 
@@ -30,7 +27,7 @@ Each list item in the `yamlFiles` key is treated as a dictionary/map with the fo
 | path | yes | A fully qualified path to the YAML file to modify, or a path relative to the location of the instructions file. Can be a path to a YAML file or a directory containing YAML files. | None | string |
 | overlays | no | List/array of overlay operations to apply. If your YAML file contains multiple documents separated by `---`, then this would apply to every YAML document first, unless a qualifier or combination of qualifiers `documentQuery` and `documentIndex` are provided.  If you need to apply overlays only to a specific YAML document in a multi-document YAML file, then see the `documents` key. See [overlays keys](#overlays-keys) for available dictionary/map keys. | None | list/array of dictionaries |
 | documents | no | List/array of overlay operations to apply to a multi-document YAML file.  When each document from a multi-document YAML file is loaded, an overlay can be applied by addressing the document by its index.  See [documents keys](#documents-keys) for available dictionary/map keys. | None | list/array of dictionaries/maps |
-| outputPath | no | alter the name of the output path. if a filename is given this will also alter the outputted filename. absolute paths are not currently supported, all paths are relative to outputDirectory defined by -o. if a directory is given then this directory will be prepended to the filename after the outputDirectory. | None | string |
+| outputPath | no | Alters the output path for a YAML file or directory of YAML files. Absolute paths are not currently supported, and all paths are relative to the output directory specified by the `-o` or `--output-directory` flag.<br/>1. If a filename is specified (must have a file extension), and the value of `path` is a single file (not a directory of files), this will alter the filename of the YAML file on output within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newfilename.yaml`<br/>2. If a new filename is proceded with a directory/directory structure in `outputPath` and the value of `path` is a single file, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir/newfilename.yaml`<br/>3. If a directory/directory structure is specified in `outputPath`, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag, and the original filename will be retained within the new `outputPath`. Example `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir/`<br/>4. If a directory is given with the `path` key, the value of `outputPath` will be treated as a new directory/directory structure within the output directory specified with by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir`.<br/>5. If you wish to change the output location for a single file that was within a `path` which was a directory, add an additional item to the `yamlFiles` array with the `path` to the file and desired `outputPath`. Yot uses the last listed `outputPath` for a given file for final output to the filesystem. | None | string |
 
 ### `overlays` keys
 
@@ -42,7 +39,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 | name | no | An optional description of the change you are performing, and used only for on-screen output or self-documentation. | None | string |
 | query | yes | JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate. If the `query` is not a fully-qualified path (such as a.b.c.d) and returns no matches, you need to specify the `onMissing` key (i.e. metadata.labels VS metadata.fake.*). | None | string or list/array|
 | value | yes | The desired value to take action with if `query` is found. | None | str, dict, list/array |
-| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `delete`, `merge`, or `replace`. | None | string |
+| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `combine`, `delete`, `merge`, or `replace`. | None | string |
 | onMissing.action | no | What to do if the JSONPath expression is not found. Can be one of `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
 | onMissing.injectPath | no | If your JSONPath expression was not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This should be a path or list/array of paths to inject the value if your JSONPath expression was not found in the YAML document | None | string or list/array |
 | documentQuery | no | A qualifier to refine which documents the overlay is applied to.  If not set, the overlay applies to all documents in the YAML file.  Can be used in conjunction with `documentIndex`. See [Qualifiers](qualifiers.md) for more details.| None | dictionary/map |
@@ -77,5 +74,54 @@ drink: juice
 ```
 
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Overlay Actions](actions.md)
+## Instructions file full-specification example
+
+```yaml
+---
+commonOverlays: # optional way to apply overlays to all 'yamlFiles'
+  - name: Apply common label only to k8s services # optional key
+    query: metadata.labels # required JSONPath (dot-notation)
+    value: # desired value to perform an action on matches of the query with
+      some: label
+    action: merge # merge | replace | delete
+    onMissing: # optional - what to do if 'query' not found in yaml
+      action: inject # inject | ignore, default of ignore if onMissing not set
+    documentQuery: # qualifier
+    # array/list of condition groupings. Each array of conditions is treated separately
+    # each grouping of conditions must all match. If 1 group of conditions returns
+    ## True, then the overlay will get applied
+    - conditions:
+        - query: kind # search for the 'kind' key in the yaml doc
+          value: Service # we expect the result of the 'kind' key to be this value before applying the overlay
+yamlFiles: # what to overlay onto
+  - name: "some arbitrary descriptor" # Name is Optional
+    path: "path/relative/to/instructions/file.yaml" 
+    outputPath: mynewfilename.yaml # renames the original filename within the output directory
+    overlays: # if multi-doc yaml file, applies to all docs, gets applied first
+      - name: Inject label to documents 0 2 or 4 if a Deployment
+        query: metadata.labels.foo
+        value: {{ foo }} # example with jinja2 templating (available in v0.6.0)
+        action: "replace" # merge, replace, delete
+        onMissing:
+          action: "inject" # inject | ignore
+          injectPath: "metadata.labels" # if your key (metadata.labels) in this instance was a JSONPath expression, we can't exactly inject to an expression.  We need a real path to plug it into. If you had a JSONPath expression and no onMissing.injectPath we would assume ignore and print a warning
+        documentQuery: # qualifier, only modify if a k8s Deployment
+          - conditions:
+              - query: kind
+                value: Deployment
+        documentIndex: # qualifier, only modify docs 0, 2, and 4 in multi-yaml doc
+          - 0
+          - 2
+          - 4
+    documents: # optional and only used for multi-doc yaml files
+      # need to refer to their path by their index
+      - name: the manifest that does something
+        path: 0
+        overlays:
+          - query: a.b.c.d
+            action: delete
+```
+
+
+[Back to Table of contents](../documentation.md)  
+[Next Up: Overlay actions](overlayActions.md)

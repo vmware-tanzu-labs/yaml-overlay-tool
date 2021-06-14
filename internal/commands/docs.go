@@ -28,7 +28,7 @@ from the previous. Values are applied to your instructions file when using templ
 	DEBUG:    {"debug", "d", "verbose", "v"} * used if no argument is provided
 `
 
-	helpInstructionsFile = "Path to the instructions file (required)"
+	helpInstructionsFile = "Path to the instructions file"
 
 	helpOutputDirectory = `(YOT_OUTPUT_DIRECTORY) Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
@@ -46,22 +46,26 @@ from the previous. Values are applied to your instructions file when using templ
 		code 0 prior to processing instructions`
 	*/
 
-	helpQuery = `define extra JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate.
-these will get added to the common overlays in conjunction with action and value`
+	helpQuery = `JSONPath query or JSONPath fully-qualified (dot-notation) path you would like to manipulate.
+This will be treated as commonOverlays when used with 'action', 'value', and 'path' parameters. 
+Typically used for one-off overlays from the CLI`
 
-	helpValue = "The desired value to take action with if `query` is found."
+	helpValue = `Desired 'value' to take 'action' with if 'query' is found within the YAML document. 
+Typically used for one-off overlays from the CLI.`
 
-	helpAction = "The action to take when the JSONPath expression is found in the YAML document. Can be one of delete, merge, or replace."
+	helpAction = `Action to take with 'value' when the JSONPath 'query' has results in a YAML document. 
+Can be one of combine, delete, merge, or replace. Typically used for one-off overlays from the CLI.
+Typically used for one-off overlays from the CLI.`
 
-	helpPath = `add extra yaml files outside of the instructions file to process against, theses will receive the common overlays defined,
-using a path of "-" will read from stdIn`
+	helpPath = `YAML files or directories outside of the instructions file to process. 
+Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.`
 
 	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment`
 
 	helpIndentLevel = `(YOT_INDENT_LEVEL) Number of spaces to be used for indenting YAML output (min: 2, max: 9)`
 
-	helpOutputStyle = `(YOT_OUTPUT_STYLE) style to be used for rendering final documents.
-multiple values can be provided to achieve the desired result, valid values are:
+	helpOutputStyle = `(YOT_OUTPUT_STYLE) YAML output style to be used for rendering final documents.
+Multiple values can be provided to achieve the desired result, valid values are:
 	NORMAL:       {"normal", "n"},
 	TAGGED:       {"tagged", "tag", "t"},
 	DOUBLEQUOTED: {"doubleQuoted", "doubleQuote", "double", "dq"},

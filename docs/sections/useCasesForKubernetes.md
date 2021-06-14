@@ -1,4 +1,4 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
 # Common use-cases and patterns for Kubernetes
 
@@ -89,7 +89,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -113,7 +113,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -138,7 +138,7 @@ commonOverlays:
       app.kubernetes.io/%k: "%v"  # the old key was %k
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -159,7 +159,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -180,7 +180,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -209,7 +209,7 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
@@ -248,12 +248,31 @@ commonOverlays:
     action: merge
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ./examples/kubernetes/manifests
+    path: ./manifests
 ```
 
 Now apply the changes by generating a new set of YAML files:  
 >`yot -i ./examples/kubernetes/insertComments.yaml -o /tmp/new`
 
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Interactive Tutorials and Learning Paths](tutorials.md)
+## Replace all instances of a string
+
+After examining a manifest, we would like to replace the name or all references to how a particular item is named.  In this example we'll replace all instances of the string `my-web-page` with `website`.
+
+```yaml
+commonOverlays:
+  - name: replace all instances of my-web-page
+    query: "..*[?(@ == 'my-web-page')]"
+    value: website
+    action: replace
+
+yamlFiles:
+  - path: ./manifests
+```
+
+Now apply the changes by generating a new set of YAML files:  
+>`yot -i ./examples/kubernetes/replaceAllInstances.yaml -o /tmp/new`
+
+
+[Back to Table of contents](../documentation.md)  
+[Next Up: Interactive tutorials and learning paths](tutorials.md)
