@@ -1,7 +1,24 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
 
 # Installation and setup
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Manual install](#manual-install)
+  - [Download the latest binary](#download-the-latest-binaryhttpsgithubcomvmare-tanzu-labsyaml-overlay-toolreleaseslatest)
+  - [wget](#wget)
+- [MacOS / Linux via Homebrew install](#macos-linux-via-homebrew-install)
+- [Linux snap install](#linux-snap-install)
+- [Docker image pull](#docker-image-pull)
+  - [One-shot container use](#one-shot-container-use)
+  - [Run container commands interactively](#run-container-commands-interactively)
+- [Go install](#go-install)
+
+<!-- /code_chunk_output -->
+
 
 ## Manual install
 
@@ -86,5 +103,5 @@ GO111MODULE=on go get github.com/vmware-tanzu-labs/yaml-overlay-tool/cmd/yot
 ```
 
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Command Line Usage and Overview](usage.md)
+[Back to Table of contents](../documentation.md)  
+[Next Up: Configuration file](configFile.md)

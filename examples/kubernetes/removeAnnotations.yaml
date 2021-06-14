@@ -6,4 +6,4 @@ commonOverlays:
 
 yamlFiles:
   - name: Set of Kubernetes manifests from upstream
-    path: ../kubernetes/manifests
+    path: ./manifests
