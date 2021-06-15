@@ -29,7 +29,7 @@ func New() *Root {
 	rc := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
-			LogLevel:               logging.ERROR,
+			LogLevel:               logging.WARNING,
 			Styles:                 actions.Styles{actions.NormalStyle},
 			DefaultOnMissingAction: actions.Ignore,
 		},

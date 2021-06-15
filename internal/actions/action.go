@@ -8,8 +8,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/op/go-logging"
 	"gopkg.in/yaml.v3"
 )
+
+var log = logging.MustGetLogger("overlays") //nolint:gochecknoglobals
 
 // ErrInvalidAction occurs when user passes a action that is not one of merge, replace, delete, combine.
 var ErrInvalidAction = errors.New("invalid overlay action")

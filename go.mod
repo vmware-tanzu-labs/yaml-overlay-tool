@@ -9,6 +9,7 @@ require (
 	github.com/onsi/ginkgo v1.16.2 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
+	github.com/rwtodd/Go.Sed v0.0.0-20190103233418-906bc69c9394
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.7.0 // indirect
