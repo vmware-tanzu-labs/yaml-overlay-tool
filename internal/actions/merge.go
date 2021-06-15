@@ -70,6 +70,7 @@ func mergeMap(o, n *yaml.Node) error {
 
 		if o.Kind != yaml.MappingNode {
 			o.Kind = yaml.MappingNode
+			o.Tag = "!!map"
 			o.Value = ""
 			o.Content = []*yaml.Node{}
 		}
@@ -114,6 +115,7 @@ func mergeMap(o, n *yaml.Node) error {
 func mergeArray(o, n *yaml.Node) error {
 	if o.Kind != yaml.SequenceNode {
 		o.Kind = yaml.SequenceNode
+		o.Tag = "!!seq"
 		o.Value = ""
 		o.Content = []*yaml.Node{}
 	}
@@ -154,6 +156,7 @@ func mergeScalar(o, n *yaml.Node, values ...string) {
 
 	if o.Kind != yaml.ScalarNode {
 		o.Kind = yaml.ScalarNode
+		o.Tag = n.Tag
 		o.Value = ""
 		o.Content = nil
 	}
