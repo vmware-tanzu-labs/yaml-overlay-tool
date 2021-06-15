@@ -185,5 +185,5 @@ func determinePath(p string) string {
 		return "stdin.yaml"
 	}
 
-	return p
+	return ""
 }
