@@ -17,8 +17,6 @@ import (
 
 var ErrFoundDirectoryWithPathOutput = errors.New("found directory as input path with file as output path")
 
-var ErrAbsolutePathForOutputPath = errors.New("absolute paths are currently not supported for outputPath")
-
 // YamlFile is used to define which files should be manipulated and overlays specific to that file.
 type YamlFile struct {
 	// Optional Name to define for organization purposes.
@@ -118,10 +116,6 @@ func (yfs *YamlFiles) expandDirectories() error {
 	for i := 0; i <= len(y)-1; i++ {
 		if !path.IsAbs(y[i].Path) {
 			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
-		}
-
-		if path.IsAbs(y[i].OutputPath) {
-			return ErrAbsolutePathForOutputPath
 		}
 
 		if ok, err := isDirectory(y[i].Path); err != nil {

@@ -72,7 +72,11 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 
 // openOutputFile opens or creates a file for outputing results.
 func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
-	fileName := path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
+	fileName := yf.OutputPath
+	if !path.IsAbs(yf.OutputPath) {
+		fileName = path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
+	}
+
 	dirName := path.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
