@@ -4,7 +4,6 @@
 package actions
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -20,24 +19,6 @@ const (
 	// KeyMarker is a format marker for the previous key name.
 	KeyMarker = `%k`
 )
-
-func sanitizeMarkers(formatStr string, v ...interface{}) (sanitizedfmt string, sanitizedV []interface{}) {
-	for i, t := range []string{
-		ValueMarker,
-		LineCommentMarker,
-		HeadCommentMarker,
-		FootCommentMarker,
-		KeyMarker,
-	} {
-		for j := range v {
-			v[j] = strings.ReplaceAll(v[j].(string), t, "")
-		}
-
-		formatStr = strings.ReplaceAll(formatStr, t, fmt.Sprintf("%%[%d]v", i+1))
-	}
-
-	return formatStr, v
-}
 
 func checkForMarkers(s string) bool {
 	for _, m := range []string{
