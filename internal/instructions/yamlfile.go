@@ -115,8 +115,6 @@ func (yfs *YamlFiles) expandDirectories() error {
 
 	var paths []string
 
-	var removeItems []int
-
 	for i := 0; i <= len(y)-1; i++ {
 		if !path.IsAbs(y[i].Path) {
 			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
@@ -152,11 +150,6 @@ func (yfs *YamlFiles) expandDirectories() error {
 			y = append(y[:i], y[i+1:]...)
 			i--
 		}
-	}
-
-	for _, remove := range removeItems {
-		y[remove] = y[len(y)-1]
-		y = y[:len(y)-1]
 	}
 
 	*yfs = y
