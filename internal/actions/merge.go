@@ -49,6 +49,8 @@ func merge(o, n *yaml.Node, keyName ...string) error {
 		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
 	}
 
+	o.Tag = n.Tag
+
 	return nil
 }
 
@@ -156,7 +158,6 @@ func mergeScalar(o, n *yaml.Node, values ...string) {
 
 	if o.Kind != yaml.ScalarNode {
 		o.Kind = yaml.ScalarNode
-		o.Tag = n.Tag
 		o.Value = ""
 		o.Content = nil
 	}
