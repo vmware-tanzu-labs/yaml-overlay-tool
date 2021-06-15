@@ -134,7 +134,7 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 
 func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
 	if cfg.Path != "" {
-		yf := YamlFiles{
+		yfs := YamlFiles{
 			&YamlFile{
 				Name:       "StdIn",
 				Path:       cfg.Path,
@@ -142,15 +142,17 @@ func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
 			},
 		}
 
-		if err := yf.expandDirectories(); err != nil {
+		if err := yfs.expandDirectories(); err != nil {
 			return fmt.Errorf("%w", err)
 		}
 
-		if err := yf[0].readYamlFile(); err != nil {
-			return err
+		for _, yf := range yfs {
+			if err := yf.readYamlFile(); err != nil {
+				return err
+			}
 		}
 
-		i.YamlFiles = append(i.YamlFiles, yf...)
+		i.YamlFiles = append(i.YamlFiles, yfs...)
 
 		i.YamlFiles.mergeDuplicates()
 	}
