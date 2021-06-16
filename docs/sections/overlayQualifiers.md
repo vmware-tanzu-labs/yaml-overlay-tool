@@ -28,9 +28,10 @@ The `documentQuery` key is a list/array which contains a list of the following t
 
 | Key | Description | Type |
 | --- | --- | --- |
-| query | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. | string |
-| value | The value that the JSONPath query must return from one of the results of the `query` before an overlay action is applied to a document. | string |
+| query | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. (can accept multiple queries)| string |
+| value | (optional) The value that the JSONPath query must return from one of the results of the `query` before an overlay action is applied to a document. | string |
 
+***if value is not provided then the condition will return true if any results are found from the query***
 
 #### documentQuery examples
 
@@ -59,8 +60,19 @@ commonOverlays:
   - conditions:
     - query: kind
       value: Deployment
-    - query: metadata.labels.`app.kubernetes.io/name`
+    - query: metadata.labels.["app.kubernetes.io/name"]
       value: cool-app
+
+ # With no Value, same conditions as above
+ commonOverlays:
+- name: Change the namespace for all k8s Deployments with name label of cool-app
+  query: metadata.namespace
+  value: my-namespace
+  action: replace
+  documentQuery:
+  - conditions:
+    - query: $[?($.kind == "Deployment")]
+    - query: metadata.labels.[?(@.name == "cool-app")]`
 ```
 
 The following example demonstrates use of multiple `documentQuery` groups.  Any single one of these query/value conditions groups have to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this" (implicit "or").  
