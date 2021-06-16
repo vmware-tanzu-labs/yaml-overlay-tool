@@ -143,20 +143,20 @@ As of v0.5.0, an overlay can be applied purely from the CLI, and can be processe
 
 To process an overlay without an instructions file, a few parameters are required:  
     * **Query:** `q`, `query`
-    * **Action:** `a`, `action`
-    * **Value:** `x`, `value`
+    * **Action:** `a`, `action` ( default is merge)
+    * **Value:** `x`, `value` (not required for action delete)
     * **Path:** `p`, `path`
 
 #### One-off overlay example
 
 ```bash
-yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
+yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -p /path/to/source/yaml/file.yaml -o /tmp/new
 ```
 
 #### One-off overlay example from stdin
 
 ```bash
-cat /path/to/yaml/files/*.yaml | yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p - -o /tmp/new
+cat /path/to/yaml/files/*.yaml | yot -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -p - -o /tmp/new
 ```
 
 #### One-off overlay example in conjunction with an Instructions file
