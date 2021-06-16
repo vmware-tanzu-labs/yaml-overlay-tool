@@ -67,7 +67,7 @@ func GetCommonPrefix(sep byte, paths ...string) string {
 		}
 	}
 
-	return c
+	return c + string(os.PathSeparator)
 }
 
 // isDirectory determines if the given path is a directory.
