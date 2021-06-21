@@ -135,7 +135,7 @@ spec:
 			name: "Merge map (with line comment)",
 			args: args{
 				query: "metadata.labels",
-				value: `app.kubernetes.io/name: "%s" # test`,
+				value: `app.kubernetes.io/name: "%v" # test`,
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -171,7 +171,7 @@ spec:
 			name: "Format Scalar Node (only type accepted for format action)",
 			args: args{
 				query: "kind",
-				value: "My%s",
+				value: "My%v",
 			},
 			expectedValue: `apiVersion: v1
 kind: MyService
@@ -207,7 +207,7 @@ spec:
 			name: "Format Scalar Node Key",
 			args: args{
 				query: "spec.ports~",
-				value: "s%s",
+				value: "s%v",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service
@@ -245,7 +245,7 @@ spec:
 			name: "Format Scalar Node in Array with head, line, foot comments",
 			args: args{
 				query: "spec.ports[0].name",
-				value: "# head\n\"%s-port\" # line\n# foot",
+				value: "# head\n\"%v-port\" # line\n# foot",
 			},
 			expectedValue: `apiVersion: v1
 kind: Service

@@ -49,6 +49,8 @@ func merge(o, n *yaml.Node, keyName ...string) error {
 		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
 	}
 
+	o.Tag = n.Tag
+
 	return nil
 }
 
@@ -70,6 +72,7 @@ func mergeMap(o, n *yaml.Node) error {
 
 		if o.Kind != yaml.MappingNode {
 			o.Kind = yaml.MappingNode
+			o.Tag = "!!map"
 			o.Value = ""
 			o.Content = []*yaml.Node{}
 		}
@@ -114,6 +117,7 @@ func mergeMap(o, n *yaml.Node) error {
 func mergeArray(o, n *yaml.Node) error {
 	if o.Kind != yaml.SequenceNode {
 		o.Kind = yaml.SequenceNode
+		o.Tag = "!!seq"
 		o.Value = ""
 		o.Content = []*yaml.Node{}
 	}

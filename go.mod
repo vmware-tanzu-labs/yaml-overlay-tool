@@ -9,11 +9,12 @@ require (
 	github.com/onsi/ginkgo v1.16.2 // indirect
 	github.com/op/go-logging v0.0.0-20160315200505-970db520ece7
 	github.com/qdm12/reprint v0.0.0-20200326205758-722754a53494
+	github.com/rwtodd/Go.Sed v0.0.0-20190103233418-906bc69c9394
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/thediveo/enumflag v0.10.1
-	github.com/vmware-labs/yaml-jsonpath v0.3.0
+	github.com/vmware-labs/yaml-jsonpath v0.3.2
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea // indirect
