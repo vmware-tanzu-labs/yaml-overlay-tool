@@ -6,9 +6,8 @@ package commands
 var version = "unstable"
 
 const (
-	YotUse = `
-	yot -i File [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
-	yot -q Query -x Value [-a Action] [-i File [-f File]...] [-o Dir | -s] [-p Path]  [-v=[critical|error|warning|notice|info|debug]] `
+	YotUse = `yot -i File [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
+  yot -q Query -x Value [-a Action] [-i File [-f File]...] [-o Dir | -s] [-p Path]  [-v=[critical|error|warning|notice|info|debug]] `
 	YotShort = "Yot (YAML Overlay Tool) is a YAML overlay tool."
 
 	YotLong = `Yot (YAML Overlay Tool) is a YAML overlay tool which uses a templatable YAML schema to define overlay 
