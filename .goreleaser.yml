@@ -15,6 +15,18 @@ builds:
     binary: yot
     ldflags:
       - -s -w -X github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands.version={{.Version}} -extldflags '-static'
+
+signs:
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "-u"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
+
 archives:
   - replacements:
       darwin: Darwin
