@@ -6,6 +6,7 @@ package instructions
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
 	"path"
 
@@ -72,6 +73,9 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 
 // openOutputFile opens or creates a file for outputing results.
 func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
+	defaultDirMode := 0755
+	defaultFileMode := 0644
+
 	fileName := yf.OutputPath
 	if !path.IsAbs(yf.OutputPath) {
 		fileName = path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
@@ -80,12 +84,12 @@ func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
 	dirName := path.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirName, 0755); err != nil {
+		if err := os.MkdirAll(dirName, fs.FileMode(defaultDirMode)); err != nil {
 			return nil, fmt.Errorf("failed to create output directory %s, %w", dirName, err)
 		}
 	}
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, fs.FileMode(defaultFileMode))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
 	}

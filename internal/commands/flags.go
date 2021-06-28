@@ -73,11 +73,13 @@ func (r *Root) initializeOutputFlags() {
 }
 
 func (r *Root) initializeFormatFlags() {
+	defaultIndentLevel := 2
+
 	r.Command.Flags().IntVarP(
 		&r.Options.Indent,
 		"indent-level",
 		"I",
-		2,
+		defaultIndentLevel,
 		helpIndentLevel,
 	)
 
