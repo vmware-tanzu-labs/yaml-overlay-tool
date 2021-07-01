@@ -4,11 +4,13 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
@@ -17,19 +19,24 @@ import (
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
 type Root struct {
-	Log     *logging.Logger
-	Options *instructions.Config
-	Command *cobra.Command
+	configFile string
+	Log        *logging.Logger
+	Options    *instructions.Config
+	Command    *cobra.Command
 }
 
 func New() *Root {
 	rc := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
-			LogLevel: logging.ERROR,
-			Styles:   actions.Styles{actions.NormalStyle},
+			LogLevel:               logging.WARNING,
+			Styles:                 actions.Styles{actions.NormalStyle},
+			DefaultOnMissingAction: actions.Ignore,
 		},
+		configFile: os.Getenv("YOT_CONFIG_FILE"),
 	}
+
+	cobra.OnInitialize(rc.initConfig)
 
 	rc.Command = rc.NewCommand()
 	rc.AddFlags()
@@ -38,15 +45,45 @@ func New() *Root {
 	return rc
 }
 
+func (r *Root) initConfig() {
+	for k, v := range envMap() {
+		if err := viper.BindEnv(k, v); err != nil {
+			r.Log.Fatal(err)
+		}
+	}
+
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("yot.config")
+
+	if r.configFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(r.configFile)
+	} else {
+		viper.AddConfigPath("./")
+		viper.AddConfigPath("$HOME/.yot/") // call multiple times to add many search paths
+		viper.AddConfigPath("/etc/yot/")   // path to look for the config file in
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		if ok := errors.As(err, &viper.ConfigFileNotFoundError{}); !ok {
+			r.Log.Fatal(err)
+		}
+
+		return
+	}
+
+	viper.Set("configFile", viper.ConfigFileUsed())
+}
+
 func (r Root) NewCommand() *cobra.Command {
 	// rootCmd represents the base command when called without any subcommands.
 	rootCmd := &cobra.Command{
-		Use:                        "yot",
+		Use:                        YotUse,
 		Aliases:                    []string{},
 		SuggestFor:                 []string{},
 		Short:                      YotShort,
 		Long:                       YotLong,
-		Example:                    HelpUsageExample,
+		Example:                    helpUsageExample,
 		ValidArgs:                  []string{},
 		Args:                       nil,
 		ArgAliases:                 []string{},
@@ -59,8 +96,7 @@ func (r Root) NewCommand() *cobra.Command {
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		Run:                        r.Execute,
-		RunE:                       nil,
+		RunE:                       r.Execute,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
@@ -68,7 +104,7 @@ func (r Root) NewCommand() *cobra.Command {
 		SilenceErrors:              false,
 		SilenceUsage:               false,
 		DisableFlagParsing:         false,
-		DisableAutoGenTag:          false,
+		DisableAutoGenTag:          true,
 		DisableFlagsInUseLine:      false,
 		DisableSuggestions:         false,
 		SuggestionsMinimumDistance: 0,
@@ -80,12 +116,17 @@ func (r Root) NewCommand() *cobra.Command {
 }
 
 func (r *Root) AddFlags() {
-	r.initializeGlobalFlags()
+	r.initializeCommonFlags()
+	r.initializeInstructionFlags()
+	r.initializeOutputFlags()
+	r.initializeFormatFlags()
 	r.initializeTemplateFlags()
+	r.initializeStdInFlags()
 }
 
 func (r *Root) AddCommands() {
 	r.Command.AddCommand(r.CompletionCommand())
+	r.Command.AddCommand(r.EnvCommand())
 }
 
 func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
@@ -98,21 +139,33 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 		logging.NewBackendFormatter(logging.NewLogBackend(os.Stderr, "", 0), format),
 	)
 
-	backend.SetLevel(r.Options.LogLevel, "")
+	logLevel, err := logging.LogLevel((viper.GetString("logLevel")))
+	if err != nil {
+		panic(err)
+	}
+
+	backend.SetLevel(logLevel, "")
+
 	logging.SetBackend(backend)
+
+	if viper.ConfigFileUsed() != "" {
+		r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+	}
 }
 
-func (r *Root) Execute(cmd *cobra.Command, args []string) {
+func (r *Root) Execute(cmd *cobra.Command, args []string) error {
 	if err := instructions.Execute(r.Options); err != nil {
 		cmd.SilenceUsage = true
 
-		r.Log.Error(fmt.Errorf("%w", err))
-		os.Exit(1)
+		return fmt.Errorf("%w", err)
 	}
+
+	return nil
 }
 
 func (r *Root) Run() {
 	if err := r.Command.Execute(); err != nil {
 		r.Log.Error(err)
+		os.Exit(1)
 	}
 }

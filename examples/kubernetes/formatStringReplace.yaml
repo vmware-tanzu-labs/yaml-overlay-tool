@@ -1,0 +1,9 @@
+---
+yamlFiles:
+  - path: examples/kubernetes/manifests/my-app.yaml
+    overlays:
+      - name: "manipulate label contents"
+        query: "metadata.labels"
+        value:
+          "%k": "%v{s/page/site/g}"
+        action: "merge"

@@ -18,17 +18,10 @@ var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals
 func Execute(cfg *Config) error {
 	eg, ctx := errgroup.WithContext(context.Background())
 
-	values, err := getValues(cfg.Values)
+	instructions, err := cfg.GetInstructions()
 	if err != nil {
 		return err
 	}
-
-	instructions, err := ReadInstructionFile(&cfg.InstructionsFile, values)
-	if err != nil {
-		return err
-	}
-
-	instructions.addCommonOverlays()
 
 	pChan := make(chan *YamlFile, len(instructions.YamlFiles))
 

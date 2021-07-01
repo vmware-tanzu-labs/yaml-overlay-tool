@@ -6,14 +6,16 @@
 ![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/yaml-overlay-tool)
+
+
 # YAML Overlay Tool (Yot)
 
 YAML Overlay Tool, or Yot for short, often pronounced */yaucht/*, is a tool to assist with patching YAML files.  Yot uses JSONPath to query YAML documents within YAML files, and to perform a change.  YAML Overlay Tool operates on YAML nodes. It is able to preserve and inject head, foot, and line comments into the new output versions of the files that you manipulate.
 
-## Getting Started
+## Getting started
 Get started by [installing YAML Overlay Tool](docs/sections/setup.md).
 
-## Why Create Another YAML Tool?
+## Why create another YAML tool?
 
 Yot is designed to be flexible, simple, and familiar; with a focus on end-user and developer experience.  Whether you want to use a templating language to transform YAML data, or just change a couple values in a YAML document, Yot can make it possible.  
 
@@ -32,6 +34,11 @@ The use of JSONPath queries and templating give the tool familiar interfaces, ma
 [Jeff Davis](https://github.com/JefeDavis)
 
 
+## Full Documentation and user guide
+
+[docs/documentation.md](docs/documentation.md)
+
+
 ## License
 
 [MIT](LICENSE)  
@@ -43,17 +50,13 @@ The use of JSONPath queries and templating give the tool familiar interfaces, ma
 Please see our [Contribution Guide](CONTRIBUTING.md)
 
 
-## Code of Conduct
+## Code of conduct
 
 Please see our project's [Code of Conduct](CODE-OF-CONDUCT.md)
 
 
 ## Communication
+
 ### E-Mail
 
 Please join our mailing list on Google Groups: [yaml-overlay-tool-users](https://groups.google.com/g/yaml-overlay-tool-users)
-
-
-## Full Documentation and User Guide
-
-[docs/documentation.md](docs/documentation.md)

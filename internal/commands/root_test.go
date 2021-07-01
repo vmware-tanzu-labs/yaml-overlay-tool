@@ -11,9 +11,7 @@ import (
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
 )
 
-func TestNew(t *testing.T) {
-	t.Parallel()
-
+func TestNew(t *testing.T) { //nolint:paralleltest
 	tests := []struct {
 		name string
 		want *cobra.Command
@@ -21,22 +19,21 @@ func TestNew(t *testing.T) {
 		{
 			name: "check initialization",
 			want: &cobra.Command{
-				Use:              "yot",
+				Use:              commands.YotUse,
 				Aliases:          []string{},
 				SuggestFor:       []string{},
 				Short:            commands.YotShort,
 				Long:             commands.YotLong,
 				Version:          "unstable",
 				PersistentPreRun: commands.New().SetupLogging,
-				Run:              commands.New().Execute,
+				RunE:             commands.New().Execute,
 			},
 		},
 	}
 
-	for _, tt := range tests {
+	for _, tt := range tests { //nolint:paralleltest
 		test := tt
 		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
 			got := commands.New()
 			if got.Command.Use != test.want.Use {
 				t.Errorf("New() = %v, want %v", got.Command.Use, test.want.Use)

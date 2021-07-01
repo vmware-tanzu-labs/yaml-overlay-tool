@@ -6,24 +6,31 @@ package instructions
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
 	"path"
 
 	"github.com/op/go-logging"
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 
 // Config contains configuration options used with instruction files.
 type Config struct {
-	Verbose          bool
-	LogLevel         logging.Level
-	InstructionsFile string
-	OutputDir        string
-	StdOut           bool
-	Indent           int
-	Styles           actions.Styles
-	Values           []string
+	LogLevel               logging.Level
+	InstructionsFile       string
+	OutputDir              string
+	StdOut                 bool
+	RemoveComments         bool
+	Indent                 int
+	Styles                 actions.Styles
+	ValueFiles             []string
+	Overlay                overlays.Overlay
+	Value                  string
+	Path                   string
+	DefaultOnMissingAction actions.OnMissingAction
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
@@ -43,7 +50,7 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 		return nil
 	}
 
-	if cfg.StdOut {
+	if viper.GetBool("stdout") {
 		o = os.Stdout
 	} else {
 		log.Debugf("Final: >>>\n%s\n", output)
@@ -66,16 +73,23 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 
 // openOutputFile opens or creates a file for outputing results.
 func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
-	fileName := path.Join(cfg.OutputDir, yf.OutputPath)
+	defaultDirMode := 0755
+	defaultFileMode := 0644
+
+	fileName := yf.OutputPath
+	if !path.IsAbs(yf.OutputPath) {
+		fileName = path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
+	}
+
 	dirName := path.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirName, 0755); err != nil {
+		if err := os.MkdirAll(dirName, fs.FileMode(defaultDirMode)); err != nil {
 			return nil, fmt.Errorf("failed to create output directory %s, %w", dirName, err)
 		}
 	}
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, fs.FileMode(defaultFileMode))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
 	}
@@ -101,7 +115,7 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 		}
 	}()
 
-	ye.SetIndent(cfg.Indent)
+	ye.SetIndent(viper.GetInt("indentLevel"))
 
 	for i, node := range nodes {
 		if len(node.Content) == 0 {
@@ -112,7 +126,8 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 			output.WriteString("---\n")
 		}
 
-		actions.SetStyle(cfg.Styles, node)
+		style := actions.GetStyleFromConfig(viper.GetStringSlice("outputStyle")...)
+		actions.SetStyle(style, node)
 
 		err := ye.Encode(node)
 		if err != nil {
@@ -123,4 +138,56 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 	}
 
 	return output, nil
+}
+
+func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
+	if cfg.Path != "" {
+		yfs := YamlFiles{
+			&YamlFile{
+				Name:       "StdIn",
+				Path:       cfg.Path,
+				OutputPath: determinePath(cfg.Path),
+			},
+		}
+
+		if err := yfs.expandDirectories(); err != nil {
+			return fmt.Errorf("%w", err)
+		}
+
+		for _, yf := range yfs {
+			if err := yf.readYamlFile(); err != nil {
+				return err
+			}
+		}
+
+		i.YamlFiles = append(i.YamlFiles, yfs...)
+
+		i.YamlFiles.mergeDuplicates()
+	}
+
+	return nil
+}
+
+func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
+	if cfg.Overlay.Query != nil {
+		if err := yaml.Unmarshal([]byte(cfg.Value), &cfg.Overlay.Value); err != nil {
+			return fmt.Errorf("unable to read overlay value from flag, %w", err)
+		}
+
+		if cfg.Overlay.Value.Kind == yaml.DocumentNode && cfg.Overlay.Value.Content != nil {
+			cfg.Overlay.Value = *cfg.Overlay.Value.Content[0]
+		}
+
+		i.CommonOverlays = append(i.CommonOverlays, &cfg.Overlay)
+	}
+
+	return nil
+}
+
+func determinePath(p string) string {
+	if p == "-" {
+		return "stdin.yaml"
+	}
+
+	return ""
 }

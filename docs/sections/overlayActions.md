@@ -1,4 +1,4 @@
-[Back to Table of Contents](../documentation.md)
+[Back to Table of contents](../documentation.md)
 
 # Actions
 
@@ -48,7 +48,7 @@ However, `merge` can also be used to format string/scalar data with some special
 The `replace` action lets a Yot user replace existing data with new data.
 
 
-## On Missing Actions
+## OnMissing actions
 
 `onMissing` actions instruct Yot on what to do if there are no results from your JSONPath `query`.
 
@@ -75,7 +75,7 @@ yamlFiles:
 
 Use `inject` if your `query` returned no results, but you still want to insert data.
 
-#### Inject Path
+#### injectPath
 
 If your initial `query` used some of JSONPath's advanced features (`../`, `*`, etc) rather than a dot-notation style path (e.g: `a.b.c.d`), and no results were obtained, an `injectPath` is also required to allow for properly building the YAML paths.  An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
 
@@ -106,5 +106,5 @@ yamlFiles:
         - spec.template.spec.containers[0].image
 ```
 
-[Back to Table of Contents](../documentation.md)  
-[Next Up: Overlay Qualifiers](qualifiers.md)
+[Back to Table of contents](../documentation.md)  
+[Next Up: Overlay qualifiers](overlayQualifiers.md)

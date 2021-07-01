@@ -43,12 +43,21 @@ func (dq DocumentQueries) checkQueries(node *yaml.Node) bool {
 func (dq *DocumentQuery) checkQuery(node *yaml.Node) bool {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
+	if dq.Conditions == nil {
+		return true
+	}
+
 	for _, c := range dq.Conditions {
 		results := c.Query.Find(node)
+		if results == nil {
+			return false
+		}
 
-		for _, result := range results {
-			if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {
-				return false
+		if !c.Value.IsZero() {
+			for _, result := range results {
+				if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {
+					return false
+				}
 			}
 		}
 	}

@@ -10,7 +10,7 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/cmd/yot/main.go",
-            "args": ["-i", "examples/static/testMerge.yaml", "-v"],
+            "args": ["-q", "metadata.label", "-a", "replace", "-x", "potato"],
             "cwd": "${workspaceFolder}"
         },
     ]

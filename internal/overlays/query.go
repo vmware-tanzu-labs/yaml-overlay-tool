@@ -98,3 +98,18 @@ func (mq *Queries) Find(node *yaml.Node) []*yaml.Node {
 
 	return results
 }
+
+func (mq *Queries) Set(val string) error {
+	var q Query
+	if err := yaml.Unmarshal([]byte(val), &q); err != nil {
+		return fmt.Errorf("%w", err)
+	}
+
+	*mq = append(*mq, q)
+
+	return nil
+}
+
+func (mq *Queries) Type() string {
+	return "overlays.Queries"
+}

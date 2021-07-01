@@ -10,13 +10,12 @@ import (
 	"os"
 	"path"
 
+	"github.com/spf13/viper"
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 
 var ErrFoundDirectoryWithPathOutput = errors.New("found directory as input path with file as output path")
-
-var ErrAbsolutePathForOutputPath = errors.New("absolute paths are currently not supported for outputPath")
 
 // YamlFile is used to define which files should be manipulated and overlays specific to that file.
 type YamlFile struct {
@@ -96,9 +95,9 @@ func (yf *YamlFile) readYamlFile() error {
 		if err := dc.Decode(&y); errors.Is(err, io.EOF) {
 			if reader, ok := reader.(*os.File); ok {
 				CloseFile(reader)
-
-				break
 			}
+
+			break
 		} else if err != nil {
 			return fmt.Errorf("failed to read file %s: %w", yf.Path, err)
 		}
@@ -114,15 +113,9 @@ func (yfs *YamlFiles) expandDirectories() error {
 
 	var paths []string
 
-	var removeItems []int
-
 	for i := 0; i <= len(y)-1; i++ {
 		if !path.IsAbs(y[i].Path) {
-			y[i].Path = path.Join(instructionsDir, y[i].Path)
-		}
-
-		if path.IsAbs(y[i].OutputPath) {
-			return ErrAbsolutePathForOutputPath
+			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
 		}
 
 		if ok, err := isDirectory(y[i].Path); err != nil {
@@ -153,11 +146,6 @@ func (yfs *YamlFiles) expandDirectories() error {
 		}
 	}
 
-	for _, remove := range removeItems {
-		y[remove] = y[len(y)-1]
-		y = y[:len(y)-1]
-	}
-
 	*yfs = y
 
 	return nil
@@ -184,4 +172,19 @@ func (yfs *YamlFiles) mergeDuplicates() {
 	}
 
 	*yfs = ys
+}
+
+// removeCommentsFromNode will traverse the tree of yaml nodes and remove all comments.
+func removeCommentsFromNode(node *yaml.Node) {
+	if node.Content == nil {
+		return
+	}
+
+	for _, child := range node.Content {
+		child.HeadComment = ""
+		child.LineComment = ""
+		child.FootComment = ""
+
+		removeCommentsFromNode(node)
+	}
 }
