@@ -185,6 +185,6 @@ func removeCommentsFromNode(node *yaml.Node) {
 		child.LineComment = ""
 		child.FootComment = ""
 
-		removeCommentsFromNode(node)
+		removeCommentsFromNode(child)
 	}
 }
