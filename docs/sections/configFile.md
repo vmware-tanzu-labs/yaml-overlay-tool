@@ -23,7 +23,7 @@ The following table will display the available settings, their default values, a
 | Setting Key | Default Value | Options |
 | --- | --- | --- |
 | indentLevel | 2 | 2-9 |
-| logLevel | error | "error" | critical, error, warning, notice, info, debug |
+| logLevel | "error" | critical, error, warning, notice, info, debug |
 | outputDirectory | ./output | any path you like |
 | outputStyle | [normal] | normal, tagged, doubleQuoted, singleQuoted, literal, folded, flow |
 | removeComments | false | false, true |
