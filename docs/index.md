@@ -1,13 +1,14 @@
 [Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)
 
 
-## Introduction to YAML Overlay Tool
+# Introduction to YAML Overlay Tool
 
-YAML Overlay Tool (Yot) is not a traditional text-based templating tool. It is a YAML overlay/patching tool that takes fragments of YAML configuration to apply or inject over the top of an existing YAML configuration.  
+YAML Overlay Tool (Yot) is not a traditional text-based templating tool. Yot operates on structured YAML nodes. Yot is a YAML overlay or patching tool that primarily takes fragments of YAML configuration from within a declaritive specification to modify and manipulate an existing YAML configuration (manifest).  
 
-Each overlay operation is performed with a JSONPath `query`, a desired `value`, and an `action`.  If a JSONPath `query` returns no results, a desired value is either ignored (default behavior), or injected, (`onMissing`). It can also provide a specific path or set of paths (`injectPath`) to inject the value, if the initial JSONPath query was not a fully-qualified JSONPath.  
+Each overlay operation is performed with a JSONPath `query`, a desired `value`, and an `action`.  If a JSONPath `query` returns no results, a desired value is either ignored (default behavior), or injected, (`onMissing`). It can also provide a specific path or set of paths (`injectPath`) to inject the value, if the initial JSONPath query was not a fully-qualified JSONPath (e.g. using wildcards in the JSONPath query).  
 
-## Table of contents
+
+# Table of contents
 1. [Installation and setup](sections/setup.md)
     - [Configuration file](sections/configFile.md)
     - [Environment variables](sections/envVars.md)
