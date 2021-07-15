@@ -74,7 +74,7 @@ drink: juice
 ```
 
 
-## Instructions file full-specification example
+## Instructions file usage example
 
 ```yaml
 ---
