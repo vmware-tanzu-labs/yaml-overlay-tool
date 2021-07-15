@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 # Common use-cases and patterns for Kubernetes
 
@@ -274,5 +274,5 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/replaceAllInstances.yaml -o /tmp/new`
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Interactive tutorials and learning paths](tutorials.md)

@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 
 # Output directory structure
@@ -21,5 +21,5 @@ output
 ```
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Common use-cases and patterns for Kubernetes](useCasesForKubernetes.md)

@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 
 ## Example CLI usage
@@ -176,5 +176,5 @@ yot env
 ```
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Instructions file introduction](instructionsFileIntro.md)

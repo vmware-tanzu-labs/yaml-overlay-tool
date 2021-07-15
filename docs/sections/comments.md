@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 # Comment preservation and injection
 
@@ -16,5 +16,5 @@ You can inject comments into YAML files by simply adding a comment above (head c
 >**NOTE:** Due to [some minor bugs within Go's yaml.v3 library](https://github.com/go-yaml/yaml/issues/610), head comments in a map/dictionary do not always apply where they should, and will be addressed in a future version of Yot.  ***However***, line comments can be reliably injected today.  Head and foot comments are considered experimental.
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Using templating within instructions files](instructionsFileTemplating.md)

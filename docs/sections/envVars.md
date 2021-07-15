@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 # Environment variables
 
@@ -22,5 +22,5 @@ The following table will display the available settings, their default values, a
 | YOT_DEFAULT_ON_MISSING_ACTION | "ignore" | ignore, inject |
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Command line interface usage and overview](commandUsage.md)

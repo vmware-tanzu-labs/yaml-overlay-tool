@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md) 
+[Back to Table of contents](../index.md) 
 
 ## Using templating within instructions files
 
@@ -25,5 +25,5 @@ Prior to processing your instructions file, if the `-f` or `--values-file` param
 See the [Example CLI usage](exampleUsage.md#) for example usage.
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Order of operations/processing order](orderOfOperations.md)

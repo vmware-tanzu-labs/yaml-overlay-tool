@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 
 ## Order of operations/Processing Order
@@ -38,5 +38,5 @@ If no `commonOverlays` have been defined, processing starts at the first path of
 Output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output/`.
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Output directory structure](outputDirStructure.md)

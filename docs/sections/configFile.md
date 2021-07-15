@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 
 ## Configuration file
@@ -31,5 +31,5 @@ The following table will display the available settings, their default values, a
 | defaultOnMissingAction | ignore | ignore, inject |
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Environment variables](envVars.md)

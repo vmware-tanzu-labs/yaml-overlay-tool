@@ -1,4 +1,4 @@
-[Back to Project README](../README.md)
+[Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)
 
 
 ## Introduction to YAML Overlay Tool
@@ -26,4 +26,4 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 1. [Interactive tutorials and learning paths](sections/tutorials.md)
 
 
-[Back to Project README](../README.md)
+[Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)

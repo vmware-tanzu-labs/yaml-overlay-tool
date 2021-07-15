@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 # Actions
 
@@ -106,5 +106,5 @@ yamlFiles:
         - spec.template.spec.containers[0].image
 ```
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Overlay qualifiers](overlayQualifiers.md)

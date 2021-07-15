@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 # Instructions file YAML specification
 
@@ -123,5 +123,5 @@ yamlFiles: # what to overlay onto
 ```
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Overlay actions](overlayActions.md)

@@ -1,6 +1,6 @@
 [Back to Overlay actions](overlayActions.md#3-merge)  
 [Back to Overlay qualifiers](overlayQualifiers.md)  
-[Back to Table of contents](../documentation.md) 
+[Back to Table of contents](../index.md) 
 
 
 # Format markers
@@ -121,4 +121,4 @@ spec:
 
 [Back to Overlay actions](overlayActions.md#3-merge)  
 [Back to Overlay qualifiers](overlayQualifiers.md)  
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
