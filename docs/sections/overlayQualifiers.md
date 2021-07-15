@@ -4,8 +4,8 @@
 
 Overlay qualifiers refine/qualify when an overlay is applied to a YAML document within a YAML file path.  
 YAML Overlkay Tool has two kinds of qualifiers that can be used together, separately, or not at all:  
-* `documentQuery`  
-* `documentIndex`  
+1. [documentQuery](#documentquery-overlay-qualifier)  
+1. [documentIndex](#documentindex-overlay-qualifier)  
 
 
 ### documentQuery overlay qualifier
@@ -92,7 +92,7 @@ commonOverlays:
       value: Service
 ```
 
-#### documentIndex overlay qualifier
+### documentIndex overlay qualifier
 
 The `documentIndex` qualifier is used on the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `documentIndex` is to qualify an overlay by specifying which specific YAML documents within a file should receive the overlay.  The `documentIndex` is a list, and should be expressed as:
 
