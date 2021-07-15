@@ -25,7 +25,7 @@
 
 ## Format marker introduction
 
-Format markers allow a Yot user the ability to access the original values returned from the JSONPath query.  This can be used to add some additional text to the original value, and they can be used more than once within the overlay's `value` key.  
+Format markers provide a Yot user the ability to access the original values returned from the JSONPath query.  This can be used to add some additional text to the original value, and they can be used more than once within the overlay's `value` key.  
 
 ## Format marker parameters
 
