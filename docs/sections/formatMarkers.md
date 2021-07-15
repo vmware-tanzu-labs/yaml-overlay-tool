@@ -16,6 +16,9 @@
   - [Content manipulation examples](#content-manipulation-examples)
     - [Simple sed string replacement](#simple-sed-string-replacement)
     - [sed read command example](#sed-read-command-example)
+    - [Forcing types with YAML tags](#forcing-types-with-yaml-tags)
+      - [Problem](#problem)
+      - [Solution](#solution)
 
 <!-- /code_chunk_output -->
 
