@@ -4,16 +4,16 @@
 
 There are four types of actions that you can use to apply changes to a YAML document within Yot.
 
-* **Combine**
-* **Delete**
-* **Merge**
-* **Replace**
+1. **[Combine](#1-combine)**
+1. **[Delete](#2-delete)**
+1. **[Merge](#3-merge)**
+1. **[Replace](#4-replace)**
 
 
 There are two types of actions that you can use to apply changes to a YAML document when a `query` returns no results (`onMissing`) within Yot.
 
-* **Ignore**
-* **Inject**
+1. **[Ignore](#1-ignore)**
+1. **[Inject](#2-inject)**
 
 
 ## Overlay actions
