@@ -22,7 +22,7 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
     - [Format markers](sections/formatMarkers.md)
     - [Comment preservation and injection](sections/comments.md)
     - [Using templating within instructions files](sections/instructionsFileTemplating.md)
-1. [Order of operations/Processing order](sections/orderOfOperations.md)
+1. [Order of operations/processing order](sections/orderOfOperations.md)
 1. [Output directory structure](sections/outputDirStructure.md)
 1. [Common use-cases and patterns for Kubernetes](sections/useCasesForKubernetes.md)
 1. [Interactive tutorials and learning paths](sections/tutorials.md)
