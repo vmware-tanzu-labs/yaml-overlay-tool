@@ -3,7 +3,7 @@
 ## Overlay qualifiers
 
 Overlay qualifiers refine/qualify when an overlay is applied to a YAML document within a YAML file path.  
-YAML Overlkay Tool has two kinds of qualifiers that can be used together, separately, or not at all:  
+YAML Overlay Tool has two kinds of qualifiers that can be used together, separately, or not at all:  
 1. [documentQuery](#documentquery-overlay-qualifier)  
 1. [documentIndex](#documentindex-overlay-qualifier)  
 
@@ -31,7 +31,7 @@ The `documentQuery` key is a list/array which contains a list of the following t
 | query | The key to search for within a YAML document expressed as a JSONPath query or dot-notation. (can accept multiple queries)| string |
 | value | (optional) The value that the JSONPath query must return from one of the results of the `query` before an overlay action is applied to a document. | string |
 
-***if value is not provided then the condition will return true if any results are found from the query***
+>**NOTE:** *If `value` is not provided then the condition will return true if any results are found from the query*
 
 #### documentQuery examples
 
