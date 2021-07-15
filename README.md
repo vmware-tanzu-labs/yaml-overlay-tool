@@ -12,8 +12,15 @@
 
 YAML Overlay Tool, or Yot for short, often pronounced */yaucht/*, is a tool to assist with patching YAML files.  Yot uses JSONPath to query YAML documents within YAML files, and to perform a change.  YAML Overlay Tool operates on YAML nodes. It is able to preserve and inject head, foot, and line comments into the new output versions of the files that you manipulate.
 
+
 ## Getting started
 Get started by [installing YAML Overlay Tool](https://docs.yaml-overlay-tool.io/sections/setup.html).
+
+
+## Full Documentation and user guide
+
+[Full Documentation and User Guide](https://docs.yaml-overlay-tool.io)
+
 
 ## Why create another YAML tool?
 
@@ -32,11 +39,6 @@ The use of JSONPath queries and templating give the tool familiar interfaces, ma
 
 [Andrew J. Huffman](https://github.com/ahuffman)  
 [Jeff Davis](https://github.com/JefeDavis)
-
-
-## Full Documentation and user guide
-
-[Full Documentation and User Guide](https://docs.yaml-overlay-tool.io)
 
 
 ## License
