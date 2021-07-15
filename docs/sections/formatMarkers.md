@@ -122,6 +122,47 @@ spec:
 `%v{r ~/myfile.yaml}` would insert the contents of 'myfile.yaml' on a new line after the existing value.  This could be useful for populating Kubernetes Secret and ConfigMap contents.
 
 
+#### Forcing types with YAML tags
+
+##### Problem
+
+There are times when you may want to simply inject a comment into an existing YAML document.  However, problems can arise if the original type was an integer.  This scenario would look like this:
+
+```yaml
+...
+- name: inject a comment
+  query: some.jsonpath
+  value: "%v"  # new comment
+  action: merge
+```
+
+Since format markers begin with the `%` character, and the YAML specification does not allow a `%` character to begin a value, we must wrap the format marker in quotation marks.  Once you have wrapped the format marker in quotation marks, you have affectively transformed the original integer (pretend we were manipulating an integer) type to that of a string.
+
+
+##### Solution
+
+To solve the above problem, we must use explicit YAML tags to force the value into a desired type.  This can be achieved by doing the following:
+
+```yaml
+...
+- name: inject a comment
+  query: some.jsonpath
+  value: !!int "%v"  # new comment
+  action: merge
+```
+
+Acceptable tags are:
+
+| Tag | Related Type |
+| --- | --- |
+| `!!int` | integer |
+| `!!float` | floating point decimal |
+| `!!null` | null value |
+| `!!map` | map/dictionary |
+| `!!seq` | Sequence/array |
+| `!!str` | String |
+
+
 [Back to Overlay actions](overlayActions.md#3-merge)  
 [Back to Overlay qualifiers](overlayQualifiers.md)  
 [Back to Table of contents](../index.md)  
