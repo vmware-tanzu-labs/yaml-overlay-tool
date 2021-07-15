@@ -76,7 +76,7 @@ drink: juice
 
 ## Instructions file usage example
 
-The following example illustrates all of features available in the Yot instructions specification, along with commented descriptions of their purpose.  This example does not illustrate [Format Markers](formatMarkers.md), which can be used to manipulate the original value returned from the JSONPath `query`.  
+The following example illustrates all of the features available in the Yot instructions specification, along with commented descriptions of their purpose.  This example does not illustrate [Format Markers](formatMarkers.md), which can be used to manipulate the original value returned from the JSONPath `query`.  
 
 ```yaml
 ---
