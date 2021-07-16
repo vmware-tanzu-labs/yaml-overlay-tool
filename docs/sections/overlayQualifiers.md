@@ -41,55 +41,55 @@ Think of each group of `conditions` as "match this" or "match this" (implicit "o
 
 ```yaml
 commonOverlays:
-- name: Change the namespace for all k8s Deployments
-  query: metadata.namespace
-  value: my-namespace
-  action: replace
-  documentQuery:
-  - conditions:
-    - query: kind
-      value: Deployment
+  - name: Change the namespace for all k8s Deployments
+    query: metadata.namespace
+    value: my-namespace
+    action: replace
+    documentQuery:
+      - conditions:
+          - query: kind
+            value: Deployment
 
 # With multiple conditions, must be a Deployment with a specific label to get applied
 commonOverlays:
-- name: Change the namespace for all k8s Deployments with name label of cool-app
-  query: metadata.namespace
-  value: my-namespace
-  action: replace
-  documentQuery:
-  - conditions:
-    - query: kind
-      value: Deployment
-    - query: metadata.labels.["app.kubernetes.io/name"]
-      value: cool-app
+  - name: Change the namespace for all k8s Deployments with name label of cool-app
+    query: metadata.namespace
+    value: my-namespace
+    action: replace
+    documentQuery:
+      - conditions:
+          - query: kind
+            value: Deployment
+          - query: metadata.labels.["app.kubernetes.io/name"]
+            value: cool-app
 
  # With no Value, same conditions as above
- commonOverlays:
-- name: Change the namespace for all k8s Deployments with name label of cool-app
-  query: metadata.namespace
-  value: my-namespace
-  action: replace
-  documentQuery:
-  - conditions:
-    - query: $[?($.kind == "Deployment")]
-    - query: metadata.labels.[?(@.name == "cool-app")]`
+commonOverlays:
+  - name: Change the namespace for all k8s Deployments with name label of cool-app
+    query: metadata.namespace
+    value: my-namespace
+    action: replace
+    documentQuery:
+      - conditions:
+          - query: $[?($.kind == "Deployment")]
+          - query: metadata.labels.[?(@.name == "cool-app")]`
 ```
 
 The following example demonstrates use of multiple `documentQuery` groups.  Any single one of these query/value conditions groups have to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this" (implicit "or").  
 
 ```yaml
 commonOverlays:
-- name: Change the namespace for all k8s Deployments or Services
-  query: metadata.namespace
-  value: my-namespace
-  action: replace
-  documentQuery:
-  - conditions:
-    - query: kind
-      value: Deployment
-  - conditions:
-    - query: kind
-      value: Service
+  - name: Change the namespace for all k8s Deployments or Services
+    query: metadata.namespace
+    value: my-namespace
+    action: replace
+    documentQuery:
+      - conditions:
+          - query: kind
+            value: Deployment
+      - conditions:
+          - query: kind
+            value: Service
 ```
 
 ### documentIndex overlay qualifier
