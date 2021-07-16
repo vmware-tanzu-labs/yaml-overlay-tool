@@ -22,7 +22,7 @@ The values file is expected to be a YAML file containing values you would like t
 
 Prior to processing your instructions file, if the `-f` or `--values-file` parameter is passed, the templated instructions will be rendered.  If the template fails to produce valid YAML, the instructions will fail to be read and an error will occur.
 
-See the [Example CLI usage](exampleUsage.md#provide-variable-values-to-a-templated-instructions-file) for example usage.
+See the [Example CLI usage](exampleUsage.md#provide-variable-values-to-a-templated-instructions-file) page for an example.
 
 
 [Back to Table of contents](../index.md)  
