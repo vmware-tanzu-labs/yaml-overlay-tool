@@ -39,6 +39,8 @@ The following example demonstrates use of `commonOverlays` with a `documentQuery
 
 Think of each group of `conditions` as "match this" or "match this" (implicit "or").  Think of each condition within a group of `conditions` as "match this" and "match this" (implicit "and").  
 
+##### Single condition
+
 ```yaml
 commonOverlays:
   - name: Change the namespace for all k8s Deployments
@@ -49,8 +51,13 @@ commonOverlays:
       - conditions:
           - query: kind
             value: Deployment
+```
 
-# With multiple conditions, must be a Deployment with a specific label to get applied
+
+##### With multiple conditions
+
+```yaml
+# documentQuery says this must be a Deployment with a specific label to get applied
 commonOverlays:
   - name: Change the namespace for all k8s Deployments with name label of cool-app
     query: metadata.namespace
@@ -62,8 +69,12 @@ commonOverlays:
             value: Deployment
           - query: metadata.labels.["app.kubernetes.io/name"]
             value: cool-app
+```
 
- # With no Value, same conditions as above
+
+##### With no Value, same conditions, but expressed in JSONPath
+
+```yaml
 commonOverlays:
   - name: Change the namespace for all k8s Deployments with name label of cool-app
     query: metadata.namespace
@@ -75,9 +86,12 @@ commonOverlays:
           - query: metadata.labels.[?(@.name == "cool-app")]`
 ```
 
+
+##### Multiple documentQuery groups
 The following example demonstrates use of multiple `documentQuery` groups.  Any single one of these query/value conditions groups have to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this" (implicit "or").  
 
 ```yaml
+# must be a k8s deployment OR a k8 service to be applied
 commonOverlays:
   - name: Change the namespace for all k8s Deployments or Services
     query: metadata.namespace
@@ -91,6 +105,7 @@ commonOverlays:
           - query: kind
             value: Service
 ```
+
 
 ### documentIndex overlay qualifier
 
