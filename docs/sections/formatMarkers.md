@@ -19,6 +19,7 @@
     - [Forcing types with YAML tags](#forcing-types-with-yaml-tags)
       - [Problem](#problem)
       - [Solution](#solution)
+      - [YAML tags reference](#yaml-tags-reference)
 
 <!-- /code_chunk_output -->
 
@@ -129,7 +130,7 @@ spec:
 
 ##### Problem
 
-There are times when you may want to simply inject a comment into an existing YAML document.  However, problems can arise if the original type was an integer.  This scenario would look like this:
+There are times when you may want to simply inject a comment into an existing YAML document while retaining a key's original value.  However, problems can arise if the original type was an integer.  This scenario would look like this:
 
 ```yaml
 ...
@@ -154,7 +155,10 @@ To solve the above problem, we must use explicit YAML tags to force the value in
   action: merge
 ```
 
-Acceptable tags are:
+
+##### YAML tags reference
+
+Acceptable YAML tags are:
 
 | Tag | Related Type |
 | --- | --- |
