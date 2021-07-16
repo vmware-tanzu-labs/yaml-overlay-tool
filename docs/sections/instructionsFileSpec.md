@@ -2,6 +2,18 @@
 
 # Instructions file YAML specification
 
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Top-level commonOverlays keys](#top-level-commonoverlays-keys)
+- [Top-Level yamlFiles keys](#top-level-yamlfiles-keys)
+  - [overlays keys](#overlays-keys)
+  - [documents keys](#documents-keys)
+- [Instructions file usage example](#instructions-file-usage-example)
+
+<!-- /code_chunk_output -->
+
 
 ## Top-level commonOverlays keys
 
@@ -29,7 +41,7 @@ Each list item in the `yamlFiles` key is treated as a dictionary/map with the fo
 | documents | no | List/array of overlay operations to apply to a multi-document YAML file.  When each document from a multi-document YAML file is loaded, an overlay can be applied by addressing the document by its index.  See [documents keys](#documents-keys) for available dictionary/map keys. | None | list/array of dictionaries/maps |
 | outputPath | no | **Added in v0.6.0**. Alters the output path for a YAML file or directory of YAML files. all paths are relative to the output directory specified by the `-o` or `--output-directory` flag or you can give an absolute path.<br/>1. If a filename is specified (must have a file extension), and the value of `path` is a single file (not a directory of files), this will alter the filename of the YAML file on output within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newfilename.yaml`<br/>2. If a new filename is proceded with a directory/directory structure in `outputPath` and the value of `path` is a single file, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir/newfilename.yaml`<br/>3. If a directory/directory structure is specified in `outputPath`, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag, and the original filename will be retained within the new `outputPath`. Example `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir/`<br/>4. If a directory is given with the `path` key, the value of `outputPath` will be treated as a new directory/directory structure within the output directory specified with by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir`.<br/>5. If you wish to change the output location for a single file that was within a `path` which was a directory, add an additional item to the `yamlFiles` array with the `path` to the file and desired `outputPath`. Yot uses the last listed `outputPath` for a given file for final output to the filesystem. | None | string |
 
-### `overlays` keys
+### overlays keys
 
 The `overlays` key is the main place to set your overlay operation instructions, but is an optional setting.  If working with multi-document YAML files, the items set under the `overlays` key will apply to all YAML documents in the file, unless a qualifier or combination of qualifiers `documentQuery` and `documentIndex` are provided. The `overlays` are processed prior to overlays in the [documents key](#documents-keys) instructions.  Each `overlays` list/array item can have the following keys set:
 
