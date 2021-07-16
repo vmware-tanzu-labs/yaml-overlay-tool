@@ -12,10 +12,10 @@ The `commonOverlays` key is optional. It provides overlays to apply to every ite
 | name | no | An optional description of the change you are performing, and used for either on-screen output or self-documentation. | None | string |
 | query | yes | JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate. If the `query` is not a fully-qualified path (such as a.b.c.d) and returns no matches, you need to specify the `onMissing` key (i.e. metadata.labels VS metadata.fake.*). | None | string or list/array |
 | value | yes | The desired value to take action with if `query` is found. This is not required when using the `delete` action, as we are removing a value altogether. | None | int, bool, str, dict/map, list/array |
-| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `combine`, `delete`, `merge`, or `replace`.  See [Actions](overlayActions.md) for details. | None | string |
+| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `combine`, `delete`, `merge`, or `replace`.  See [Overlay actions](overlayActions.md) for details. | None | string |
 | onMissing.action | no | Instructions for what to do if the JSONPath `query` is not found. Can be `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
 | onMissing.injectPath | no | If your JSONPath expression is not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This is the path or list/array of paths to inject the value if your JSONPath expression was not found in the YAML document. | None | string or list/array |
-| documentQuery | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary/map |
+| documentQuery | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Overlay qualifiers](overlayQualifiers.md) for more details. | None | dictionary/map |
 
 ## Top-Level yamlFiles keys
 
@@ -50,7 +50,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 
 The `documents` list/array applies to multi-document YAML files only.  It is optional, just like the top-level `overlays` key.  If you require changes to a specific YAML document in the multi-document YAML file, this is where you define them.  Actions in the `documents` key are processed after the actions in the top-level `overlays` key.  Consider the `commonOverlays` key as a place to perform "common" changes on all YAML documents within all files listed in `yamlFiles`.  Consider the `overlays` key as the place to perform "common" changes on all YAML documents in a single file.  Actions defined in the `documents` key are for making specific changes to a specific document within the YAML file.
 
-The keys in the `documents` list are the same as those in the [Top-Level Instructions Keys](#top-level-instructions-keys). The only difference is for you to see the `path` key as a numeric value.  This numeric value represents the positional index of the YAML document within the multi-document YAML file.  To determine the numeric value, refer to your file, and count each document (separated by `---`) starting at `0`.  
+The keys in the `documents` list are the same as those in the [Top-Level yamlFiles Keys](#top-level-yamlFiles-keys). The only difference is for you to see the `path` key as a numeric value.  This numeric value represents the positional index of the YAML document within the multi-document YAML file.  To determine the numeric value, refer to your file, and count each document (separated by `---`) starting at `0`.  
 
 >**NOTE**: Qualifiers such as the `documentQuery` and `documentIndex` are not available here because we are performing actions on a specific document within a YAML file, and there is nothing to qualify.
 
