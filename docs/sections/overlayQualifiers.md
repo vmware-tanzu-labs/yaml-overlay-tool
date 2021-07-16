@@ -8,6 +8,25 @@ YAML Overlay Tool has two kinds of qualifiers that can be used together, separat
 1. [documentIndex](#documentindex-overlay-qualifier)  
 
 
+
+## Overlay qualifiers Table of Contents
+<!-- @import "[TOC]" {cmd="toc" depthFrom=3 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [documentQuery overlay qualifier](#documentquery-overlay-qualifier)
+  - [documentQuery top-level keys](#documentquery-top-level-keys)
+    - [documentQuery conditions keys](#documentquery-conditions-keys)
+  - [documentQuery examples](#documentquery-examples)
+    - [Single condition](#single-condition)
+    - [With multiple conditions](#with-multiple-conditions)
+    - [With no Value, same conditions, but expressed in JSONPath](#with-no-value-same-conditions-but-expressed-in-jsonpath)
+    - [Multiple documentQuery groups](#multiple-documentquery-groups)
+- [documentIndex overlay qualifier](#documentindex-overlay-qualifier)
+
+<!-- /code_chunk_output -->
+
+
 ### documentQuery overlay qualifier
 
 The `documentQuery` qualifier can be used on either `commonOverlays` or the `overlays` key on a `yamlFiles.path`, but cannot be used under the `documents` key.  The purpose of a `documentQuery` is to qualify an overlay operation by checking for a value or multiple values contained in a YAML document within a file.
