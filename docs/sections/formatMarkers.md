@@ -162,11 +162,11 @@ Acceptable YAML tags are:
 
 | Tag | Related Type |
 | --- | --- |
-| `!!int` | integer |
-| `!!float` | floating point decimal |
-| `!!null` | null value |
-| `!!map` | map/dictionary |
-| `!!seq` | Sequence/array |
+| `!!int` | Integer |
+| `!!float` | Floating point decimal |
+| `!!null` | `null` value |
+| `!!map` | Map/Dictionary |
+| `!!seq` | Sequence/Array |
 | `!!str` | String |
 
 
