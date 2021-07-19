@@ -18,8 +18,8 @@ yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output 
 Within the [examples/kubernetes/manifests](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/tree/main/examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
 
 ```yaml
-# my-app.yaml
 ---
+# my-app.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -42,8 +42,8 @@ spec:
 ```
 
 ```yaml
-# my-service.yaml
 ---
+# my-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
