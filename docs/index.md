@@ -9,6 +9,7 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 
 
 # Table of contents
+1. [YAML Overlay Tool features](sections/features.md)
 1. [Installation and setup](sections/setup.md)
     - [Configuration file](sections/configFile.md)
     - [Environment variables](sections/envVars.md)
