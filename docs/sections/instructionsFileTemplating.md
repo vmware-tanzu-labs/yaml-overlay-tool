@@ -4,12 +4,12 @@
 
 ### Why use templating?
 
-Templating creates reusability within your overlays.  
+Templating creates reusability within your overlays when managing multiple sites.  
 
 ### Supported templating languages
 
-* As of v0.4.0 YAML Overlay Tool supports [Go Templating](https://golang.org/pkg/text/template/).  
-* As of v0.5.0 YAML Overlay Tool supports Go Templating with [Sprig functions](https://masterminds.github.io/sprig/).  
+* As of v0.4.0 YAML Overlay Tool supports [Go Templating](https://golang.org/pkg/text/template/) within [Yot instructions files](instuctionsFileIntro.md).  
+* As of v0.5.0 YAML Overlay Tool supports Go Templating with [Sprig functions](https://masterminds.github.io/sprig/) within [Yot instructions files](instuctionsFileIntro.md).  
 
 Future versions of Yot ***may*** add additional configurable templating language support.
 
