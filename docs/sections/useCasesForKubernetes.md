@@ -172,6 +172,7 @@ Annotations are set for specific environments that may not apply to your environ
 Use the `delete` action to remove all annotations in the following example:  
 
 ```yaml
+---
 # removeAnnotations.yaml
 commonOverlays:
   - name: Remove all annotations
@@ -192,6 +193,7 @@ Now apply the changes by generating a new set of YAML files:
 To build on the previous example, there are times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove annotations, use the `delete` action and a `documentQuery`.
 
 ```yaml
+---
 # removeAnnotationsWithConditions.yaml
 commonOverlays:
   - name: Remove all annotations with conditions
@@ -260,6 +262,8 @@ Now apply the changes by generating a new set of YAML files:
 After examining a manifest, we would like to replace the name or all references to how a particular item is named.  In this example we'll replace all instances of the string `my-web-page` with `website`.
 
 ```yaml
+---
+#replaceAllInstances.yaml
 commonOverlays:
   - name: replace all instances of my-web-page
     query: "..*[?(@ == 'my-web-page')]"
