@@ -12,7 +12,7 @@ The following table will display the available settings, their default values, a
 
 | Environment Variable | Default Value | Options | Description |
 | --- | --- | --- | --- |
-| YOT_CONFIG_FILE | "" | any path to a file you like | Yot configuration file location. Corresponds to the `--config` CLI parameter. |
+| YOT_CONFIG_FILE | "" | any path to a Yot configuration file you like | Yot configuration file location. Corresponds to the `--config` CLI parameter. |
 | YOT_INDENT_LEVEL | "2" | 2-9 | How much to indent the new YAML.  Corresponds to the `-I` or `--indent-level` CLI parameter. |
 | YOT_LOG_LEVEL | "error" | critical, error, warning, notice, info, debug | What log level to run with.  Corresponds to the `-v` or `--log-level` CLI parameter. |
 | YOT_OUTPUT_DIRECTORY | "./output" | any path you like | Path where you would like the new YAML files to be output. Corresponds to the `-o` or `--output-directory` CLI parameter. |
