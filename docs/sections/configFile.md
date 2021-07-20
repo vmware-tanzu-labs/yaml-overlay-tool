@@ -25,15 +25,15 @@ If Yot is behaving in an unexpected behavior, you can check your current configu
 
 The following table will display the available settings, their default values, and their available options.
 
-| Setting Key | Default Value | Options |
-| --- | --- | --- |
-| indentLevel | 2 | 2-9 |
-| logLevel | "error" | critical, error, warning, notice, info, debug |
-| outputDirectory | ./output | any path you like |
-| outputStyle | [normal] | normal, tagged, doubleQuoted, singleQuoted, literal, folded, flow |
-| removeComments | false | false, true |
-| stdout | false | false, true |
-| defaultOnMissingAction | ignore | ignore, inject |
+| Setting Key | Default Value | Options | Description |
+| --- | --- | --- | --- |
+| indentLevel | 2 | 2-9 | How much to indent the new YAML.  Corresponds to the `-I` or `--indent-level` CLI parameter. |
+| logLevel | "error" | critical, error, warning, notice, info, debug | What log level to run with.  Corresponds to the `-v` or `--log-level` CLI parameter. |
+| outputDirectory | ./output | any path you like | Path where you would like the new YAML files to be output. Corresponds to the `-o` or `--output-directory` CLI parameter. |
+| outputStyle | [normal] | normal, tagged, doubleQuoted, singleQuoted, literal, folded, flow | Style of the new YAML file output. Corresponds to the `-S` or `--output-style` CLI parameter. |
+| removeComments | false | false, true | Removes existing comments prior to performing overlays.  Corresponds to the `--remove-comments` CLI parameter. |
+| stdout | false | false, true | Whether or not to output to `stdout`/standard out.  Corresponds to the `-s` or `--stdout` CLI parameter. |
+| defaultOnMissingAction | ignore | ignore, inject | Sets the default `onMissing` action, which is defaulted to `ignore`. |
 
 
 [Back to Table of contents](../index.md)  
