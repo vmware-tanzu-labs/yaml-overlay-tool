@@ -1,10 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/yaml-overlay-tool)
-[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/yaml-overlay-tool)](https://golang.org/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/yaml-overlay-tool)
-[![GitHub](https://img.shields.io/github/license/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/blob/main/LICENSE)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases)
-![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
-
+[![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/yaml-overlay-tool)](https://golang.org/)[![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub](https://img.shields.io/github/license/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/blob/main/LICENSE)[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases)![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/yaml-overlay-tool)
 
 
@@ -14,12 +8,12 @@ YAML Overlay Tool, or Yot for short, often pronounced */yaucht/*, is a tool to a
 
 
 ## Getting started
-Get started by [installing YAML Overlay Tool](https://docs.yaml-overlay-tool.io/sections/setup.html).
 
+  * Check out the list of [YAML Overlay Tool's features](https://docs.yaml-overlay-tool.io/sections/features.html).
 
-## Full Documentation and user guide
+  * [Install YAML Overlay Tool](https://docs.yaml-overlay-tool.io/sections/setup.html).
 
-[Full Documentation and User Guide](https://docs.yaml-overlay-tool.io)
+  * Read the [full documentation and user guide](https://docs.yaml-overlay-tool.io) at [docs.yaml-overlay-tool.io](https://docs.yaml-overlay-tool.io).
 
 
 ## Why create another YAML tool?
