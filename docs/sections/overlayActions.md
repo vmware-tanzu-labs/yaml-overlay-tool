@@ -125,6 +125,11 @@ yamlFiles:
 
 The `ignore` action is the default `onMissing` action if there are no results found from your `query`.  Use of the `onMissing` key is optional. Use of `ignore` can be added for the sake of being explicit to anyone reading your instructions file.  
 
+
+#### Ignore example
+
+The following example illustrates using the optional long-form API for `onMissing` with action of `ignore`, which is the default behavior if `onMissing` was omitted.
+
 ```yaml
 yamlFiles:
   - path: /some/yaml/file.yaml
@@ -143,7 +148,7 @@ yamlFiles:
 
 ### 2. Inject
 
-Use `inject` if your `query` returned no results, but you still want to insert data.
+Use `inject` if your `query` returned no results, but you still want to insert data into the YAML file.
 
 
 #### Inject Example
@@ -167,7 +172,9 @@ yamlFiles:
 
 #### injectPath
 
-If your initial `query` used some of JSONPath's advanced features (`../`, `*`, etc) rather than a dot-notation style path (e.g: `a.b.c.d`), and no results were obtained, an `injectPath` is also required to allow for properly building the YAML paths.  An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
+If your initial `query` used some of JSONPath's advanced features (`../`, `*`, etc) rather than a dot-notation style path (e.g: `a.b.c.d`), and no results were obtained, an `injectPath` is also required to allow for properly building the YAML paths and inserting the desired data.  
+
+An `injectPath` can either be a `string` or a `list/array` that you can use to inject the same data to multiple-locations within the file.
 
 ##### injectPath Example
 
