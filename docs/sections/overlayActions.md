@@ -184,7 +184,7 @@ The following example will illustrate the purpose of the `injectPath`.  We are q
 yamlFiles:
   - path: /some/yaml/file.yaml
     overlays:
-      - name: Find some data, and inject if it does not exist to multiple locations
+      - name: Find some data, and inject if it does not exist to a location
         query: ..image
         value: nginx:latest
         action: replace
