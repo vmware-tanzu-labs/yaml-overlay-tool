@@ -17,7 +17,7 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
     - [Example CLI usage](sections/exampleUsage.md)
 1. [Instructions file introduction](sections/instructionsFileIntro.md)
     - [Instructions file YAML specification](sections/instructionsFileSpec.md)
-        - [Instructions file usage example](sections/instructionsFileSpec.md#instructions-file-full-specification-example)
+        - [Instructions file usage example](sections/instructionsFileSpec.md#instructions-file-usage-example)
     - [Overlay actions](sections/overlayActions.md)
     - [Overlay qualifiers](sections/overlayQualifiers.md)
     - [Format markers](sections/formatMarkers.md)
