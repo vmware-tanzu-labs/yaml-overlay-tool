@@ -61,48 +61,57 @@ Think of each group of `conditions` as "match this" or "match this" (implicit "o
 ##### Single condition
 
 ```yaml
-commonOverlays:
-  - name: Change the namespace for all k8s Deployments
-    query: metadata.namespace
-    value: my-namespace
-    action: replace
-    documentQuery:
-      - conditions:
-          - query: kind
-            value: Deployment
+---
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentQuery:
+          - conditions:
+              - query: kind
+                value: Deployment
 ```
 
 
 ##### With multiple conditions
 
 ```yaml
+---
 # documentQuery says this must be a Deployment with a specific label to get applied
-commonOverlays:
-  - name: Change the namespace for all k8s Deployments with name label of cool-app
-    query: metadata.namespace
-    value: my-namespace
-    action: replace
-    documentQuery:
-      - conditions:
-          - query: kind
-            value: Deployment
-          - query: metadata.labels.["app.kubernetes.io/name"]
-            value: cool-app
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments with name label of cool-app
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentQuery:
+          - conditions:
+              - query: kind
+                value: Deployment
+              - query: metadata.labels.["app.kubernetes.io/name"]
+                value: cool-app
 ```
 
 
 ##### With no Value, same conditions, but expressed in JSONPath
 
 ```yaml
-commonOverlays:
-  - name: Change the namespace for all k8s Deployments with name label of cool-app
-    query: metadata.namespace
-    value: my-namespace
-    action: replace
-    documentQuery:
-      - conditions:
-          - query: $[?($.kind == "Deployment")]
-          - query: metadata.labels.[?(@.name == "cool-app")]`
+---
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments with name label of cool-app
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentQuery:
+          - conditions:
+              - query: $[?($.kind == "Deployment")]
+              - query: metadata.labels.[?(@.name == "cool-app")]`
 ```
 
 
@@ -110,19 +119,22 @@ commonOverlays:
 The following example demonstrates use of multiple `documentQuery` groups.  Any single one of these query/value conditions groups have to match within the YAML document prior to the overlay's application. Think of each group of conditions as "match this" or "match this" (implicit "or").  
 
 ```yaml
+---
 # must be a k8s deployment OR a k8 service to be applied
-commonOverlays:
-  - name: Change the namespace for all k8s Deployments or Services
-    query: metadata.namespace
-    value: my-namespace
-    action: replace
-    documentQuery:
-      - conditions:
-          - query: kind
-            value: Deployment
-      - conditions:
-          - query: kind
-            value: Service
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments or Services
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentQuery:
+          - conditions:
+              - query: kind
+                value: Deployment
+          - conditions:
+              - query: kind
+                value: Service
 ```
 
 
@@ -131,16 +143,34 @@ commonOverlays:
 The `documentIndex` qualifier is used on the `overlays` key on a file path, but cannot be used under the `documents` key.  The purpose of a `documentIndex` is to qualify an overlay by specifying which specific YAML documents within a file should receive the overlay.  The `documentIndex` is a list, and should be expressed as:
 
 ```yaml
-documentIndex: [0,1,3]
+---
+# only apply this to document 0, 1, or 3 in file /file/to/modify.yaml
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments or Services
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentIndex: [0,1,3]
 ```
 
 or
 
 ```yaml
-documentIndex:
-  - 0
-  - 1
-  - 3
+---
+# only apply this to document 0, 1, or 3 in file /file/to/modify.yaml
+yamlFiles:
+  - path: /file/to/modify.yaml
+    overlays:
+      - name: Change the namespace for all k8s Deployments or Services
+        query: metadata.namespace
+        value: my-namespace
+        action: replace
+        documentIndex:
+          - 0
+          - 1
+          - 3
 ```
 
 
