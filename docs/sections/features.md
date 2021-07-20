@@ -21,7 +21,7 @@ Here's a quick introduction to YAML Overlay Tool's set of features, and why you 
 1. Ability to [remove existing comments](exampleUsage.md#remove-source-yaml-file-comments-prior-to-overlayment) from YAML documents prior to further manipulation of the data
 1. Ability to manipulate the value of data returned from JSONPath queries
     * By the use of your JSONPath`query` and [format markers](formatMarkers.md) an end-user can take the returned original data and manipulate it with or without a `sed` implementation
-1. Ability to both *preserve* and *inject* new **comments** into a YAML document
+1. Ability to both [*preserve*](comments.md#comment-preservation) and [*inject*](comments.md#comment-injection) new **comments** into a YAML document
     * This is useful for additional tooling that can consume comments
     * Useful when you want to leave end-users of the configuration notes as to *why* something is setup the way it is
 1. Ability to perform [one-off overlays from the CLI](exampleUsage.md#use-without-an-instructions-file)
