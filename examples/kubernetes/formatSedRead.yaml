@@ -1,0 +1,9 @@
+---
+yamlFiles:
+  - path: ./manifests/antrea-configmap.yaml
+    overlays:
+      - name: insert antrea-agent config into configMap
+        query: data
+        value: 
+          "%k": "%v{r manifests/%k}"
+        action: merge
