@@ -70,7 +70,7 @@ func doFormat(s string, values ...interface{}) string {
 		}
 	}
 
-	re := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*)})?`)
+	re := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*?)})?`)
 
 	matches := re.FindAllStringSubmatch(s, -1)
 
