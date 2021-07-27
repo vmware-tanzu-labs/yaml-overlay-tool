@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 
 
 ## Example CLI usage
@@ -164,7 +164,7 @@ cat /path/to/yaml/files/*.yaml | yot -q metadata.labels -x "{app.kubernetes.io/o
 An additional overlay can be added to be processed in addition to an Instructions file.  CLI based overlays are processed as if they were `commonOverlays`, and when specified in addition to an Instructions file they are always processed as the ***last*** `commonOverlay`.  
 
 ```bash
-yot -i /paht/to/my/instructions/file.yaml -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
+yot -i /path/to/my/instructions/file.yaml -q metadata.labels -x "{app.kubernetes.io/owner: Jeff Smith}" -a merge -p /path/to/source/yaml/file.yaml -o /tmp/new
 ```
 
 ### Check YAML Overlay Tool's Configuration Setting
@@ -176,5 +176,5 @@ yot env
 ```
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Instructions file introduction](instructionsFileIntro.md)

@@ -1,6 +1,18 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 # Instructions file YAML specification
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [Top-level commonOverlays keys](#top-level-commonoverlays-keys)
+- [Top-Level yamlFiles keys](#top-level-yamlfiles-keys)
+  - [overlays keys](#overlays-keys)
+  - [documents keys](#documents-keys)
+- [Instructions file usage example](#instructions-file-usage-example)
+
+<!-- /code_chunk_output -->
 
 
 ## Top-level commonOverlays keys
@@ -12,10 +24,10 @@ The `commonOverlays` key is optional. It provides overlays to apply to every ite
 | name | no | An optional description of the change you are performing, and used for either on-screen output or self-documentation. | None | string |
 | query | yes | JSONPath query or JSONPath fully-qualified (dot-notation) path to value you would like to manipulate. If the `query` is not a fully-qualified path (such as a.b.c.d) and returns no matches, you need to specify the `onMissing` key (i.e. metadata.labels VS metadata.fake.*). | None | string or list/array |
 | value | yes | The desired value to take action with if `query` is found. This is not required when using the `delete` action, as we are removing a value altogether. | None | int, bool, str, dict/map, list/array |
-| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `combine`, `delete`, `merge`, or `replace`.  See [Actions](actions.md) for details. | None | string |
+| action | yes | The action to take when the JSONPath expression is found in the YAML document. Can be one of `combine`, `delete`, `merge`, or `replace`.  See [Overlay actions](overlayActions.md) for details. | None | string |
 | onMissing.action | no | Instructions for what to do if the JSONPath `query` is not found. Can be `ignore` or `inject`. Only applies to the actions `merge` and `replace`| `ignore` | string |
 | onMissing.injectPath | no | If your JSONPath expression is not a fully-qualified path (dot-notation) then an `injectPath` is required to qualify your action. Only applies if `onMissing: {'action': 'inject'}` is set. This is the path or list/array of paths to inject the value if your JSONPath expression was not found in the YAML document. | None | string or list/array |
-| documentQuery | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Qualifiers](#qualifiers) for more details. | None | dictionary/map |
+| documentQuery | no | A qualifier to refine which documents the common overlay is applied to.  If not set, the overlay applies to all files in `yamlFiles`.  See [Overlay qualifiers](overlayQualifiers.md) for more details. | None | dictionary/map |
 
 ## Top-Level yamlFiles keys
 
@@ -27,9 +39,9 @@ Each list item in the `yamlFiles` key is treated as a dictionary/map with the fo
 | path | yes | A fully qualified path to the YAML file to modify, or a path relative to the location of the instructions file. Can be a path to a YAML file or a directory containing YAML files. | None | string |
 | overlays | no | List/array of overlay operations to apply. If your YAML file contains multiple documents separated by `---`, then this would apply to every YAML document first, unless a qualifier or combination of qualifiers `documentQuery` and `documentIndex` are provided.  If you need to apply overlays only to a specific YAML document in a multi-document YAML file, then see the `documents` key. See [overlays keys](#overlays-keys) for available dictionary/map keys. | None | list/array of dictionaries |
 | documents | no | List/array of overlay operations to apply to a multi-document YAML file.  When each document from a multi-document YAML file is loaded, an overlay can be applied by addressing the document by its index.  See [documents keys](#documents-keys) for available dictionary/map keys. | None | list/array of dictionaries/maps |
-| outputPath | no | Alters the output path for a YAML file or directory of YAML files. all paths are relative to the output directory specified by the `-o` or `--output-directory` flag or you can give an absolute path.<br/>1. If a filename is specified (must have a file extension), and the value of `path` is a single file (not a directory of files), this will alter the filename of the YAML file on output within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newfilename.yaml`<br/>2. If a new filename is proceded with a directory/directory structure in `outputPath` and the value of `path` is a single file, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir/newfilename.yaml`<br/>3. If a directory/directory structure is specified in `outputPath`, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag, and the original filename will be retained within the new `outputPath`. Example `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir/`<br/>4. If a directory is given with the `path` key, the value of `outputPath` will be treated as a new directory/directory structure within the output directory specified with by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir`.<br/>5. If you wish to change the output location for a single file that was within a `path` which was a directory, add an additional item to the `yamlFiles` array with the `path` to the file and desired `outputPath`. Yot uses the last listed `outputPath` for a given file for final output to the filesystem. | None | string |
+| outputPath | no | **Added in v0.6.0**. Alters the output path for a YAML file or directory of YAML files. all paths are relative to the output directory specified by the `-o` or `--output-directory` flag or you can give an absolute path.<br/>1. If a filename is specified (must have a file extension), and the value of `path` is a single file (not a directory of files), this will alter the filename of the YAML file on output within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newfilename.yaml`<br/>2. If a new filename is proceded with a directory/directory structure in `outputPath` and the value of `path` is a single file, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir/newfilename.yaml`<br/>3. If a directory/directory structure is specified in `outputPath`, the directory structure will be created within the output directory specified by the `-o` or `--output-directory` flag, and the original filename will be retained within the new `outputPath`. Example `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir/`<br/>4. If a directory is given with the `path` key, the value of `outputPath` will be treated as a new directory/directory structure within the output directory specified with by the `-o` or `--output-directory` flag. Example: `outputPath: newDir/anotherNewDir` or `outputPath: newDir/anotherNewDir`.<br/>5. If you wish to change the output location for a single file that was within a `path` which was a directory, add an additional item to the `yamlFiles` array with the `path` to the file and desired `outputPath`. Yot uses the last listed `outputPath` for a given file for final output to the filesystem. | None | string |
 
-### `overlays` keys
+### overlays keys
 
 The `overlays` key is the main place to set your overlay operation instructions, but is an optional setting.  If working with multi-document YAML files, the items set under the `overlays` key will apply to all YAML documents in the file, unless a qualifier or combination of qualifiers `documentQuery` and `documentIndex` are provided. The `overlays` are processed prior to overlays in the [documents key](#documents-keys) instructions.  Each `overlays` list/array item can have the following keys set:
 
@@ -50,7 +62,7 @@ The `overlays` key is the main place to set your overlay operation instructions,
 
 The `documents` list/array applies to multi-document YAML files only.  It is optional, just like the top-level `overlays` key.  If you require changes to a specific YAML document in the multi-document YAML file, this is where you define them.  Actions in the `documents` key are processed after the actions in the top-level `overlays` key.  Consider the `commonOverlays` key as a place to perform "common" changes on all YAML documents within all files listed in `yamlFiles`.  Consider the `overlays` key as the place to perform "common" changes on all YAML documents in a single file.  Actions defined in the `documents` key are for making specific changes to a specific document within the YAML file.
 
-The keys in the `documents` list are the same as those in the [Top-Level Instructions Keys](#top-level-instructions-keys). The only difference is for you to see the `path` key as a numeric value.  This numeric value represents the positional index of the YAML document within the multi-document YAML file.  To determine the numeric value, refer to your file, and count each document (separated by `---`) starting at `0`.  
+The keys in the `documents` list are the same as those in the [Top-Level yamlFiles Keys](#top-level-yamlfiles-keys). The only difference is for you to see the `path` key as a numeric value.  This numeric value represents the positional index of the YAML document within the multi-document YAML file.  To determine the numeric value, refer to your file, and count each document (separated by `---`) starting at `0`.  
 
 >**NOTE**: Qualifiers such as the `documentQuery` and `documentIndex` are not available here because we are performing actions on a specific document within a YAML file, and there is nothing to qualify.
 
@@ -74,7 +86,9 @@ drink: juice
 ```
 
 
-## Instructions file full-specification example
+## Instructions file usage example
+
+The following example illustrates all of the features available in the Yot instructions specification, along with commented descriptions of their purpose.  This example does not illustrate [Format Markers](formatMarkers.md), which can be used to manipulate the original value returned from the JSONPath `query`.  
 
 ```yaml
 ---
@@ -123,5 +137,5 @@ yamlFiles: # what to overlay onto
 ```
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Overlay actions](overlayActions.md)

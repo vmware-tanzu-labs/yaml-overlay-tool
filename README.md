@@ -1,10 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/yaml-overlay-tool)
-[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/yaml-overlay-tool)](https://golang.org/)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/yaml-overlay-tool)
-[![GitHub](https://img.shields.io/github/license/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/blob/main/LICENSE)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases)
-![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
-
+[![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/yaml-overlay-tool)](https://golang.org/)[![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub](https://img.shields.io/github/license/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/blob/main/LICENSE)[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases)![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/yaml-overlay-tool)
 
 
@@ -12,8 +6,15 @@
 
 YAML Overlay Tool, or Yot for short, often pronounced */yaucht/*, is a tool to assist with patching YAML files.  Yot uses JSONPath to query YAML documents within YAML files, and to perform a change.  YAML Overlay Tool operates on YAML nodes. It is able to preserve and inject head, foot, and line comments into the new output versions of the files that you manipulate.
 
+
 ## Getting started
-Get started by [installing YAML Overlay Tool](docs/sections/setup.md).
+
+  * Check out the list of [YAML Overlay Tool's features](https://docs.yaml-overlay-tool.io/sections/features.html).
+
+  * Install [YAML Overlay Tool](https://docs.yaml-overlay-tool.io/sections/setup.html).
+
+  * Read the [full documentation and user guide](https://docs.yaml-overlay-tool.io) at [docs.yaml-overlay-tool.io](https://docs.yaml-overlay-tool.io).
+
 
 ## Why create another YAML tool?
 
@@ -25,18 +26,13 @@ Templated files are hard to manage over time, making them difficult to read.  Yo
 
 At the same time, Yot's instructions file specification provides you with documentation-as-code. This is because you have documented all the required changes to source YAML files in one place, including what is required to get an application running in your environment.
 
-The use of JSONPath queries and templating give the tool familiar interfaces, making adoption easier, and providing for a more pleasant end-user experience.  The specification, also known as the *instructions file*, is assembled in a declarative way, where we only operate on what is clearly defined.  We take *actions* based on JSONPath query results.  We provide flexibility by allowing your instructions to be templated if needed. See the [full documentation](docs/documentation.md), which will help get you moving along with Yot!
+The use of JSONPath queries and templating give the tool familiar interfaces, making adoption easier, and providing for a more pleasant end-user experience.  The specification, also known as the *instructions file*, is assembled in a declarative way, where we only operate on what is clearly defined.  We take *actions* based on JSONPath query results.  We provide flexibility by allowing your instructions to be templated if needed. See the [full documentation](https://docs.yaml-overlay-tool.io), which will help get you moving along with Yot!
 
 
 ## Author
 
 [Andrew J. Huffman](https://github.com/ahuffman)  
 [Jeff Davis](https://github.com/JefeDavis)
-
-
-## Full Documentation and user guide
-
-[docs/documentation.md](docs/documentation.md)
 
 
 ## License

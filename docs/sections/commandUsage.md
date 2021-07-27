@@ -1,4 +1,4 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 
 ## yot
@@ -68,5 +68,5 @@ Flags:
       --version                      version for yot
 ```
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Example CLI usage](exampleUsage.md)

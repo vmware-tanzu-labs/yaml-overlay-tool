@@ -1,17 +1,17 @@
-[Back to Table of contents](../documentation.md) 
+[Back to Table of contents](../index.md) 
 
 ## Using templating within instructions files
 
 ### Why use templating?
 
-Templating creates reusability within your overlays.  
+Templating creates reusability within your overlays when managing multiple sites.  
 
 ### Supported templating languages
 
-* As of v0.4.0 YAML Overlay Tool supports [Go Templating](https://golang.org/pkg/text/template/).  
-* As of v0.5.0 YAML Overlay Tool supports Go Templating with [Sprig functions](https://masterminds.github.io/sprig/).  
+* As of v0.4.0 YAML Overlay Tool supports [Go Templating](https://golang.org/pkg/text/template/) within [Yot instructions files](instuctionsFileIntro.md).  
+* As of v0.5.0 YAML Overlay Tool supports Go Templating with [Sprig functions](https://masterminds.github.io/sprig/) within [Yot instructions files](instuctionsFileIntro.md).  
 
-Future versions of Yot will add additional configurable templating language support.  Jinja2 is on the road-map for v0.6.0. 
+Future versions of Yot ***may*** add additional configurable templating language support.
 
 
 ### How templating variables are handled
@@ -22,8 +22,8 @@ The values file is expected to be a YAML file containing values you would like t
 
 Prior to processing your instructions file, if the `-f` or `--values-file` parameter is passed, the templated instructions will be rendered.  If the template fails to produce valid YAML, the instructions will fail to be read and an error will occur.
 
-See the [Example CLI usage](exampleUsage.md#) for example usage.
+See the [Example CLI usage](exampleUsage.md#provide-variable-values-to-a-templated-instructions-file) page for an example.
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Order of operations/processing order](orderOfOperations.md)

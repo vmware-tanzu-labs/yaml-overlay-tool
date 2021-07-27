@@ -1,6 +1,6 @@
 # Maintainers
 
-The code is currently maintained by:
+The code is currently maintained by:  
 * [Andrew J. Huffman](https://github.com/ahuffman)
 * [Jeff Davis](https://github.com/JefeDavis)
 

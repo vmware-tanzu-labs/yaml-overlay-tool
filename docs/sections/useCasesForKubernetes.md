@@ -1,10 +1,10 @@
-[Back to Table of contents](../documentation.md)
+[Back to Table of contents](../index.md)
 
 # Common use-cases and patterns for Kubernetes
 
 The following set of examples will help you quickly achieve common tasks in the context of Kubernetes YAML manifests.  
 
-All examples are available for your convenience in [examples/kubernetes](../../examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
+All examples are available for your convenience in the project's repository within [examples/kubernetes](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/tree/main/examples/kubernetes) and are intended to be launched from the root of your local copy of the YAML Overlay Tool repository:
 
 ```bash
 yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output path >
@@ -15,11 +15,11 @@ yot -i examples/kubernetes/< example you wish to run >.yaml -o < desired output 
 
 ### Example Kubernetes YAML manifests
 
-Within the [examples/kubernetes/manifests](../../examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
+Within the [examples/kubernetes/manifests](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/tree/main/examples/kubernetes/manifests) directory of the YAML Overlay Tool repository, you will find the two example Kubernetes YAML Manifests which we will be manipulating in the following set of example use-cases:
 
 ```yaml
-# my-app.yaml
 ---
+# my-app.yaml
 apiVersion: v1
 kind: Pod
 metadata:
@@ -42,8 +42,8 @@ spec:
 ```
 
 ```yaml
-# my-service.yaml
 ---
+# my-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -68,7 +68,7 @@ spec:
 <br/>
 
 
-## Adding additional labels and selectors to all YAML files on a directory
+## Adding additional labels and selectors to all YAML files in a directory
 
 In the following example, the `merge` action adds in 2 new labels to a set of YAML files contained in a directory.
 
@@ -172,6 +172,7 @@ Annotations are set for specific environments that may not apply to your environ
 Use the `delete` action to remove all annotations in the following example:  
 
 ```yaml
+---
 # removeAnnotations.yaml
 commonOverlays:
   - name: Remove all annotations
@@ -192,6 +193,7 @@ Now apply the changes by generating a new set of YAML files:
 To build on the previous example, there are times when you may want to remove annotations from specific Kubernetes types, or a combination of conditions.  To remove annotations, use the `delete` action and a `documentQuery`.
 
 ```yaml
+---
 # removeAnnotationsWithConditions.yaml
 commonOverlays:
   - name: Remove all annotations with conditions
@@ -260,6 +262,8 @@ Now apply the changes by generating a new set of YAML files:
 After examining a manifest, we would like to replace the name or all references to how a particular item is named.  In this example we'll replace all instances of the string `my-web-page` with `website`.
 
 ```yaml
+---
+#replaceAllInstances.yaml
 commonOverlays:
   - name: replace all instances of my-web-page
     query: "..*[?(@ == 'my-web-page')]"
@@ -274,5 +278,5 @@ Now apply the changes by generating a new set of YAML files:
 >`yot -i ./examples/kubernetes/replaceAllInstances.yaml -o /tmp/new`
 
 
-[Back to Table of contents](../documentation.md)  
+[Back to Table of contents](../index.md)  
 [Next Up: Interactive tutorials and learning paths](tutorials.md)
