@@ -8,4 +8,4 @@ You will also find that `yot`, the YAML Overlay Tool binary, has been installed 
 
 You can see the available Yot usage by running `yot --help`{{execute}}.
 
-The lab envioronment also has access to a Kubernetes cluster, so we will be available to deploy any of the manifests we manipulate with Yot.
+The lab envioronment also has access to a Kubernetes cluster, so we will be available to deploy any of the manifests we manipulate later on with Yot.
