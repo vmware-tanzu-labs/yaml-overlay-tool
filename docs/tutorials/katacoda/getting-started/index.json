@@ -1,59 +1,82 @@
 {
-  "title": "YAML Overlay Tool - Getting Started",
-  "description": "A real-world tutorial on how to use \"YAML Overlay Tool (yot)\".",
-  "difficulty": "Beginner",
-  "time": "35 minutes",
-  "details": {
-    "assets": {
-      "host01": [
-        {
-          "file": "labsetup.sh",
-          "target": "/usr/local/bin/",
-          "chmod": "+x"
-        },
-        {
-          "file": "source-manifests/*.yaml",
-          "target": "~/source-manifests/"
-        }
-      ]
-    },
-    "steps": [
-      {
-        "title": "Step 1",
-        "text": "step1.md"
+    "title": "YAML Overlay Tool - Getting Started",
+    "description": "A real-world tutorial on how to use \"YAML Overlay Tool (yot)\".",
+    "difficulty": "Beginner",
+    "time": "35 minutes",
+    "details": {
+        "assets": {
+            "host01": [
+                {
+                  "file": "labsetup.sh",
+                  "target": "/usr/local/bin/",
+                "chmod": "+x"
+                },
+                {
+                  "file": "frontend-deployment.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "frontend-service.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "guestbook-namespace.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "redis-follower-deployment.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "redis-follower-service.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "redis-leader-deployment.yaml",
+                  "target": "~/source-manifests/"
+                },
+                {
+                  "file": "redis-leader-deployment.yaml",
+                  "target": "~/source-manifests/"
+                }
+            ]
       },
-      {
-        "title": "Step 2",
-        "text": "step2.md"
+      "steps": [
+          {
+              "title": "Step 1",
+              "text": "step1.md"
+          },
+          {
+              "title": "Step 2",
+              "text": "step2.md"
+          },
+          {
+              "title": "Step 3",
+              "text": "step3.md"
+          },
+          {
+              "title": "Step 4",
+              "text": "step4.md"
+          },
+          {
+              "title": "Step 5",
+              "text": "step5.md"
+          }
+      ],
+      "intro": {
+          "text": "intro.md",
+          "courseData": "launch.sh",
+          "code": "labsetup.sh",
+          "credits": "Andrew J. Huffman"
       },
-      {
-        "title": "Step 3",
-        "text": "step3.md"
-      },
-      {
-        "title": "Step 4",
-        "text": "step4.md"
-      },
-      {
-        "title": "Step 5",
-        "text": "step5.md"
+      "finish": {
+          "text": "finish.md"
       }
-    ],
-    "intro": {
-      "text": "intro.md",
-      "courseData": "launch.sh",
-      "code": "labsetup.sh",
-      "credits": "Andrew J. Huffman"
     },
-    "finish": {
-      "text": "finish.md"
+    "environment": {
+        "uilayout": "editor-terminal"
+    },
+    "backend": {
+        "imageid": "kubernetes-cluster-running:1.18"
     }
-  },
-  "environment": {
-    "uilayout": "vscode-terminal-split",
-    "uieditorpath": "~/"
-  },
-  "backend": {
-    "imageid": "kubernetes-cluster-running:1.18"
-  }
 }
