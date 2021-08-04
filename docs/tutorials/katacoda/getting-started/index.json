@@ -13,31 +13,31 @@
                 },
                 {
                   "file": "frontend-deployment.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "frontend-service.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "guestbook-namespace.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "redis-follower-deployment.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "redis-follower-service.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "redis-leader-deployment.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 },
                 {
                   "file": "redis-leader-deployment.yaml",
-                  "target": "~/source-manifests/"
+                  "target": "~/"
                 }
             ]
       },
