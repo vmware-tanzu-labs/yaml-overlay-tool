@@ -4,7 +4,7 @@ In your lab environment, you will find a collection of source Kubernetes manifes
 
 These manifests can be found within `/root/source-manifests`.  
 
-Have a look at the original files: `ls /root/source-manifests`{{execute}}
+Have a look at the original files: `ls -1 /root/source-manifests`{{execute}}
 
 ---
 You will also find that `yot`, the YAML Overlay Tool binary, has been installed to the environment.
