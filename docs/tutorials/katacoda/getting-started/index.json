@@ -65,7 +65,6 @@
       ],
       "intro": {
           "text": "intro.md",
-          "code": "~/labsetup.sh",
           "credits": "Andrew J. Huffman"
       },
       "finish": {
