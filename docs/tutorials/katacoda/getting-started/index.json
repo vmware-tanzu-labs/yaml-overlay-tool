@@ -8,7 +8,7 @@
             "host01": [
                 {
                   "file": "labsetup.sh",
-                  "target": "/usr/local/bin/",
+                  "target": "~/",
                 "chmod": "+x"
                 },
                 {
@@ -65,7 +65,7 @@
       ],
       "intro": {
           "text": "intro.md",
-          "code": "/usr/local/bin/labsetup.sh",
+          "code": "~/labsetup.sh",
           "credits": "Andrew J. Huffman"
       },
       "finish": {
