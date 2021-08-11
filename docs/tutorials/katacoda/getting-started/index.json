@@ -61,7 +61,8 @@
       "intro": {
           "text": "intro.md",
           "credits": "Andrew J. Huffman",
-          "courseData": "labsetup.sh"
+          "courseData": "labsetup.sh",
+          "code": "wait.sh"
       },
       "finish": {
           "text": "finish.md"
