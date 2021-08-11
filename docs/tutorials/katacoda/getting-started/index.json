@@ -65,7 +65,7 @@
       ],
       "intro": {
           "text": "intro.md",
-          "code": "labsetup.sh",
+          "code": "/usr/local/bin/labsetup.sh",
           "credits": "Andrew J. Huffman"
       },
       "finish": {
