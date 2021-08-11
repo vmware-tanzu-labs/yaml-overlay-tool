@@ -7,11 +7,6 @@
         "assets": {
             "host01": [
                 {
-                  "file": "labsetup.sh",
-                  "target": "/usr/local/bin",
-                "chmod": "+x"
-                },
-                {
                   "file": "frontend-deployment.yaml",
                   "target": "~/"
                 },
@@ -44,8 +39,7 @@
       "steps": [
           {
               "title": "Step 1",
-              "text": "step1.md",
-              "code": "/usr/local/bin/labsetup.sh"
+              "text": "step1.md"
           },
           {
               "title": "Step 2",
@@ -66,7 +60,8 @@
       ],
       "intro": {
           "text": "intro.md",
-          "credits": "Andrew J. Huffman"
+          "credits": "Andrew J. Huffman",
+          "code": "labsetup.sh"
       },
       "finish": {
           "text": "finish.md"
