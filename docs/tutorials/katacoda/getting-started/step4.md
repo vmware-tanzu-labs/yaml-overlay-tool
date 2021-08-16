@@ -9,8 +9,7 @@ Click the copy icon below to copy this block of code.
     query: metadata.labels.app~
     action: merge
     value: app.kubernetes.io/%v
-```
-{{ copy }}
+```{{ copy }}
 
 On a new line below `commonOverlays`, paste the block of code so it appears in your editor as such:
 

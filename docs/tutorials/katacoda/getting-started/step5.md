@@ -7,8 +7,7 @@ Click the copy icon below to copy the code block.
 ```yaml
   - name: source manifests
     path: source-manifests
-```
-{{ copy }}
+```{{ copy }}
 
 Paste the copied code on a new line below the `yamlFiles:` line so that is looks like this:
 
