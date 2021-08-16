@@ -24,7 +24,22 @@ Go ahead and replace the line that is currently `query: metadata.labels.app~` by
 
 This new `query` in list format will replace all instances where `app` is a label key with `app.kubernetes.io/app` so that everything related to that label key will now function properly when you attempt to deploy it to a Kubernetes cluster.
 
-Your editor will auto-save the yot.yaml.  Let's go ahead and try it out:
+
+Your `commonOverlays` should now look like this:
+
+```yaml
+commonOverlays:
+  - name: prefix a single label
+    query:
+      - metadata.labels.app~
+      - spec.selector.matchLabels.app~
+      - spec.template.metadata.labels.app~
+      - spec.selector.app~
+    action: merge
+    value: app.kubernetes.io/%v
+```
+
+Your editor will auto-save the yot.yaml, so let's go ahead and try the changes out:
 
 `yot -i yot.yaml -s`{{ execute }}  
 
