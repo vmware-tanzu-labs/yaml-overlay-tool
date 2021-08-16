@@ -1,5 +1,11 @@
-# Link to the `yot` Python Code
+# Creating our first overlay
 
-To be able to run `yot` without a fully qualified path, (i.e. `yot` and not ~/git/yot/yot) we must create a symbolic link to the executable.  Run the following command to create a symbolic link:
+Make sure you have `yot.yaml` {{ open }} in your editor.  
 
-`ln -s ~/git/yot/yot /usr/local/bin/yot`{{ execute }}
+```yaml
+  - name: prefix all of our labels
+    query: metadata.labels
+    action: merge
+    value: app.kubernetes.io/%v
+```{{ copy }}
+
