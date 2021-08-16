@@ -1,20 +1,28 @@
-# Make sure we can run `yot`
+# Creating our first overlay (continued)
 
-To check if `yot` is properly installed, run the following command:
+In the previous step, we created a `commonOverlay`.  Now we need to list out the files it applies to.  
 
-`yot -h`{{ execute }}
+Click the copy icon below to copy the code block.
 
+```yaml
+  - name: source manifests
+    path: source-manifests
+```
+{{ copy }}
 
-You should now see the `yot` help and usage instructions.  
+Paste the copied code on a new line below the `yamlFiles:` line so that is looks like this:
 
-If you get a message of `-bash: /usr/local/bin/yot: Permission denied`, then you will need to make `yot` executable by running the following command:
+```yaml
+yamlFiles:
+  - name: source manifests
+    path: source-manifests
+```
 
-`chmod +x ~/git/yot/yot`{{ execute }}
+---
 
-You can run the following command to check if `yot` is now setup properly:
-`yot -h`{{ execute }}
+Let's disect what this means.
 
+1. `name` is an optional key to describe the files we're working on.
+1. `path` is a required key that describes the files to manipulate relative to the Yot instructions file (yot.yaml).  This value can be either a single file or an entire directory.  In this case we've declared that we'd like to operate on an entire directory.
 
-## Congratulations!
-
-You now have your environment setup and are ready to get started learning how to use `yot`!
+There are additional keys available under each `yamlFiles` item that we'll introduce in later steps.
