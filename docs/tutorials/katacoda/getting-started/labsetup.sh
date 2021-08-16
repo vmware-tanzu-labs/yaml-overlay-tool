@@ -6,4 +6,5 @@ curl -sL -o /tmp/yot_amd64.deb https://github.com/vmware-tanzu-labs/yaml-overlay
 
 echo "YAML Overlay Tool installed successfully"
 
-mkdir ~/source-manifests && mv ~/*.yaml ~/source-manifests/ && touch /tmp/yot-installed
+mkdir ~/source-manifests && mv ~/*.yaml ~/source-manifests/ && mv /tmp/yot.yaml /root/yot.yaml
+touch /tmp/yot-installed
