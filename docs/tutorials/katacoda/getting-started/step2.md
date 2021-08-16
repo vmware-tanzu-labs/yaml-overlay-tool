@@ -1,11 +1,21 @@
-# Cloning the `yot` Project Repository
+# Working with Kubernetes labels
 
-To be able to use `yot` we must clone the git repository.
+Yot is primarily a generic YAML manipulation tool, however, we will focus on using the tool in the context of Kubernetes for this lab.
 
-First, let's make sure we are in our home directory.  We will make a new directory called `git` here:
+## Recommended labels
 
-`cd ~/ && mkdir git && cd git`{{ execute }}
+Per the ["Recommended Labels" section of the Kubernetes documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/common-labels/), it is recommended to prefix a common shared label prefix of `app.kubernetes.io/` to each label for a Kubernetes component.
 
-Run the following command to clone the repository:
+Let's take a look at one of the existing sample manifests for our guestbook application. `source-manifests/frontend-service.yaml`{{ open }}
 
-`git clone https://github.com/vmware-tanzu-labs/yot.git`{{ execute }}
+Now that the file is opened in your editor, inspect the value of `metadata.labels` and `spec.selector`.  These are two locations within the manifest that contain labels.  Also notice that they do not contain the recommended `app.kubernetes.io/` prefix.
+
+---
+
+Let's take a look at another manifest.  `source-manifests/frontend-deployment.yaml`{{ open }}  
+
+Inspect the value of `metadata.labels`.  There are not any labels here for some reason.  
+
+Also inspect the value of `spec.selector.matchLabels`, `spec.template.metadata.labels`.  Again, we do not have the recommended `app.kubernetes.io/` prefix on these labels.
+
+Let's learn how to quickly rectify this with Yot!
