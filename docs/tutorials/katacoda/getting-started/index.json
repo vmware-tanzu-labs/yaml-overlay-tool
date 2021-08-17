@@ -19,10 +19,6 @@
                   "target": "~/"
                 },
                 {
-                  "file": "guestbook-namespace.yaml",
-                  "target": "~/"
-                },
-                {
                   "file": "redis-follower-deployment.yaml",
                   "target": "~/"
                 },

@@ -15,6 +15,7 @@ Copy the following code block by clicking on the copy icon.
       - conditions:
           - query: kind
             value: Deployment
+      - conditions:
           - query: kind
             value: Service
 ```{{ copy }}
@@ -23,8 +24,14 @@ On a new line below the last overlay in your yot.yaml `commonOverlays` section, 
 
 Finally, let's deploy our application to our Kubernetes cluster to complete the lesson:
 
+1. Create the Kubernetes namespace:
+
+`kubectl create ns guestbook-application`{{ execute }}
+
+1. Run our overlay instructions and deploy it directly to Kubernetes:
+
 `yot -i yot.yaml -s | kubectl apply -f -`{{ execute }}
 
-Let's ensure our application has been deployed:
+1. Ensure our application has been deployed:
 
 `kubectl get all -n guestbook-application`{{ execute }}
