@@ -1,5 +1,7 @@
 # Lab information
 
+Please wait until you see the message `YAML Overlay Tool lab environment successfully configured` in your terminal window before proceding with the lab.
+
 In your lab environment, you will find a collection of source Kubernetes manifests that deploy a redis based guestbook application.  These example manifests were taken from the Kubernetes documentation here: [https://cloud.google.com/kubernetes-engine/docs/tutorials/guestbook](https://cloud.google.com/kubernetes-engine/docs/tutorials/guestbook)
 
 These manifests can be found within `/root/source-manifests`.  
