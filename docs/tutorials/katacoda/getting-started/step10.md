@@ -1,9 +1,11 @@
-# Overlay qualifiers (continued)
+# Overlay qualifier introduction
 
-Looking at the additional overlay we added to handle selectors on `Deployments`, let's describe what each new field does and how it works.
+An Overlay qualifier allows us to add additional conditions as to when an overlay should be applied by making use of a `query` and an expected `value`.
+
+Copy the code block below by clicking on the copy icon.
 
 ```yaml
-  - name: Prefix labels for Deployment selectors
+  - name: Prefix labels for Service selectors
     query: spec.selector.matchLabels
     action: merge
     value:
@@ -11,19 +13,32 @@ Looking at the additional overlay we added to handle selectors on `Deployments`,
     documentQuery:
       - conditions:
           - query: kind
-            value: Deployment
+            value: Service
+```{{ copy }}
+
+Paste this on a new line below your previous commonOverlay in the yot.yaml.
+
+You should now have a `commonOverlays` section that looks like this:
+
+```yaml
+commonOverlays:
+  - name: prefix labels
+    query:
+      - metadata.labels
+      - spec.selector.matchLabels
+      - spec.template.metadata.labels
+    action: merge
+    value:
+      app.kubernetes.io/%k: "%v"
+  - name: Prefix labels for Service selectors
+    query: spec.selector
+    action: merge
+    value:
+      app.kubernetes.io/%k: "%v"
+    documentQuery:
+      - conditions:
+          - query: kind
+            value: Service
 ```
 
-The addition of the `documentQuery` field opens the door to qualifying when to apply overlays with conditions.
-
-Each item containing the key word of `conditions` allows us to have a grouping of conditions that must be met for an overlay to be applied.
-
-In this instance we only have one condition listed, and that is to say when we `query` the `kind` key on a YAML document it must return a `value` of `Deployment`.  We could add additional conditions here as well that all must be met under the `conditions` key word.
-
-Additionally, we could add a second listing of `conditions` for other scenarios where we would want to see this change applied.  Each group of `conditions` is treated as an **OR**, while each `query` and `value` under a `conditions` group acts as an **AND**.
-
-Your yot.yaml should be auto-saved and we can now try it out.
-
-Go ahead and run the following command to see all of our labels prefixed with `app.kubernetes.io/`.
-
-`yot -i yot.yaml -s`{{ execute }}
+Let's break this down in the next step and also try it out.

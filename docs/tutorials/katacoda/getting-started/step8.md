@@ -21,7 +21,7 @@ Replace the existing query by pasting it into the yot.yaml.
 
 Notice that we've dropped `.app~` from each of the JSONPath queries in the list.
 
-We need to make one more change our overlay.  This is where we'll see the `%k` format marker come into play.
+We need to make one more change to our overlay.  This is where we'll see the `%k` format marker come into play.
 
 Click the copy icon to copy the updated `value` code block:
 
@@ -33,9 +33,9 @@ Click the copy icon to copy the updated `value` code block:
 Replace the existing `value` line by pasting what you copied above.
 
 
-Notice how the YAML for `value` is no longer on a single line.  This represents the updated value will be a map/dictionary.  
+Notice how the YAML for `value` is no longer on a single line.  This represents the updated value will be a map/dictionary since we're expecting a map/dictionary returned from our queries.  
 
-Furthermore, the `%k` format marker will be substituted with existing key, and the `%v` will be substituted with the existing value.  Since the data returned from our queries may have 1 or more keys, this update will apply to each of them automatically.
+Furthermore, the `%k` format marker will be substituted with the existing key, and the `%v` will be substituted with the existing value.  Since the data returned from our queries may have 1 or more keys, this update will apply to each of them automatically by iterating over each key/value pair in the returned map.
 
 Feel free to update the `name` value with "prefix labels" if desired.
 
