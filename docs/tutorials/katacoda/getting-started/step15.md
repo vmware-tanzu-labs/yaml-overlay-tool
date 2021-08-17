@@ -49,4 +49,8 @@ Since the `frontend-deployment.yaml` only has a single YAML document, our docume
 
 Go ahead and apply the changes by running:
 
-`yot -i yot.yaml -s`{{ execute }}
+`yot -i yot.yaml -o /tmp/new-manifests`{{ execute }}
+
+Let's take a look at the specific file we added a new label to:
+
+`cat /tmp/new-manifests/frontend-deployment.yaml`{{ execute }}
