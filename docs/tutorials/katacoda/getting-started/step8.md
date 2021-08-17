@@ -1,8 +1,8 @@
 # Improving our first overlay (continued)
 
-Now that we have all instances of the label `app` replaced with `app.kubernetes.io/app` wouldn't it be nice to do the same for all of the other labels in one step?
+Now that we have all instances of the label `app` replaced with `app.kubernetes.io/app` wouldn't it be nice to do the same for nearly all of the other labels in one step?
 
-Yes, we can do it all in one step!
+Yes, we can do it in *almost* one step!
 
 We will be introducing another format marker, `%k`, which represents the existing key when JSONPath query returns a map/dictionary of key/value pairs.  The `%k` format marker can only be used on maps/dictionaries.
 
@@ -15,7 +15,6 @@ Click the copy icon to copy the updated query code block:
       - metadata.labels
       - spec.selector.matchLabels
       - spec.template.metadata.labels
-      - spec.selector
 ```{{ copy }}
 
 Replace the existing query by pasting it into the yot.yaml.  
@@ -38,15 +37,16 @@ Notice how the YAML for `value` is no longer on a single line.  This represents 
 
 Furthermore, the `%k` format marker will be substituted with existing key, and the `%v` will be substituted with the existing value.  Since the data returned from our queries may have 1 or more keys, this update will apply to each of them automatically.
 
-Your `commonOverlays` should now look like this:
+Feel free to update the `name` value with "prefix labels" if desired.
+
+Your `commonOverlays` should now look something like this:
 ```yaml
 commonOverlays:
-  - name: prefix all labels
+  - name: prefix labels
     query:
       - metadata.labels
       - spec.selector.matchLabels
       - spec.template.metadata.labels
-      - spec.selector
     action: merge
     value:
       app.kubernetes.io/%k: "%v"
@@ -55,4 +55,6 @@ commonOverlays:
 Go ahead and try it out now:
 `yot -i yot.yaml -s`{{ execute }}
 
-All of your labels should now be prefixed!
+Almost all of your labels should now be prefixed!
+
+In the next step we'll explain why we couldn't quite get every label for every Kubernetes component in one shot, and introduce qualifiers.
