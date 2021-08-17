@@ -37,6 +37,10 @@
                 {
                   "file": "redis-leader-deployment.yaml",
                   "target": "~/"
+                },
+                {
+                  "file": "redis-leader-service.yaml",
+                  "target": "~/"
                 }
             ]
       },
