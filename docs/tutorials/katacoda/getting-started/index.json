@@ -1,8 +1,8 @@
 {
     "title": "YAML Overlay Tool - Getting Started",
-    "description": "A real-world tutorial on how to use \"YAML Overlay Tool (yot)\".",
+    "description": "A real-world tutorial on how to use many features of \"YAML Overlay Tool\" (yot).",
     "difficulty": "Beginner",
-    "time": "35 minutes",
+    "time": "60 minutes",
     "details": {
         "assets": {
             "host01": [
