@@ -114,6 +114,10 @@ func (yfs *YamlFiles) expandDirectories() error {
 	var paths []string
 
 	for i := 0; i <= len(y)-1; i++ {
+		if y[i].Path == "-" {
+			continue
+		}
+
 		if !path.IsAbs(y[i].Path) {
 			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
 		}
