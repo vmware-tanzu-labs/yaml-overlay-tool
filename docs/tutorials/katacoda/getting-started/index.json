@@ -1,0 +1,133 @@
+{
+    "title": "YAML Overlay Tool - Getting Started",
+    "description": "A real-world tutorial on how to use many features of \"YAML Overlay Tool\" (yot).",
+    "difficulty": "Beginner",
+    "time": "60 minutes",
+    "details": {
+        "assets": {
+            "host01": [
+                {
+                  "file": "yot.yaml",
+                  "target": "/tmp"
+                },
+                {
+                  "file": "frontend-deployment.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "frontend-service.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "redis-follower-deployment.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "redis-follower-service.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "redis-leader-deployment.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "redis-leader-deployment.yaml",
+                  "target": "~/"
+                },
+                {
+                  "file": "redis-leader-service.yaml",
+                  "target": "~/"
+                }
+            ]
+      },
+      "steps": [
+          {
+              "title": "Step 1",
+              "text": "step1.md"
+          },
+          {
+              "title": "Step 2",
+              "text": "step2.md"
+          },
+          {
+              "title": "Step 3",
+              "text": "step3.md"
+          },
+          {
+              "title": "Step 4",
+              "text": "step4.md"
+          },
+          {
+              "title": "Step 5",
+              "text": "step5.md"
+          },
+          {
+            "title": "Step 6",
+            "text": "step6.md"
+          },
+          {
+            "title": "Step 7",
+            "text": "step7.md"
+          },
+          {
+            "title": "Step 8",
+            "text": "step8.md"
+          },
+          {
+            "title": "Step 9",
+            "text": "step9.md"
+          },
+          {
+            "title": "Step 10",
+            "text": "step10.md"
+          },
+          {
+            "title": "Step 11",
+            "text": "step11.md"
+          },
+          {
+            "title": "Step 12",
+            "text": "step12.md"
+          },
+          {
+            "title": "Step 13",
+            "text": "step13.md"
+          },
+          {
+            "title": "Step 14",
+            "text": "step14.md"
+          },
+          {
+            "title": "Step 15",
+            "text": "step15.md"
+          },
+          {
+            "title": "Step 16",
+            "text": "step16.md"
+          },
+          {
+            "title": "Step 17",
+            "text": "step17.md"
+          },
+          {
+            "title": "Step 18",
+            "text": "step18.md"
+          }
+      ],
+      "intro": {
+          "text": "intro.md",
+          "credits": "Andrew J. Huffman",
+          "courseData": "labsetup.sh",
+          "code": "wait.sh"
+      },
+      "finish": {
+          "text": "finish.md"
+      }
+    },
+    "environment": {
+        "uilayout": "editor-terminal"
+    },
+    "backend": {
+        "imageid": "kubernetes-cluster-running:1.18"
+    }
+}

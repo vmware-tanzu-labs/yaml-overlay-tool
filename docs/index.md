@@ -26,7 +26,7 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 1. [Order of operations/processing order](sections/orderOfOperations.md)
 1. [Output directory structure](sections/outputDirStructure.md)
 1. [Common use-cases and patterns for Kubernetes](sections/useCasesForKubernetes.md)
-1. [Interactive tutorials and learning paths](sections/tutorials.md)
+1. [Interactive tutorials](sections/tutorials.md)
 
 
 [Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)

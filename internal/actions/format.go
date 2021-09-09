@@ -70,7 +70,7 @@ func doFormat(s string, values ...interface{}) string {
 		}
 	}
 
-	re := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*)})?`)
+	re := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*?)})?`)
 
 	matches := re.FindAllStringSubmatch(s, -1)
 
@@ -84,16 +84,18 @@ func doFormat(s string, values ...interface{}) string {
 		}
 
 		if result["marker"] != "" {
+			marker := valueMap[result["marker"]]
+
 			if result["command"] != "" {
 				var err error
 
-				valueMap[result["marker"]], err = processSedCommand(result["command"], valueMap[result["marker"]])
+				marker, err = processSedCommand(result["command"], valueMap[result["marker"]])
 				if err != nil {
 					log.Warningf("Skipping additional format on [%s] due to invalid sed exp [%s], %s", s, result["command"], err)
 				}
 			}
 
-			s = strings.Replace(s, match[0], valueMap[result["marker"]], 1)
+			s = strings.Replace(s, match[0], marker, 1)
 		}
 	}
 

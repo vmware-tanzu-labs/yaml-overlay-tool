@@ -15,6 +15,7 @@ YAML Overlay Tool, or Yot for short, often pronounced */yaucht/*, is a tool to a
 
   * Read the [full documentation and user guide](https://docs.yaml-overlay-tool.io) at [docs.yaml-overlay-tool.io](https://docs.yaml-overlay-tool.io).
 
+  * Try out an interactive [YAML Overlay Tool tutorial](https://katacoda.com/ahuffman/scenarios/getting-started) to get you started quickly
 
 ## Why create another YAML tool?
 
