@@ -1,5 +1,5 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/yaml-overlay-tool)](https://golang.org/)[![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/yaml-overlay-tool)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/yaml-overlay-tool)[![GitHub](https://img.shields.io/github/license/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/blob/main/LICENSE)[![GitHub release (latest by date)](https://img.shields.io/github/v/release/vmware-tanzu-labs/yaml-overlay-tool)](https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases)![Github Downloads (by Release)](https://img.shields.io/github/downloads/vmware-tanzu-labs/yaml-overlay-tool/total.svg)
-[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/yaml-overlay-tool)
+[![Get it from the Snap Store](https://badgen.net/snapcraft/v/yaml-overlay-tool/)](https://snapcraft.io/yaml-overlay-tool)
 
 
 # YAML Overlay Tool (Yot)
@@ -57,3 +57,8 @@ Please see our project's [Code of Conduct](CODE-OF-CONDUCT.md)
 ### E-Mail
 
 Please join our mailing list on Google Groups: [yaml-overlay-tool-users](https://groups.google.com/g/yaml-overlay-tool-users)
+
+
+### Kubernetes Slack
+
+Please join us on the [Kubernetes Community Slack #yaml-overlay-tool channel](https://kubernetes.slack.com/archives/C02HFK4H9D5)
