@@ -38,7 +38,7 @@ func GetCommonPrefix(sep byte, paths ...string) string {
 	case 0:
 		return ""
 	case 1:
-		return path.Dir(path.Clean(paths[0]))
+		return path.Dir(path.Clean(paths[0])) + string(os.PathSeparator)
 	}
 
 	c := path.Clean(paths[0]) + string(sep)
