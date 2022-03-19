@@ -36,11 +36,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Snapcraft Login
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_LOGIN }}")
+      #-
+      #  name: Snapcraft Login
+      #  if: startsWith(github.ref, 'refs/tags/v')
+      #  run: |
+      #    snapcraft login --with <(echo "${{ secrets.SNAPCRAFT_LOGIN }}")
       -
         name: Import GPG key
         id: import_gpg
