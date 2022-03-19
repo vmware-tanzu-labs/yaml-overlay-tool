@@ -93,7 +93,7 @@ func (tst testCases) runTests(t *testing.T, a string) {
 			results, _ := yp.Find(testYaml)
 
 			if err := testAction(t, a, results[0], testYaml, val.Content...); (err != nil) != testCase.wantErr {
-				t.Errorf("Error: %w, WantErr: %v", err, testCase.wantErr)
+				t.Errorf("Error: %v, WantErr: %v", err, testCase.wantErr)
 			}
 
 			buf := new(bytes.Buffer)

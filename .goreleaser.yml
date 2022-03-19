@@ -61,7 +61,6 @@ dockers:
       - 'ghcr.io/vmware-tanzu-labs/yot:v{{ .Version }}'
       - 'ghcr.io/vmware-tanzu-labs/yot:latest'
     dockerfile: Dockerfile
-    use_buildx: true
     build_flag_templates:
       - "--label=org.opencontainers.image.created={{.Date}}"
       - "--label=org.opencontainers.image.name={{.ProjectName}}"
@@ -144,16 +143,16 @@ nfpms:
       - rpm
     recommends:
       - kubectl
-snapcrafts:
-  - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    name: yaml-overlay-tool
-    summary: "A YAML Overlay Tool with templating tendencies."
-    description: |
-      YAML Overlay Tool, or Yot for short, often pronounced /yaucht/, is a tool 
-      to assist with patching YAML files. Yot uses JSONPath to query YAML documents
-      within YAML files, and to perform a change. YAML Overlay Tool operates on YAML 
-      nodes. It is able to preserve and inject head, foot, and line comments into the 
-      new output versions of the files that you manipulate.
-    grade: stable
-    confinement: strict
-    publish: true
+# snapcrafts:
+#   - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+#     name: yaml-overlay-tool
+#     summary: "A YAML Overlay Tool with templating tendencies."
+#     description: |
+#       YAML Overlay Tool, or Yot for short, often pronounced /yaucht/, is a tool 
+#       to assist with patching YAML files. Yot uses JSONPath to query YAML documents
+#       within YAML files, and to perform a change. YAML Overlay Tool operates on YAML 
+#       nodes. It is able to preserve and inject head, foot, and line comments into the 
+#       new output versions of the files that you manipulate.
+#     grade: stable
+#     confinement: strict
+#     publish: true

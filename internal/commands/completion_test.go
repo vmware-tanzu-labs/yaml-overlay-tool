@@ -81,7 +81,7 @@ func TestCompletions(t *testing.T) {
 
 			defer func() {
 				if err := recover(); err != nil {
-					newErr := fmt.Errorf("%w", err)
+					newErr := fmt.Errorf("%w", err.(error))
 
 					if !test.wantErr && newErr != nil {
 						t.Errorf("Completions() error = %v, wantErr %v", err, test.wantErr)
